@@ -21,10 +21,33 @@ final class Subst {
   }
 
   public Object walk(Object u) {
-    while (MusubiDemo.isVar(u) && map.containsKey(u)) {
+    while ((u instanceof Var) && map.containsKey(u)) {
       u = map.get(u);
     }
     return u;
+  }
+
+  public Subst unify(Object u, Object v) {
+    u = walk(u);
+    v = walk(v);
+    if (u == v) {
+      return this;
+    }
+    if (u instanceof Var) {
+      return ext((Var) u, v);
+    } else if (v instanceof Var) {
+      return ext((Var) v, u);
+    }
+    if ((u == null) || (v == null)) {
+      return null;
+    }
+    if ((u instanceof LogicValue) && (u.getClass() == v.getClass())) {
+      return ((LogicValue) u).unify(this, (LogicValue) v);
+    }
+    if (u.equals(v)) {
+      return this;
+    }
+    return null;
   }
 
   @Override

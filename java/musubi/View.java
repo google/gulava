@@ -71,27 +71,34 @@ public final class View {
       } else {
         occurrences.get(value)[0]++;
       }
-    } else if (value instanceof Cons) {
-      Cons cons = (Cons) value;
-      countOccurrences(occurrences, cons.car());
-      countOccurrences(occurrences, cons.cdr());
+    } else if (value instanceof LogicValue) {
+      for (Object subValue : ((LogicValue) value).asMap().values()) {
+        countOccurrences(occurrences, subValue);
+      }
     }
   }
 
-  private Object replace(Map<Var, int[]> occurrences, Object value) {
-    if (value instanceof Var) {
-      int[] thisCount = occurrences.get(value);
-      if ((thisCount != null) && (thisCount[0] == 1) && map.containsKey(value)) {
-        return replace(occurrences, map.get(value));
-      }
-    } else if (value instanceof Cons) {
-      Cons cons = (Cons) value;
-      return new Cons(
-          replace(occurrences, cons.car()),
-          replace(occurrences, cons.cdr()));
+  private static final class ReplacerImpl implements Replacer {
+    private final Map<Var, int[]> occurrences;
+    private final Map<Var, Object> map;
+
+    ReplacerImpl(Map<Var, int[]> occurrences, Map<Var, Object> map) {
+      this.occurrences = occurrences;
+      this.map = map;
     }
 
-    return value;
+    @Override
+    public Object replace(Object original) {
+      if (original instanceof Var) {
+        int[] thisCount = occurrences.get(original);
+        if ((thisCount != null) && (thisCount[0] == 1) && map.containsKey(original)) {
+          return replace(map.get(original));
+        }
+      } else if (original instanceof LogicValue) {
+        return ((LogicValue) original).replace(this);
+      }
+      return original;
+    }
   }
 
   private View simplify(Set<Var> requestedVars) {
@@ -112,7 +119,7 @@ public final class View {
         continue;
       }
 
-      newMap.put(var, replace(occurrences, map.get(var)));
+      newMap.put(var, new ReplacerImpl(occurrences, map).replace(map.get(var)));
     }
 
     return new View(newMap);

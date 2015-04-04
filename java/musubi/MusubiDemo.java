@@ -6,41 +6,14 @@ import java.util.List;
 
 // TODO: Refactor this into test cases and proper documentation.
 public class MusubiDemo {
-  static boolean isVar(Object o) {
-    return o instanceof Var;
-  }
-
-  //Extends s in such a way that u made equals with v, returns the resulted substitution
-  //Returns null if there is no way to unify u and v
-  static Subst unify(Object u, Object v, Subst s) {
-    u = s.walk(u);
-    v = s.walk(v);
-    if (isVar(u) && isVar(v) && u.equals(v)) return s;
-    if (isVar(u)) return s.ext((Var) u, v);
-    if (isVar(v)) return s.ext((Var) v, u);
-    if (u instanceof Cons && v instanceof Cons) {
-      s = unify(((Cons)u).car(), ((Cons)v).car(), s);
-      if (s ==  null) return null;
-      return unify(((Cons)u).cdr(), ((Cons)v).cdr(), s);
-    }
-    if (u == null) {
-      if (v == null) {
-        return s;
-      }
-    } else if (u.equals(v)) {
-      return s;
-    }
-    return null;
-  }
-
   static Goal same(final Object u, final Object v) {
     return new Goal() {
       public Stream run(Subst state) {
-        Subst s = unify(u, v, state);
-        if (s == null) {
+        state = state.unify(u, v);
+        if (state == null) {
           return EmptyStream.INSTANCE;
         }
-        return unit(s);
+        return unit(state);
       }
     };
   }
