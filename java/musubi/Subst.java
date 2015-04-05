@@ -3,7 +3,7 @@ package musubi;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
-final class Subst {
+public final class Subst {
   public static final Subst EMPTY = new Subst(Empty.map());
 
   private final PMap<Var, Object> map;

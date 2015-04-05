@@ -1,77 +1,16 @@
 package musubi;
 
-import java.util.ArrayList;
+import static musubi.Goals.conj;
+import static musubi.Goals.disj;
+import static musubi.Goals.ordero;
+import static musubi.Goals.same;
+
 import java.util.Arrays;
-import java.util.List;
 
 // TODO: Refactor this into test cases and proper documentation.
 public class MusubiDemo {
-  static Goal same(final Object u, final Object v) {
-    return new Goal() {
-      public Stream run(Subst state) {
-        state = state.unify(u, v);
-        if (state == null) {
-          return EmptyStream.INSTANCE;
-        }
-        return unit(state);
-      }
-    };
-  }
-
   static Stream unit(Subst s) {
     return new SolveStep(s, EmptyStream.INSTANCE);
-  }
-
-  private static List<Goal> goalList(Goal g1, Goal g2, Goal... gs) {
-    List<Goal> allGoals = new ArrayList<>();
-    allGoals.add(g1);
-    allGoals.add(g2);
-    for (Goal g : gs) {
-      allGoals.add(g);
-    }
-    return allGoals;
-  }
-
-  static Goal disj(Goal g1, Goal g2, Goal... gs) {
-    final List<Goal> allGoals = goalList(g1, g2, gs);
-    return new Goal() {
-      public Stream run(Subst s) {
-        Stream result = allGoals.get(0).run(s);
-        for (int i = 1; i < allGoals.size(); i++) {
-          result = result.mplus(allGoals.get(i).run(s));
-        }
-        return result;
-      }
-    };
-  }
-
-  static Goal conj(Goal g1, Goal g2, Goal... gs) {
-    final List<Goal> allGoals = goalList(g1, g2, gs);
-
-    return new Goal() {
-      public Stream run(Subst s) {
-        Stream result = allGoals.get(0).run(s);
-        for (int i = 1; i < allGoals.size(); i++) {
-          result = result.bind(allGoals.get(i));
-        }
-        return result;
-      }
-    };
-  }
-
-  static class DelayedGoal implements Goal {
-    private final Goal g;
-    public DelayedGoal(Goal g) {
-      this.g = g;
-    }
-    public Stream run(final Subst s) {
-      return new ImmatureStream() {
-        @Override
-        protected Stream realize() {
-          return g.run(s);
-        }
-      };
-    }
   }
 
   static void print(Stream s, int n, Var... requestedVars) {
@@ -141,30 +80,6 @@ public class MusubiDemo {
             conj(
                 same(a, new Cons(aFirst, aRest)),
                 new DelayedGoal(reverseo(aRest, b, new Cons(aFirst, bTail)))))
-            .run(s);
-      }
-    };
-  }
-
-  static Goal ordero(final Object sub, final Object full) {
-    return new Goal() {
-      @Override
-      public Stream run(Subst s) {
-        Var head = new Var();
-        Var subTail = new Var();
-        Var fullTail = new Var();
-
-        return disj(
-            conj(
-                same(sub, null),
-                same(full, null)),
-            conj(
-                same(new Cons(head, fullTail), full),
-                disj(
-                    conj(
-                        same(new Cons(head, subTail), sub),
-                        ordero(subTail, fullTail)),
-                    ordero(sub, fullTail))))
             .run(s);
       }
     };

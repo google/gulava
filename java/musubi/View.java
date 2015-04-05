@@ -64,6 +64,13 @@ public final class View {
     this.map = map;
   }
 
+  /**
+   * Returns a map representation of this view, which is a mapping of variables to values.
+   */
+  public Map<Var, Object> map() {
+    return map;
+  }
+
   private static void countOccurrences(Map<Var, int[]> occurrences, Object value) {
     if (value instanceof Var) {
       if (!occurrences.containsKey(value)) {
