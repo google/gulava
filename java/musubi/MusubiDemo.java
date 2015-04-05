@@ -136,5 +136,12 @@ public class MusubiDemo {
     System.out.println("\nexample 10");
     g = same(x, x);
     print(g.run(Subst.EMPTY), 10, x, x);
+
+    System.out.println("\nexample 11");
+    g = conj(
+        same(x, 42),
+        same(y, Cons.list(Arrays.asList(5, 7, 9))),
+        same(a, new Cons(x, y)));
+    print(g.run(Subst.EMPTY), 10, a);
   }
 }
