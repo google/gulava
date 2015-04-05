@@ -16,8 +16,6 @@ import javax.lang.model.util.SimpleAnnotationValueVisitor6;
  * Contains information derived from the {@code MakeLogicValue} annotation.
  */
 public final class MakeLogicValueMetadata {
-  public static final String ANNOTATION_NAME = "musubi.annotation.MakeLogicValue";
-
   private final String name;
   private final List<String> fields;
 
@@ -68,7 +66,7 @@ public final class MakeLogicValueMetadata {
     for (AnnotationMirror annotation : pkg.getAnnotationMirrors()) {
       if (((TypeElement) annotation.getAnnotationType().asElement())
           .getQualifiedName()
-          .contentEquals(ANNOTATION_NAME)) {
+          .contentEquals(ClassNames.MAKE_LOGIC_VALUE)) {
         metadatas.add(forAnnotation(annotation));
       }
     }

@@ -16,7 +16,7 @@ import javax.tools.JavaFileObject;
  * An annotation processor that reads {@code MakeLogicValue} annotations and creates corresponding
  * implementations of the {@code LogicValue} interface.
  */
-@SupportedAnnotationTypes(MakeLogicValueMetadata.ANNOTATION_NAME)
+@SupportedAnnotationTypes(ClassNames.MAKE_LOGIC_VALUE)
 public final class MakeLogicValueProcessor extends AbstractProcessor {
   private static final String capitalizeFirst(String s) {
     if (s.length() == 0) {
@@ -40,7 +40,8 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
             try (Writer writer = file.openWriter()) {
               writer.write("package " + pkg.getQualifiedName() + ";\n");
               writer.write("\n");
-              writer.write("public final class " + metadata.getName() + " {\n");
+              writer.write("public final class " + metadata.getName()
+                  + " implements " + ClassNames.LOGIC_VALUE + " {\n");
 
               // Builder
               writer.write("  public static final class Builder {\n");
@@ -90,6 +91,47 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
                 writer.write("  }\n");
                 writer.write("\n");
               }
+
+              // LogicValue method: asMap
+              writer.write("  @Override public java.util.Map<String, ?> asMap() {\n");
+              writer.write("    java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
+              for (String field : metadata.getFields()) {
+                writer.write("    map.put(\"" + field + "\", " + field + ");\n");
+              }
+              writer.write("    return map;\n");
+              writer.write("  }\n");
+              writer.write("\n");
+
+              // LogicValue method: unify
+              writer.write("  @Override public " + ClassNames.SUBST + " unify("
+                  + ClassNames.SUBST + " subst, " + ClassNames.LOGIC_VALUE + " other) {\n");
+              boolean first = true;
+              for (String field : metadata.getFields()) {
+                if (!first) {
+                  writer.write("    if (subst == null) {\n");
+                  writer.write("      return null;\n");
+                  writer.write("    }\n");
+                }
+                writer.write("    subst = subst.unify(this." + field + ", "
+                    + "((" + metadata.getName() + ") other)." + field + ");\n");
+                first = false;
+              }
+              writer.write("    return subst;\n");
+              writer.write("  }\n");
+              writer.write("\n");
+
+              // LogicValue method: replace
+              writer.write("  @Override public " + ClassNames.LOGIC_VALUE + " replace("
+                  + ClassNames.REPLACER + " replacer) {\n");
+              writer.write("    return new " + metadata.getName() + "(");
+              delimiter = "";
+              for (String field : metadata.getFields()) {
+                writer.write(delimiter);
+                writer.write("replacer.replace(" + field + ")");
+                delimiter = ", ";
+              }
+              writer.write(");\n");
+              writer.write("  }\n");
               writer.write("}\n");
             }
           } catch (IOException e) {

@@ -4,7 +4,10 @@
 java_library(
     name = "processor",
     exported_plugins = [":make_logic_value_plugin"],
-    exports = ["//java/musubi/annotation"],
+    exports = [
+        "//java/musubi",
+        "//java/musubi/annotation",
+    ],
     visibility = ["//visibility:public"],
 )
 

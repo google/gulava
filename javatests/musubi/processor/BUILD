@@ -16,3 +16,15 @@ java_test(
         "//third_party/junit4",
     ],
 )
+
+java_test(
+    name = "MakeLogicValueFunctionalTest",
+    srcs = ["MakeLogicValueFunctionalTest.java"],
+    deps = [
+        ":package_info",
+        "//java/musubi",
+        "//java/musubi/processor",
+        "//java/musubi/testing",
+        "//third_party/junit4",
+    ],
+)
