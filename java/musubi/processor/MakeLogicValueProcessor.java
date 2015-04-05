@@ -132,6 +132,50 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
               }
               writer.write(");\n");
               writer.write("  }\n");
+
+              // Object method: equals
+              writer.write("  @Override public boolean equals(Object o) {\n");
+              writer.write("    if (o == null) return false;\n");
+              writer.write("    if (o.getClass() != getClass()) return false;\n");
+              writer.write("\n");
+              writer.write("    " + metadata.getName() + " other = (" + metadata.getName() + ") o;\n");
+              for (String field : metadata.getFields()) {
+                writer.write("    if (this." + field + " == null) {\n");
+                writer.write("      if (other." + field + " != null) return false;\n");
+                writer.write("    } else if (!this." + field + ".equals(other." + field + ")) {\n");
+                writer.write("      return false;\n");
+                writer.write("    }\n");
+                writer.write("\n");
+              }
+              writer.write("    return true;\n");
+              writer.write("  }\n");
+
+              // Object method: hashCode
+              writer.write("  @Override public int hashCode() {\n");
+              writer.write("    int code = 1;\n");
+              for (String field : metadata.getFields()) {
+                writer.write("    code *= 31;\n");
+                writer.write("    if (this." + field + " != null) {\n");
+                writer.write("      code ^= this." + field + ".hashCode();\n");
+                writer.write("    }\n");
+              }
+              writer.write("    return code;\n");
+              writer.write("  }\n");
+
+              // Object method: toString
+              writer.write("  @Override public String toString() {\n");
+              writer.write("    StringBuilder s = new StringBuilder(\"" + metadata.getName() + "(\");\n");
+              first = true;
+              for (String field : metadata.getFields()) {
+                if (!first) {
+                  writer.write("    s.append(\", \");\n");
+                }
+                first = false;
+
+                writer.write("    s.append(this." + field + ");\n");
+              }
+              writer.write("    return s.append(')').toString();");
+              writer.write("  }\n");
               writer.write("}\n");
             }
           } catch (IOException e) {
