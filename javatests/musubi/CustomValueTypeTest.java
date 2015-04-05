@@ -16,6 +16,7 @@ import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,6 +134,49 @@ public class CustomValueTypeTest {
         .put(name, new PersonName(2, 4))
         .startSubst()
         .put(name, new PersonName(3, 4))
+        .test();
+  }
+
+  static final class Foo implements LogicValue {
+    public Map<String, ?> asMap() {
+      return Collections.emptyMap();
+    }
+
+    @Override
+    public Subst unify(Subst subst, LogicValue other) {
+      return subst;
+    }
+
+    @Override
+    public LogicValue replace(Replacer replacer) {
+      return this;
+    }
+  }
+
+  static final class Bar implements LogicValue {
+    public Map<String, ?> asMap() {
+      return Collections.emptyMap();
+    }
+
+    @Override
+    public Subst unify(Subst subst, LogicValue other) {
+      return subst;
+    }
+
+    @Override
+    public LogicValue replace(Replacer replacer) {
+      return this;
+    }
+  }
+
+  @Test
+  public void differingClassesCannotUnion() {
+    Var x = new Var();
+    Var y = new Var();
+
+    new LogicAsserter()
+        .stream(conj(same(x, y), same(x, new Foo()), same(y, new Bar())))
+        .workUnits(1)
         .test();
   }
 }
