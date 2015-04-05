@@ -24,8 +24,16 @@ package musubi.annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-@Target(ElementType.PACKAGE)
+/**
+ * Attach this annotation to an interface to automatically create a {@code LogicValue}
+ * implementation. The generated {@code LogicValue} implementation adds fields for each abstract
+ * method in the interface. The methods must return {@link Object}, take no arguments, and only be
+ * named the name of the field, as opposed to {@code get[FIELD_NAME]}.
+ */
+@Target(ElementType.TYPE)
 public @interface MakeLogicValue {
+  /**
+   * The name of the implementation type to generate.
+   */
   String name();
-  String[] fields();
 }

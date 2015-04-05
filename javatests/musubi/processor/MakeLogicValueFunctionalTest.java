@@ -26,6 +26,7 @@ import static musubi.Goals.same;
 
 import musubi.LogicValue;
 import musubi.Var;
+import musubi.annotation.MakeLogicValue;
 import musubi.testing.LogicAsserter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -105,5 +106,28 @@ public class MakeLogicValueFunctionalTest {
   public void testToString() {
     Assert.assertEquals("SimpleValue(x, y)", new SimpleValue("x", "y").toString());
     Assert.assertEquals("SimpleValue(x, null)", new SimpleValue("x", null).toString());
+  }
+
+  @MakeLogicValue(name = "NestedTypeLogicValueImpl")
+  interface NestedTypeLogicValue {
+    Object field1();
+    Object field2();
+  }
+
+  @Test
+  public void nestedTypeLogicValue() {
+    Object value = new NestedTypeLogicValueImpl('a', 'b');
+    Assert.assertEquals(new NestedTypeLogicValueImpl('a', 'b'), value);
+    Var a = new Var();
+    Var b = new Var();
+
+    new LogicAsserter()
+        .stream(same(value, new NestedTypeLogicValueImpl(a, b)))
+        .startSubst()
+        .put(a, 'a')
+        .put(b, 'b')
+        .addRequestedVar(a, b)
+        .workUnits(2)
+        .test();
   }
 }

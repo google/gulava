@@ -34,4 +34,5 @@ java_plugin(
     name = "make_logic_value_plugin",
     processor_class = "musubi.processor.MakeLogicValueProcessor",
     srcs = glob(["*.java"]),
+    deps = ["//java/musubi/annotation"],
 )

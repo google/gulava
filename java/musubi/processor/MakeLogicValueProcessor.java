@@ -29,8 +29,10 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.ElementFilter;
 import javax.tools.JavaFileObject;
 
 /**
@@ -50,158 +52,162 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     for (TypeElement annotation : annotations) {
-      for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
-        PackageElement pkg = (PackageElement) element;
+      Iterable<? extends TypeElement> interfaces =
+          ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(annotation));
+      for (TypeElement interfaze : interfaces) {
+        Element packageElement = interfaze.getEnclosingElement();
+        while (!(packageElement instanceof PackageElement)) {
+          packageElement = packageElement.getEnclosingElement();
+        }
+        Name pkgName = ((PackageElement) packageElement).getQualifiedName();
+        MakeLogicValueMetadata metadata = MakeLogicValueMetadata.forInterface(interfaze);
+        try {
+          JavaFileObject file =
+              processingEnv.getFiler().createSourceFile(pkgName + "." + metadata.getName());
 
-        for (MakeLogicValueMetadata metadata : MakeLogicValueMetadata.forPackage(pkg)) {
-          try {
-            JavaFileObject file = processingEnv.getFiler().createSourceFile(
-                pkg.getQualifiedName() + "." + metadata.getName());
+          try (Writer writer = file.openWriter()) {
+            writer.write("package " + pkgName + ";\n");
+            writer.write("\n");
+            writer.write("public final class " + metadata.getName()
+                + " implements " + ClassNames.LOGIC_VALUE + " {\n");
 
-            try (Writer writer = file.openWriter()) {
-              writer.write("package " + pkg.getQualifiedName() + ";\n");
-              writer.write("\n");
-              writer.write("public final class " + metadata.getName()
-                  + " implements " + ClassNames.LOGIC_VALUE + " {\n");
-
-              // Builder
-              writer.write("  public static final class Builder {\n");
-              for (String field : metadata.getFields()) {
-                writer.write("    private Object " + field + ";\n");
-                writer.write("    public Builder set" + capitalizeFirst(field)
-                    + "(Object " + field + ") {\n");
-                writer.write("      this." + field + " = " + field + ";\n");
-                writer.write("      return this;\n");
-                writer.write("    }\n");
-                writer.write("\n");
-              }
-
-              writer.write("    public " + metadata.getName() + " build() {\n");
-              writer.write("      return new " + metadata.getName() + "(");
-              String delimiter = "";
-              for (String field : metadata.getFields()) {
-                writer.write(delimiter);
-                writer.write(field);
-                delimiter = ", ";
-              }
-              writer.write(");\n");
+            // Builder
+            writer.write("  public static final class Builder {\n");
+            for (String field : metadata.getFields()) {
+              writer.write("    private Object " + field + ";\n");
+              writer.write("    public Builder set" + capitalizeFirst(field)
+                  + "(Object " + field + ") {\n");
+              writer.write("      this." + field + " = " + field + ";\n");
+              writer.write("      return this;\n");
               writer.write("    }\n");
-              writer.write("  }\n");
               writer.write("\n");
-
-              // Constructor
-              writer.write("  public " + metadata.getName() + "(");
-              delimiter = "";
-              for (String field : metadata.getFields()) {
-                writer.write(delimiter);
-                writer.write("Object " + field);
-                delimiter = ", ";
-              }
-              writer.write(") {\n");
-              for (String field : metadata.getFields()) {
-                writer.write("    this." + field + " = " + field + ";\n");
-              }
-              writer.write("  }\n");
-              writer.write("\n");
-
-              // Fields and accessors
-              for (String field : metadata.getFields()) {
-                writer.write("  private final Object " + field + ";\n");
-                writer.write("  public Object " + field + "() {\n");
-                writer.write("    return " + field + ";\n");
-                writer.write("  }\n");
-                writer.write("\n");
-              }
-
-              // LogicValue method: asMap
-              writer.write("  @Override public java.util.Map<String, ?> asMap() {\n");
-              writer.write("    java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
-              for (String field : metadata.getFields()) {
-                writer.write("    map.put(\"" + field + "\", " + field + ");\n");
-              }
-              writer.write("    return map;\n");
-              writer.write("  }\n");
-              writer.write("\n");
-
-              // LogicValue method: unify
-              writer.write("  @Override public " + ClassNames.SUBST + " unify("
-                  + ClassNames.SUBST + " subst, " + ClassNames.LOGIC_VALUE + " other) {\n");
-              boolean first = true;
-              for (String field : metadata.getFields()) {
-                if (!first) {
-                  writer.write("    if (subst == null) {\n");
-                  writer.write("      return null;\n");
-                  writer.write("    }\n");
-                }
-                writer.write("    subst = subst.unify(this." + field + ", "
-                    + "((" + metadata.getName() + ") other)." + field + ");\n");
-                first = false;
-              }
-              writer.write("    return subst;\n");
-              writer.write("  }\n");
-              writer.write("\n");
-
-              // LogicValue method: replace
-              writer.write("  @Override public " + ClassNames.LOGIC_VALUE + " replace("
-                  + ClassNames.REPLACER + " replacer) {\n");
-              writer.write("    return new " + metadata.getName() + "(");
-              delimiter = "";
-              for (String field : metadata.getFields()) {
-                writer.write(delimiter);
-                writer.write("replacer.replace(" + field + ")");
-                delimiter = ", ";
-              }
-              writer.write(");\n");
-              writer.write("  }\n");
-
-              // Object method: equals
-              writer.write("  @Override public boolean equals(Object o) {\n");
-              writer.write("    if (o == null) return false;\n");
-              writer.write("    if (o.getClass() != getClass()) return false;\n");
-              writer.write("\n");
-              writer.write("    " + metadata.getName() + " other = (" + metadata.getName() + ") o;\n");
-              for (String field : metadata.getFields()) {
-                writer.write("    if (this." + field + " == null) {\n");
-                writer.write("      if (other." + field + " != null) return false;\n");
-                writer.write("    } else if (!this." + field + ".equals(other." + field + ")) {\n");
-                writer.write("      return false;\n");
-                writer.write("    }\n");
-                writer.write("\n");
-              }
-              writer.write("    return true;\n");
-              writer.write("  }\n");
-
-              // Object method: hashCode
-              writer.write("  @Override public int hashCode() {\n");
-              writer.write("    int code = 1;\n");
-              for (String field : metadata.getFields()) {
-                writer.write("    code *= 31;\n");
-                writer.write("    if (this." + field + " != null) {\n");
-                writer.write("      code ^= this." + field + ".hashCode();\n");
-                writer.write("    }\n");
-              }
-              writer.write("    return code;\n");
-              writer.write("  }\n");
-
-              // Object method: toString
-              writer.write("  @Override public String toString() {\n");
-              writer.write("    StringBuilder s = new StringBuilder(\"" + metadata.getName() + "(\");\n");
-              first = true;
-              for (String field : metadata.getFields()) {
-                if (!first) {
-                  writer.write("    s.append(\", \");\n");
-                }
-                first = false;
-
-                writer.write("    s.append(this." + field + ");\n");
-              }
-              writer.write("    return s.append(')').toString();");
-              writer.write("  }\n");
-              writer.write("}\n");
             }
-          } catch (IOException e) {
-            throw new RuntimeException(e);
+
+            writer.write("    public " + metadata.getName() + " build() {\n");
+            writer.write("      return new " + metadata.getName() + "(");
+            String delimiter = "";
+            for (String field : metadata.getFields()) {
+              writer.write(delimiter);
+              writer.write(field);
+              delimiter = ", ";
+            }
+            writer.write(");\n");
+            writer.write("    }\n");
+            writer.write("  }\n");
+            writer.write("\n");
+
+            // Constructor
+            writer.write("  public " + metadata.getName() + "(");
+            delimiter = "";
+            for (String field : metadata.getFields()) {
+              writer.write(delimiter);
+              writer.write("Object " + field);
+              delimiter = ", ";
+            }
+            writer.write(") {\n");
+            for (String field : metadata.getFields()) {
+              writer.write("    this." + field + " = " + field + ";\n");
+            }
+            writer.write("  }\n");
+            writer.write("\n");
+
+            // Fields and accessors
+            for (String field : metadata.getFields()) {
+              writer.write("  private final Object " + field + ";\n");
+              writer.write("  public Object " + field + "() {\n");
+              writer.write("    return " + field + ";\n");
+              writer.write("  }\n");
+              writer.write("\n");
+            }
+
+            // LogicValue method: asMap
+            writer.write("  @Override public java.util.Map<String, ?> asMap() {\n");
+            writer.write("    java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
+            for (String field : metadata.getFields()) {
+              writer.write("    map.put(\"" + field + "\", " + field + ");\n");
+            }
+            writer.write("    return map;\n");
+            writer.write("  }\n");
+            writer.write("\n");
+
+            // LogicValue method: unify
+            writer.write("  @Override public " + ClassNames.SUBST + " unify("
+                + ClassNames.SUBST + " subst, " + ClassNames.LOGIC_VALUE + " other) {\n");
+            boolean first = true;
+            for (String field : metadata.getFields()) {
+              if (!first) {
+                writer.write("    if (subst == null) {\n");
+                writer.write("      return null;\n");
+                writer.write("    }\n");
+              }
+              writer.write("    subst = subst.unify(this." + field + ", "
+                  + "((" + metadata.getName() + ") other)." + field + ");\n");
+              first = false;
+            }
+            writer.write("    return subst;\n");
+            writer.write("  }\n");
+            writer.write("\n");
+
+            // LogicValue method: replace
+            writer.write("  @Override public " + ClassNames.LOGIC_VALUE + " replace("
+                + ClassNames.REPLACER + " replacer) {\n");
+            writer.write("    return new " + metadata.getName() + "(");
+            delimiter = "";
+            for (String field : metadata.getFields()) {
+              writer.write(delimiter);
+              writer.write("replacer.replace(" + field + ")");
+              delimiter = ", ";
+            }
+            writer.write(");\n");
+            writer.write("  }\n");
+
+            // Object method: equals
+            writer.write("  @Override public boolean equals(Object o) {\n");
+            writer.write("    if (o == null) return false;\n");
+            writer.write("    if (o.getClass() != getClass()) return false;\n");
+            writer.write("\n");
+            writer.write("    " + metadata.getName() + " other = (" + metadata.getName() + ") o;\n");
+            for (String field : metadata.getFields()) {
+              writer.write("    if (this." + field + " == null) {\n");
+              writer.write("      if (other." + field + " != null) return false;\n");
+              writer.write("    } else if (!this." + field + ".equals(other." + field + ")) {\n");
+              writer.write("      return false;\n");
+              writer.write("    }\n");
+              writer.write("\n");
+            }
+            writer.write("    return true;\n");
+            writer.write("  }\n");
+
+            // Object method: hashCode
+            writer.write("  @Override public int hashCode() {\n");
+            writer.write("    int code = 1;\n");
+            for (String field : metadata.getFields()) {
+              writer.write("    code *= 31;\n");
+              writer.write("    if (this." + field + " != null) {\n");
+              writer.write("      code ^= this." + field + ".hashCode();\n");
+              writer.write("    }\n");
+            }
+            writer.write("    return code;\n");
+            writer.write("  }\n");
+
+            // Object method: toString
+            writer.write("  @Override public String toString() {\n");
+            writer.write("    StringBuilder s = new StringBuilder(\"" + metadata.getName() + "(\");\n");
+            first = true;
+            for (String field : metadata.getFields()) {
+              if (!first) {
+                writer.write("    s.append(\", \");\n");
+              }
+              first = false;
+
+              writer.write("    s.append(this." + field + ");\n");
+            }
+            writer.write("    return s.append(')').toString();");
+            writer.write("  }\n");
+            writer.write("}\n");
           }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
       }
     }
@@ -209,3 +215,4 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
     return true;
   }
 }
+

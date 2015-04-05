@@ -19,9 +19,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-@MakeLogicValue(
-    name = "SimpleValue",
-    fields = {"foo", "bar"})
 package musubi.processor;
 
 import musubi.annotation.MakeLogicValue;
+
+@MakeLogicValue(name = "SimpleValue")
+public interface SimpleValueInterface {
+  Object foo();
+  Object bar();
+}

@@ -21,17 +21,15 @@
  */
 package musubi.processor;
 
+import musubi.annotation.MakeLogicValue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.SimpleAnnotationValueVisitor6;
+import javax.lang.model.util.ElementFilter;
 
 /**
  * Contains information derived from the {@code MakeLogicValue} annotation.
@@ -39,10 +37,12 @@ import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 public final class MakeLogicValueMetadata {
   private final String name;
   private final List<String> fields;
+  private final TypeElement interfaze;
 
-  private MakeLogicValueMetadata(String name, List<String> fields) {
+  private MakeLogicValueMetadata(String name, List<String> fields, TypeElement interfaze) {
     this.name = name;
     this.fields = Collections.unmodifiableList(new ArrayList<>(fields));
+    this.interfaze = interfaze;
   }
 
   public String getName() {
@@ -53,45 +53,27 @@ public final class MakeLogicValueMetadata {
     return fields;
   }
 
-  /**
-   * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
-   */
-  public static MakeLogicValueMetadata forAnnotation(AnnotationMirror annotation) {
-    String name = null;
-    List<String> fields = null;
-
-    for (ExecutableElement key : annotation.getElementValues().keySet()) {
-      AnnotationValue value = annotation.getElementValues().get(key);
-      Name keyName = key.getSimpleName();
-      if (keyName.contentEquals("name")) {
-        name = (String) value.getValue();
-      } else if (keyName.contentEquals("fields")) {
-        fields = new ArrayList<>();
-        for (Object fieldNameValue : (List<?>) value.getValue()) {
-          fields.add((String) ((AnnotationValue) fieldNameValue).getValue());
-        }
-      } else {
-        throw new UnsupportedOperationException("Unknown attribute property name: " + keyName);
-      }
-    }
-
-    return new MakeLogicValueMetadata(name, fields);
+  public TypeElement getInterface() {
+    return interfaze;
   }
 
   /**
-   * Returns all the metadata instances for the annotations on a package.
+   * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
    */
-  public static List<MakeLogicValueMetadata> forPackage(PackageElement pkg) {
-    List<MakeLogicValueMetadata> metadatas = new ArrayList<>();
+  public static MakeLogicValueMetadata forInterface(TypeElement interfaze) {
+    MakeLogicValue annotation = interfaze.getAnnotation(MakeLogicValue.class);
+    List<String> fields = new ArrayList<>();
 
-    for (AnnotationMirror annotation : pkg.getAnnotationMirrors()) {
-      if (((TypeElement) annotation.getAnnotationType().asElement())
-          .getQualifiedName()
-          .contentEquals(ClassNames.MAKE_LOGIC_VALUE)) {
-        metadatas.add(forAnnotation(annotation));
-      }
+    for (ExecutableElement method : ElementFilter.methodsIn(interfaze.getEnclosedElements())) {
+      fields.add(method.getSimpleName().toString());
     }
 
-    return metadatas;
+    String name = annotation.name();
+    if (name == null) {
+      throw new IllegalArgumentException(
+          "No name given for MakeLogicValue annotation on: " + interfaze.getQualifiedName());
+    }
+
+    return new MakeLogicValueMetadata(name, fields, interfaze);
   }
 }
