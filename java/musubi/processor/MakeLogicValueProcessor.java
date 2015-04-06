@@ -68,8 +68,9 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
           try (Writer writer = file.openWriter()) {
             writer.write("package " + pkgName + ";\n");
             writer.write("\n");
-            writer.write("public final class " + metadata.getName()
-                + " implements " + ClassNames.LOGIC_VALUE + " {\n");
+            writer.write("public final class " + metadata.getName() + " implements "
+                + ClassNames.LOGIC_VALUE + ", "
+                + metadata.getInterface().getQualifiedName() + " {\n");
 
             // Builder
             writer.write("  public static final class Builder {\n");

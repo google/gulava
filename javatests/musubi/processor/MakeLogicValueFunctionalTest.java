@@ -130,4 +130,12 @@ public class MakeLogicValueFunctionalTest {
         .workUnits(2)
         .test();
   }
+
+  @Test
+  public void implementsInterfaces() {
+    Assert.assertTrue(new NestedTypeLogicValueImpl(null, null) instanceof LogicValue);
+    Assert.assertTrue(new NestedTypeLogicValueImpl(null, null) instanceof NestedTypeLogicValue);
+    Assert.assertTrue(new SimpleValue(null, null) instanceof LogicValue);
+    Assert.assertTrue(new SimpleValue(null, null) instanceof SimpleValueInterface);
+  }
 }
