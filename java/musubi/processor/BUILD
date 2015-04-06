@@ -23,7 +23,10 @@
 
 java_library(
     name = "processor",
-    exported_plugins = [":make_logic_value_plugin"],
+    exported_plugins = [
+        ":make_goal_factory_plugin",
+        ":make_logic_value_plugin",
+    ],
     exports = [
         "//java/musubi",
         "//java/musubi/annotation",
@@ -31,10 +34,22 @@ java_library(
     visibility = ["//visibility:public"],
 )
 
+java_library(
+    name = "processor_lib",
+    srcs = glob(["*.java"]),
+    deps = ["//java/musubi/annotation"],
+)
+
 java_plugin(
     name = "make_logic_value_plugin",
     processor_class = "musubi.processor.MakeLogicValueProcessor",
-    srcs = glob(["*.java"]),
-    deps = ["//java/musubi/annotation"],
+    deps = [":processor_lib"],
+    visibility = ["//java/musubi:__pkg__"],
+)
+
+java_plugin(
+    name = "make_goal_factory_plugin",
+    processor_class = "musubi.processor.MakeGoalFactoryProcessor",
+    deps = [":processor_lib"],
     visibility = ["//java/musubi:__pkg__"],
 )

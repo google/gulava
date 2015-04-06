@@ -21,19 +21,22 @@
  */
 package musubi.processor;
 
+import java.util.Set;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.lang.model.element.TypeElement;
+
 /**
- * Constants containing fully-qualified names of classes of concern to this processor.
+ * An annotation processor that reads classes annoated with @{@code MakeGoalFactory} and creates
+ * a corresponding class for each one that constructs a certain goal.
  */
-public class ClassNames {
-  public static final String MAKE_LOGIC_VALUE = "musubi.annotation.MakeLogicValue";
-
-  public static final String MAKE_GOAL_FACTORY = "musubi.annotation.MakeGoalFactory";
-
-  public static final String LOGIC_VALUE = "musubi.LogicValue";
-
-  public static final String SUBST = "musubi.Subst";
-
-  public static final String REPLACER = "musubi.Replacer";
-
-  private ClassNames() {}
+@SupportedAnnotationTypes(ClassNames.MAKE_GOAL_FACTORY)
+public final class MakeGoalFactoryProcessor extends AbstractProcessor {
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    // TODO: implement
+    return true;
+  }
 }
