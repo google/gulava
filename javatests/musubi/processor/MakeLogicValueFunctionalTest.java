@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -137,5 +138,11 @@ public class MakeLogicValueFunctionalTest {
     Assert.assertTrue(new NestedTypeLogicValueImpl(null, null) instanceof NestedTypeLogicValue);
     Assert.assertTrue(new SimpleValue(null, null) instanceof LogicValue);
     Assert.assertTrue(new SimpleValue(null, null) instanceof SimpleValueInterface);
+  }
+
+  @Test
+  public void staticMethodsAreNotFields() {
+    HasStaticMethodImpl x = new HasStaticMethodImpl(42);
+    Assert.assertEquals(Collections.singletonMap("foo", 42), x.asMap());
   }
 }

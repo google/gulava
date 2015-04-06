@@ -17,12 +17,16 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+
 # Unit tests for annotation processors
 package(default_testonly = 1)
 
 java_library(
     name = "generated",
-    srcs = ["SimpleValueInterface.java"],
+    srcs = [
+        "SimpleValueInterface.java",
+        "HasStaticMethod.java",
+    ],
     deps = ["//java/musubi/processor"],
 )
 

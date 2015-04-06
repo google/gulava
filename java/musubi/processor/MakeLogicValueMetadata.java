@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 
@@ -38,11 +39,14 @@ public final class MakeLogicValueMetadata {
   private final String name;
   private final List<String> fields;
   private final TypeElement interfaze;
+  private final boolean autoDefineToString;
 
-  private MakeLogicValueMetadata(String name, List<String> fields, TypeElement interfaze) {
+  private MakeLogicValueMetadata(
+      String name, List<String> fields, TypeElement interfaze, boolean autoDefineToString) {
     this.name = name;
     this.fields = Collections.unmodifiableList(new ArrayList<>(fields));
     this.interfaze = interfaze;
+    this.autoDefineToString = autoDefineToString;
   }
 
   public String getName() {
@@ -57,15 +61,24 @@ public final class MakeLogicValueMetadata {
     return interfaze;
   }
 
+  public boolean autoDefineToString() {
+    return autoDefineToString;
+  }
+
   /**
    * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
    */
   public static MakeLogicValueMetadata forInterface(TypeElement interfaze) {
     MakeLogicValue annotation = interfaze.getAnnotation(MakeLogicValue.class);
     List<String> fields = new ArrayList<>();
+    boolean autoDefineToString = true;
 
     for (ExecutableElement method : ElementFilter.methodsIn(interfaze.getEnclosedElements())) {
-      fields.add(method.getSimpleName().toString());
+      if (method.getSimpleName().contentEquals("toString")) {
+        autoDefineToString = false;
+      } else if (!method.getModifiers().contains(Modifier.STATIC)) {
+        fields.add(method.getSimpleName().toString());
+      }
     }
 
     String name = annotation.name();
@@ -74,6 +87,6 @@ public final class MakeLogicValueMetadata {
           "No name given for MakeLogicValue annotation on: " + interfaze.getQualifiedName());
     }
 
-    return new MakeLogicValueMetadata(name, fields, interfaze);
+    return new MakeLogicValueMetadata(name, fields, interfaze, autoDefineToString);
   }
 }

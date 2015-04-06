@@ -66,11 +66,23 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
               processingEnv.getFiler().createSourceFile(pkgName + "." + metadata.getName());
 
           try (Writer writer = file.openWriter()) {
+            String extendsClause = "";
+            String implementsClause = " implements " + ClassNames.LOGIC_VALUE;
+            switch (interfaze.getKind()) {
+              case INTERFACE:
+                implementsClause += ", " + interfaze.getQualifiedName();
+                break;
+              case CLASS:
+                extendsClause += " extends " + interfaze.getQualifiedName();
+                break;
+              default:
+                throw new IllegalStateException("unexpected kind: " + interfaze.getKind());
+            }
+
             writer.write("package " + pkgName + ";\n");
             writer.write("\n");
-            writer.write("public final class " + metadata.getName() + " implements "
-                + ClassNames.LOGIC_VALUE + ", "
-                + metadata.getInterface().getQualifiedName() + " {\n");
+            writer.write("public final class " + metadata.getName()
+                + extendsClause + implementsClause + " {\n");
 
             // Builder
             writer.write("  public static final class Builder {\n");
@@ -192,19 +204,22 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
             writer.write("  }\n");
 
             // Object method: toString
-            writer.write("  @Override public String toString() {\n");
-            writer.write("    StringBuilder s = new StringBuilder(\"" + metadata.getName() + "(\");\n");
-            first = true;
-            for (String field : metadata.getFields()) {
-              if (!first) {
-                writer.write("    s.append(\", \");\n");
-              }
-              first = false;
+            if (metadata.autoDefineToString()) {
+              writer.write("  @Override public String toString() {\n");
+              writer.write("    StringBuilder s = new StringBuilder(\""
+                  + metadata.getName() + "(\");\n");
+              first = true;
+              for (String field : metadata.getFields()) {
+                if (!first) {
+                  writer.write("    s.append(\", \");\n");
+                }
+                first = false;
 
-              writer.write("    s.append(this." + field + ");\n");
+                writer.write("    s.append(this." + field + ");\n");
+              }
+              writer.write("    return s.append(')').toString();");
+              writer.write("  }\n");
             }
-            writer.write("    return s.append(')').toString();");
-            writer.write("  }\n");
             writer.write("}\n");
           }
         } catch (IOException e) {

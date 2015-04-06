@@ -17,6 +17,7 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+
 # Implementation of annotation processor for automatically creating LogicValue
 # implementations
 
@@ -35,4 +36,5 @@ java_plugin(
     processor_class = "musubi.processor.MakeLogicValueProcessor",
     srcs = glob(["*.java"]),
     deps = ["//java/musubi/annotation"],
+    visibility = ["//java/musubi:__pkg__"],
 )
