@@ -21,13 +21,24 @@
  */
 package musubi;
 
+import static musubi.Goals.conj;
+import static musubi.Goals.same;
+
+import musubi.testing.LogicAsserter;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+
 @RunWith(JUnit4.class)
 public class ConsTest {
+  private static final Var X = new Var();
+  private static final Var Y = new Var();
+  private static final Var Z = new Var();
+
   @Test
   public void testToString() {
     Assert.assertEquals("[1]", new Cons<>(1, null).toString());
@@ -35,5 +46,20 @@ public class ConsTest {
     Assert.assertEquals("[1,2,3|foo]",
         new Cons<>(1, new Cons<>(2, new Cons<>(3, "foo"))).toString());
     Assert.assertEquals("[null|42]", new Cons<>(null, 42).toString());
+  }
+
+  @Test
+  public void testUnifyTail() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                same(X, 42),
+                same(Y, Cons.list(Arrays.asList(5, 7, 9))),
+                same(Z, new Cons<>(X, Y))))
+        .workUnits(2)
+        .addRequestedVar(Z)
+        .startSubst()
+        .put(Z, Cons.list(Arrays.asList(42, 5, 7, 9)))
+        .test();
   }
 }

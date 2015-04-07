@@ -79,4 +79,13 @@ public class GoalsTest {
         .startSubst().put(X, Y).put(Y, 5)
         .test();
   }
+
+  @Test
+  public void unifyVarWithSelf() {
+    new LogicAsserter()
+        .stream(same(X, X))
+        .workUnits(2)
+        .startSubst()
+        .test();
+  }
 }

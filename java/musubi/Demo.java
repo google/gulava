@@ -26,8 +26,12 @@ import static musubi.Goals.same;
 
 import java.util.Arrays;
 
-// TODO: Refactor this into test cases and proper documentation.
-public class MusubiDemo {
+/**
+ * The code in this console application demonstrates how to run a query and print its results. This
+ * code can also be used as a starting point to write a tool that prints the results of a one-off
+ * logic computation.
+ */
+public class Demo {
   static void print(Stream s, int n, Var... requestedVars) {
     while (n-- >= 0) {
       SolveStep solve = s.solve();
@@ -46,28 +50,17 @@ public class MusubiDemo {
   }
 
   public static void main(String... args) {
+    Var a = new Var();
+    Var b = new Var();
     Var x = new Var();
     Var y = new Var();
 
-    System.out.println("\nexample 5");
-    Var a = new Var();
-    Var b = new Var();
+    System.out.println("\nexample");
     Goal g = conj(
         same(x, y),
         same(x, Cons.list(Arrays.asList(2, 3, 4))),
         same(a, new Cons<>(42, x)),
         same(b, new Cons<>(43, y)));
     print(g.run(Subst.EMPTY), 10, a, b);
-
-    System.out.println("\nexample 10");
-    g = same(x, x);
-    print(g.run(Subst.EMPTY), 10, x, x);
-
-    System.out.println("\nexample 11");
-    g = conj(
-        same(x, 42),
-        same(y, Cons.list(Arrays.asList(5, 7, 9))),
-        same(a, new Cons<>(x, y)));
-    print(g.run(Subst.EMPTY), 10, a);
   }
 }

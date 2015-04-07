@@ -21,10 +21,10 @@
 package(default_visibility = ["//visibility:public"])
 
 java_binary(
-    name = "MusubiDemo",
-    srcs = ["MusubiDemo.java"],
+    name = "Demo",
+    srcs = ["Demo.java"],
     deps = [":musubi"],
-    main_class = "musubi.MusubiDemo",
+    main_class = "musubi.Demo",
 )
 
 java_library(
