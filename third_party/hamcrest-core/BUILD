@@ -5,4 +5,5 @@ licenses(["notice"]) # BSD
 java_library(
     name = "hamcrest-core",
     srcs = glob(["java/**/*.java"]),
+    javacopts = ["-Xlint:-unchecked"],
 )

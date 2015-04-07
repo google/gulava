@@ -6,4 +6,5 @@ java_library(
     name = "junit4",
     srcs = glob(["java/**/*.java"]),
     deps = ["//third_party/hamcrest-core"],
+    javacopts = ["-Xlint:-unchecked"],
 )
