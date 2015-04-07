@@ -46,10 +46,10 @@ public class OrderClauses {
     Var fullTail = new Var();
 
     return conj(
-        same(new Cons(head, fullTail), full),
+        same(new Cons<>(head, fullTail), full),
         disj(
             conj(
-                same(new Cons(head, subTail), sub),
+                same(new Cons<>(head, subTail), sub),
                 Order.o(subTail, fullTail)),
             Order.o(sub, fullTail)));
   }

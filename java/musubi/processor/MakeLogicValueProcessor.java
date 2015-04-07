@@ -36,14 +36,6 @@ import javax.lang.model.element.TypeElement;
  */
 @SupportedAnnotationTypes(ClassNames.MAKE_LOGIC_VALUE)
 public final class MakeLogicValueProcessor extends AbstractProcessor {
-  private static final String capitalizeFirst(String s) {
-    if (s.length() == 0) {
-      return "";
-    }
-
-    return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
@@ -65,26 +57,31 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         }
 
         writer.write("public final class " + metadata.getName()
+            + metadata.typeParametersAlligator()
             + extendsClause + implementsClause + " {\n");
 
         // Builder
-        writer.write("  public static final class Builder {\n");
-        for (String field : metadata.getFields()) {
-          writer.write("    private Object " + field + ";\n");
-          writer.write("    public Builder set" + capitalizeFirst(field)
-              + "(Object " + field + ") {\n");
+        writer.write("  public static final class Builder"
+            + metadata.typeParametersAlligator() + " {\n");
+        for (LogicValueField field : metadata.getFields()) {
+          writer.write("    private " + field.getTypeAndName() + ";\n");
+          writer.write("    public Builder" + metadata.typeParametersAlligator()
+              + " " + field.getSetterMethodName()
+              + "(" + field.getTypeAndName() + ") {\n");
           writer.write("      this." + field + " = " + field + ";\n");
           writer.write("      return this;\n");
           writer.write("    }\n");
           writer.write("\n");
         }
 
-        writer.write("    public " + metadata.getName() + " build() {\n");
-        writer.write("      return new " + metadata.getName() + "(");
+        writer.write("    public " + metadata.getName() + metadata.typeParametersAlligator()
+            + " build() {\n");
+        writer.write("      return new " + metadata.getName() + metadata.typeParametersAlligator()
+            + "(");
         String delimiter = "";
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write(delimiter);
-          writer.write(field);
+          writer.write(field.getName());
           delimiter = ", ";
         }
         writer.write(");\n");
@@ -95,22 +92,22 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         // Constructor
         writer.write("  public " + metadata.getName() + "(");
         delimiter = "";
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write(delimiter);
-          writer.write("Object " + field);
+          writer.write(field.getTypeAndName());
           delimiter = ", ";
         }
         writer.write(") {\n");
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write("    this." + field + " = " + field + ";\n");
         }
         writer.write("  }\n");
         writer.write("\n");
 
         // Fields and accessors
-        for (String field : metadata.getFields()) {
-          writer.write("  private final Object " + field + ";\n");
-          writer.write("  public Object " + field + "() {\n");
+        for (LogicValueField field : metadata.getFields()) {
+          writer.write("  private final " + field.getTypeAndName() + ";\n");
+          writer.write("  public " + field.getTypeAndName() + "() {\n");
           writer.write("    return " + field + ";\n");
           writer.write("  }\n");
           writer.write("\n");
@@ -119,7 +116,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         // LogicValue method: asMap
         writer.write("  @Override public java.util.Map<String, ?> asMap() {\n");
         writer.write("    java.util.Map<String, Object> map = new java.util.HashMap<>();\n");
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write("    map.put(\"" + field + "\", " + field + ");\n");
         }
         writer.write("    return map;\n");
@@ -130,7 +127,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         writer.write("  @Override public " + ClassNames.SUBST + " unify("
             + ClassNames.SUBST + " subst, " + ClassNames.LOGIC_VALUE + " other) {\n");
         boolean first = true;
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           if (!first) {
             writer.write("    if (subst == null) {\n");
             writer.write("      return null;\n");
@@ -147,9 +144,9 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         // LogicValue method: replace
         writer.write("  @Override public " + ClassNames.LOGIC_VALUE + " replace("
             + ClassNames.REPLACER + " replacer) {\n");
-        writer.write("    return new " + metadata.getName() + "(");
+        writer.write("    return new " + metadata.getName() + "<>(");
         delimiter = "";
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write(delimiter);
           writer.write("replacer.replace(" + field + ")");
           delimiter = ", ";
@@ -163,7 +160,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         writer.write("    if (o.getClass() != getClass()) return false;\n");
         writer.write("\n");
         writer.write("    " + metadata.getName() + " other = (" + metadata.getName() + ") o;\n");
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write("    if (this." + field + " == null) {\n");
           writer.write("      if (other." + field + " != null) return false;\n");
           writer.write("    } else if (!this." + field + ".equals(other." + field + ")) {\n");
@@ -177,7 +174,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         // Object method: hashCode
         writer.write("  @Override public int hashCode() {\n");
         writer.write("    int code = 1;\n");
-        for (String field : metadata.getFields()) {
+        for (LogicValueField field : metadata.getFields()) {
           writer.write("    code *= 31;\n");
           writer.write("    if (this." + field + " != null) {\n");
           writer.write("      code ^= this." + field + ".hashCode();\n");
@@ -192,7 +189,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
           writer.write("    StringBuilder s = new StringBuilder(\""
               + metadata.getName() + "(\");\n");
           first = true;
-          for (String field : metadata.getFields()) {
+          for (LogicValueField field : metadata.getFields()) {
             if (!first) {
               writer.write("    s.append(\", \");\n");
             }

@@ -30,9 +30,10 @@ import org.junit.runners.JUnit4;
 public class ConsTest {
   @Test
   public void testToString() {
-    Assert.assertEquals("[1]", new Cons(1, null).toString());
-    Assert.assertEquals("[1|2]", new Cons(1, 2).toString());
-    Assert.assertEquals("[1,2,3|foo]", new Cons(1, new Cons(2, new Cons(3, "foo"))).toString());
-    Assert.assertEquals("[null|42]", new Cons(null, 42).toString());
+    Assert.assertEquals("[1]", new Cons<>(1, null).toString());
+    Assert.assertEquals("[1|2]", new Cons<>(1, 2).toString());
+    Assert.assertEquals("[1,2,3|foo]",
+        new Cons<>(1, new Cons<>(2, new Cons<>(3, "foo"))).toString());
+    Assert.assertEquals("[null|42]", new Cons<>(null, 42).toString());
   }
 }

@@ -29,6 +29,13 @@ import java.lang.annotation.Target;
  * implementation. The generated {@code LogicValue} implementation adds fields for each abstract
  * method in the interface. The methods must return {@link Object}, take no arguments, and only be
  * named the name of the field, as opposed to {@code get[FIELD_NAME]}.
+ *
+ * <p>Generated logic value types are generic, with a single type parameter for each field. These
+ * fields are completely unbound, meaning they can be {@link Object} or {@code Var} or some other
+ * implementation of {@code LogicValue}. If you don't care about the generic type parameters
+ * (perharps because you will not call any methods on the fields), you can just use an unqualified
+ * reference, although you should use the diamond syntax to invoke the constructor to avoid compiler
+ * warnings, e.g. {@code MyValue v = new MyValue<>("x", "y")}.
  */
 @Target(ElementType.TYPE)
 public @interface MakeLogicValue {

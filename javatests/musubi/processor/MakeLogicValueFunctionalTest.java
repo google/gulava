@@ -50,7 +50,7 @@ public class MakeLogicValueFunctionalTest {
     Var simpleValueVar = new Var();
 
     new LogicAsserter()
-        .stream(same(new SimpleValue("Doe", "John"), new SimpleValue(fooVar, barVar)))
+        .stream(same(new SimpleValue<>("Doe", "John"), new SimpleValue<>(fooVar, barVar)))
         .startSubst()
         .put(fooVar, "Doe")
         .put(barVar, "John")
@@ -69,9 +69,9 @@ public class MakeLogicValueFunctionalTest {
         .stream(
             conj(
                 same(fooVar, "foo"),
-                same(new SimpleValue(fooVar, "bar"), simpleValueVar)))
+                same(new SimpleValue<>(fooVar, "bar"), simpleValueVar)))
         .startSubst()
-        .put(simpleValueVar, new SimpleValue("foo", "bar"))
+        .put(simpleValueVar, new SimpleValue<>("foo", "bar"))
         .addRequestedVar(simpleValueVar)
         .workUnits(2)
         .test();
@@ -79,18 +79,18 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void equality() {
-    Assert.assertNotEquals(new SimpleValue("", null), new SimpleValue(null, ""));
-    Assert.assertNotEquals(new SimpleValue("x", null), new SimpleValue("x", 42));
-    Assert.assertNotEquals(new SimpleValue("q", 42), new SimpleValue("x", 42));
-    Assert.assertEquals(new SimpleValue("x", "y"), new SimpleValue("x", "y"));
+    Assert.assertNotEquals(new SimpleValue<>("", null), new SimpleValue<>(null, ""));
+    Assert.assertNotEquals(new SimpleValue<>("x", null), new SimpleValue<>("x", 42));
+    Assert.assertNotEquals(new SimpleValue<>("q", 42), new SimpleValue<>("x", 42));
+    Assert.assertEquals(new SimpleValue<>("x", "y"), new SimpleValue<>("x", "y"));
 
     Set<SimpleValue> values = new HashSet<SimpleValue>();
     for (int i = 0; i < 2; i++) {
-      values.add(new SimpleValue("", null));
-      values.add(new SimpleValue(null, ""));
-      values.add(new SimpleValue(null, null));
-      values.add(new SimpleValue("x", "y"));
-      values.add(new SimpleValue("y", "x"));
+      values.add(new SimpleValue<>("", null));
+      values.add(new SimpleValue<>(null, ""));
+      values.add(new SimpleValue<>(null, null));
+      values.add(new SimpleValue<>("x", "y"));
+      values.add(new SimpleValue<>("y", "x"));
     }
 
     Assert.assertEquals(5, values.size());
@@ -105,8 +105,8 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void testToString() {
-    Assert.assertEquals("SimpleValue(x, y)", new SimpleValue("x", "y").toString());
-    Assert.assertEquals("SimpleValue(x, null)", new SimpleValue("x", null).toString());
+    Assert.assertEquals("SimpleValue(x, y)", new SimpleValue<>("x", "y").toString());
+    Assert.assertEquals("SimpleValue(x, null)", new SimpleValue<>("x", null).toString());
   }
 
   @MakeLogicValue(name = "NestedTypeLogicValueImpl")
@@ -117,13 +117,13 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void nestedTypeLogicValue() {
-    Object value = new NestedTypeLogicValueImpl('a', 'b');
-    Assert.assertEquals(new NestedTypeLogicValueImpl('a', 'b'), value);
+    Object value = new NestedTypeLogicValueImpl<>('a', 'b');
+    Assert.assertEquals(new NestedTypeLogicValueImpl<>('a', 'b'), value);
     Var a = new Var();
     Var b = new Var();
 
     new LogicAsserter()
-        .stream(same(value, new NestedTypeLogicValueImpl(a, b)))
+        .stream(same(value, new NestedTypeLogicValueImpl<>(a, b)))
         .startSubst()
         .put(a, 'a')
         .put(b, 'b')
@@ -134,15 +134,15 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void implementsInterfaces() {
-    Assert.assertTrue(new NestedTypeLogicValueImpl(null, null) instanceof LogicValue);
-    Assert.assertTrue(new NestedTypeLogicValueImpl(null, null) instanceof NestedTypeLogicValue);
-    Assert.assertTrue(new SimpleValue(null, null) instanceof LogicValue);
-    Assert.assertTrue(new SimpleValue(null, null) instanceof SimpleValueInterface);
+    Assert.assertTrue(new NestedTypeLogicValueImpl<>(null, null) instanceof LogicValue);
+    Assert.assertTrue(new NestedTypeLogicValueImpl<>(null, null) instanceof NestedTypeLogicValue);
+    Assert.assertTrue(new SimpleValue<>(null, null) instanceof LogicValue);
+    Assert.assertTrue(new SimpleValue<>(null, null) instanceof SimpleValueInterface);
   }
 
   @Test
   public void staticMethodsAreNotFields() {
-    HasStaticMethodImpl x = new HasStaticMethodImpl(42);
+    HasStaticMethodImpl x = new HasStaticMethodImpl<>(42);
     Assert.assertEquals(Collections.singletonMap("foo", 42), x.asMap());
   }
 }

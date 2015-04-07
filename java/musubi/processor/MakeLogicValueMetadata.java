@@ -25,6 +25,7 @@ import musubi.annotation.MakeLogicValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
@@ -40,12 +41,12 @@ import javax.tools.Diagnostic;
  */
 public final class MakeLogicValueMetadata {
   private final String name;
-  private final List<String> fields;
+  private final List<LogicValueField> fields;
   private final TypeElement interfaze;
   private final boolean autoDefineToString;
 
-  private MakeLogicValueMetadata(
-      String name, List<String> fields, TypeElement interfaze, boolean autoDefineToString) {
+  private MakeLogicValueMetadata(String name, List<LogicValueField> fields, TypeElement interfaze,
+      boolean autoDefineToString) {
     this.name = name;
     this.fields = Collections.unmodifiableList(new ArrayList<>(fields));
     this.interfaze = interfaze;
@@ -56,7 +57,7 @@ public final class MakeLogicValueMetadata {
     return name;
   }
 
-  public List<String> getFields() {
+  public List<LogicValueField> getFields() {
     return fields;
   }
 
@@ -69,18 +70,30 @@ public final class MakeLogicValueMetadata {
   }
 
   /**
+   * Returns the type parameters of each field, separated by commas, and enclosed in alligator
+   * brackets, e.g. {@code "<FOO_TYPE, BAR_TYPE>"}.
+   */
+  public String typeParametersAlligator() {
+    List<String> typeParameters = new ArrayList<>();
+    for (LogicValueField field : fields) {
+      typeParameters.add(field.getTypeParameter());
+    }
+    return "<" + Processors.join(", ", typeParameters) + ">";
+  }
+
+  /**
    * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
    */
   public static MakeLogicValueMetadata forInterface(TypeElement interfaze, Messager messager) {
     MakeLogicValue annotation = interfaze.getAnnotation(MakeLogicValue.class);
-    List<String> fields = new ArrayList<>();
+    List<LogicValueField> fields = new ArrayList<>();
     boolean autoDefineToString = true;
 
     for (ExecutableElement method : ElementFilter.methodsIn(interfaze.getEnclosedElements())) {
       if (method.getSimpleName().contentEquals("toString")) {
         autoDefineToString = false;
       } else if (!method.getModifiers().contains(Modifier.STATIC)) {
-        fields.add(method.getSimpleName().toString());
+        fields.add(new LogicValueField(method.getSimpleName().toString()));
       }
     }
 

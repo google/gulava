@@ -31,7 +31,7 @@ import org.junit.runners.JUnit4;
 public class MakeLogicValueProcessorBuilderTest {
   @Test
   public void useBuilderToCreateValue() {
-    SimpleValue value = new SimpleValue.Builder()
+    SimpleValue value = new SimpleValue.Builder<Object, Object>()
         .setFoo(42)
         .setBar("hello")
         .build();
@@ -42,7 +42,7 @@ public class MakeLogicValueProcessorBuilderTest {
 
   @Test
   public void fieldsDefaultToNull() {
-    SimpleValue value = new SimpleValue.Builder()
+    SimpleValue value = new SimpleValue.Builder<Object, Object>()
         .setFoo(9)
         .build();
     Assert.assertEquals(9, value.foo());

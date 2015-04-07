@@ -55,8 +55,8 @@ public class MusubiDemo {
     Goal g = conj(
         same(x, y),
         same(x, Cons.list(Arrays.asList(2, 3, 4))),
-        same(a, new Cons(42, x)),
-        same(b, new Cons(43, y)));
+        same(a, new Cons<>(42, x)),
+        same(b, new Cons<>(43, y)));
     print(g.run(Subst.EMPTY), 10, a, b);
 
     System.out.println("\nexample 10");
@@ -67,7 +67,7 @@ public class MusubiDemo {
     g = conj(
         same(x, 42),
         same(y, Cons.list(Arrays.asList(5, 7, 9))),
-        same(a, new Cons(x, y)));
+        same(a, new Cons<>(x, y)));
     print(g.run(Subst.EMPTY), 10, a);
   }
 }

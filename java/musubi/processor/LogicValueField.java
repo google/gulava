@@ -19,31 +19,51 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package musubi;
+package musubi.processor;
 
-import static musubi.Goals.conj;
-import static musubi.Goals.same;
-
-import musubi.annotation.MakeGoalFactory;
+import java.util.Locale;
 
 /**
- * Defines a goal (see {@link Append}) where the first two arguments concatenate to form the third
- * argument. All arguments are {@link Cons} sequences.
+ * Information about a field in a generated logic value.
  */
-@MakeGoalFactory(name = "Append")
-public class AppendClauses {
-  static Goal finish(Object a, Object b, Object ab) {
-    return conj(same(a, null), same(b, ab));
+public final class LogicValueField {
+  private final String name;
+
+  public LogicValueField(String name) {
+    this.name = name;
   }
 
-  static Goal iterate(Object a, Object b, Object ab) {
-    Var afirst = new Var();
-    Var arest = new Var();
-    Var abrest = new Var();
+  /**
+   * The name of the field.
+   */
+  public String getName() {
+    return name;
+  }
 
-    return conj(
-        same(new Cons<>(afirst, arest), a),
-        same(new Cons<>(afirst, abrest), ab),
-        Append.o(arest, b, abrest));
+  /**
+   * The name of the type parameter.
+   */
+  public String getTypeParameter() {
+    return name.toUpperCase(Locale.US) + "_TYPE";
+  }
+
+  /**
+   * The name of the setter method in the generated value builder.
+   */
+  public String getSetterMethodName() {
+    return "set" + Processors.capitalizeFirst(name);
+  }
+
+  /**
+   * Returns the type parameter and name separate by a space - useable as a kind of declaration or
+   * in a method signature.
+   */
+  public String getTypeAndName() {
+    return getTypeParameter() + " " + getName();
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 }

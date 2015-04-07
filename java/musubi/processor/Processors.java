@@ -60,5 +60,16 @@ public class Processors {
     return list.toString();
   }
 
+  /**
+   * Returns a string equivalent to {@code s} but with the first character capitalized.
+   */
+  public static final String capitalizeFirst(String s) {
+    if (s.length() == 0) {
+      return "";
+    }
+
+    return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+  }
+
   private Processors() {}
 }

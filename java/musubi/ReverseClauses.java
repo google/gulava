@@ -43,8 +43,8 @@ public class ReverseClauses {
       Var aRest = new Var();
 
       return conj(
-          same(a, new Cons(aFirst, aRest)),
-          ReverseWithAccum.d(aRest, b, new Cons(aFirst, bTail)));
+          same(a, new Cons<>(aFirst, aRest)),
+          ReverseWithAccum.d(aRest, b, new Cons<>(aFirst, bTail)));
     }
   }
 

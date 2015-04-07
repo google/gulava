@@ -71,7 +71,7 @@ public abstract class ConsBase {
   public static Cons list(List<?> values) {
     Cons result = null;
     for (ListIterator<?> valueIter = values.listIterator(values.size()); valueIter.hasPrevious();) {
-      result = new Cons(valueIter.previous(), result);
+      result = new Cons<>(valueIter.previous(), result);
     }
     return result;
   }
