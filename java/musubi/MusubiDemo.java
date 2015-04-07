@@ -23,7 +23,6 @@ package musubi;
 
 import static musubi.Goals.conj;
 import static musubi.Goals.disj;
-import static musubi.Goals.ordero;
 import static musubi.Goals.same;
 
 import java.util.Arrays;
@@ -139,16 +138,6 @@ public class MusubiDemo {
     System.out.println("\nexample 6");
     g = reverseo(Cons.list(Arrays.asList(4, 5, 6)), x);
     print(g.run(Subst.EMPTY), 10, x);
-
-    System.out.println("\nexample 7");
-    g = ordero(x, Cons.list(Arrays.asList(1, 2, 3, 4, 5)));
-    print(g.run(Subst.EMPTY), 50, x);
-
-    System.out.println("\nexample 8");
-    g = ordero(
-        Cons.list(Arrays.asList(x, y)),
-        Cons.list(Arrays.asList(1, 2, 3, 4, 5)));
-    print(g.run(Subst.EMPTY), 50, x, y);
 
     System.out.println("\nexample 9");
     g = reverseo(x, y);

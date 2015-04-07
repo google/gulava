@@ -22,7 +22,6 @@
 package musubi;
 
 import static musubi.Goals.conj;
-import static musubi.Goals.ordero;
 import static musubi.Goals.same;
 
 import musubi.Cons;
@@ -139,7 +138,9 @@ public class CustomValueTypeTest {
     new LogicAsserter()
         .stream(
             conj(
-                ordero(Cons.list(Arrays.asList(family, given)), Cons.list(Arrays.asList(1, 2, 3, 4))),
+                Order.o(
+                    Cons.list(Arrays.asList(family, given)),
+                    Cons.list(Arrays.asList(1, 2, 3, 4))),
                 same(new PersonName(family, given), name)))
         .workUnits(7)
         .addRequestedVar(name)

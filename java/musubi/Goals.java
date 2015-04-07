@@ -21,9 +21,6 @@
  */
 package musubi;
 
-import musubi.EmptyStream;
-import musubi.SolveStep;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,29 +77,6 @@ public class Goals {
     };
   }
 
-  public static Goal ordero(final Object sub, final Object full) {
-    return new Goal() {
-      @Override
-      public Stream run(Subst s) {
-        Var head = new Var();
-        Var subTail = new Var();
-        Var fullTail = new Var();
-
-        return disj(
-            conj(
-                same(sub, null),
-                same(full, null)),
-            conj(
-                same(new Cons(head, fullTail), full),
-                disj(
-                    conj(
-                        same(new Cons(head, subTail), sub),
-                        ordero(subTail, fullTail)),
-                    ordero(sub, fullTail))))
-            .run(s);
-      }
-    };
-  }
-
   private Goals() {}
 }
+

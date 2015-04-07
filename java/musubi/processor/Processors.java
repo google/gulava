@@ -42,5 +42,23 @@ public class Processors {
     throwable.printStackTrace();
   }
 
+  /**
+   * Joins the string representation of each object in {@code objects} into a single string.
+   * {@code delimiter} is used to separate the objects, but is not added before the first or after
+   * the last object.
+   */
+  public static String join(String delimiter, Iterable<?> objects) {
+    StringBuilder list = new StringBuilder();
+    boolean first = true;
+    for (Object object : objects) {
+      if (!first) {
+        list.append(delimiter);
+      }
+      first = false;
+      list.append(object);
+    }
+    return list.toString();
+  }
+
   private Processors() {}
 }

@@ -19,29 +19,38 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package musubi.processor;
+package musubi;
+
+import static musubi.Goals.conj;
+import static musubi.Goals.disj;
+import static musubi.Goals.same;
+
+import musubi.annotation.MakeGoalFactory;
 
 /**
- * Constants containing fully-qualified names of classes of concern to this processor.
+ * Defines a goal (see {@link Order}) which indicates the first argument ({@link Cons} sequence) is
+ * a subset of the second argument (also {@link Cons} sequence) and the items in the former are in
+ * the same order as the items in the latter.
  */
-public class ClassNames {
-  public static final String MAKE_LOGIC_VALUE = "musubi.annotation.MakeLogicValue";
+@MakeGoalFactory(name = "Order")
+public class OrderClauses {
+  static Goal endOfLists(Object sub, Object full) {
+    return conj(
+        same(sub, null),
+        same(full, null));
+  }
 
-  public static final String MAKE_GOAL_FACTORY = "musubi.annotation.MakeGoalFactory";
+  static Goal iterate(Object sub, Object full) {
+    Var head = new Var();
+    Var subTail = new Var();
+    Var fullTail = new Var();
 
-  public static final String DELAYED_GOAL = "musubi.DelayedGoal";
-
-  public static final String LOGIC_VALUE = "musubi.LogicValue";
-
-  public static final String GOAL = "musubi.Goal";
-
-  public static final String GOALS = "musubi.Goals";
-
-  public static final String STREAM = "musubi.Stream";
-
-  public static final String SUBST = "musubi.Subst";
-
-  public static final String REPLACER = "musubi.Replacer";
-
-  private ClassNames() {}
+    return conj(
+        same(new Cons(head, fullTail), full),
+        disj(
+            conj(
+                same(new Cons(head, subTail), sub),
+                Order.o(subTail, fullTail)),
+            Order.o(sub, fullTail)));
+  }
 }

@@ -30,7 +30,10 @@ java_binary(
 java_library(
     name = "musubi",
     srcs = glob(["*.java"], exclude = ["MusubiDemo.java"]),
-    plugins = ["//java/musubi/processor:make_logic_value_plugin"],
+    plugins = [
+        "//java/musubi/processor:make_logic_value_plugin",
+        "//java/musubi/processor:make_goal_factory_plugin",
+    ],
     deps = [
         "//java/musubi/annotation",
         "//third_party/pcollections",
