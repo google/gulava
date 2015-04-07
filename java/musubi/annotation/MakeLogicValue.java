@@ -36,6 +36,9 @@ import java.lang.annotation.Target;
  * (perharps because you will not call any methods on the fields), you can just use an unqualified
  * reference, although you should use the diamond syntax to invoke the constructor to avoid compiler
  * warnings, e.g. {@code MyValue v = new MyValue<>("x", "y")}.
+ *
+ * <p>Note that to suppress a rawtypes warning for {@code MyValue v} (these are shown by default in
+ * Eclipse), you should qualify it as {@code MyValue<?, ?> v}.
  */
 @Target(ElementType.TYPE)
 public @interface MakeLogicValue {
