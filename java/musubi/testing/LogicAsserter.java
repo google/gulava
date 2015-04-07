@@ -31,6 +31,7 @@ import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,10 @@ public final class LogicAsserter {
    * actual results obtained from the stream.
    */
   public void test() {
+    Assert.assertEquals(expectedSubsts, execute());
+  }
+
+  private List<Map<Var, Object>> execute() {
     List<Map<Var, Object>> actualSubsts = new ArrayList<>();
     boolean actualFinishes = false;
     int actualWorkUnits = 0;
@@ -130,6 +135,17 @@ public final class LogicAsserter {
 
     Assert.assertEquals(expectedWorkUnits, actualWorkUnits);
     Assert.assertEquals(expectedFinishes, actualFinishes);
-    Assert.assertEquals(expectedSubsts, actualSubsts);
+    return actualSubsts;
+  }
+
+  /**
+   * Rather than compare expected substitutions to actual ones (like {@link #test()} does), just
+   * returns the substitutions and allows the caller to verify them. This still asserts that the
+   * correct number of work units were spent and and that the stream did or did not finish according
+   * to expectations.
+   */
+  public List<Map<Var, Object>> actualSubsts() {
+    Assert.assertEquals(Collections.emptyList(), expectedSubsts);
+    return execute();
   }
 }

@@ -23,6 +23,7 @@ package musubi;
 
 import musubi.annotation.MakeLogicValue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -73,5 +74,17 @@ public abstract class ConsBase {
       result = new Cons(valueIter.previous(), result);
     }
     return result;
+  }
+
+  /**
+   * Converts a sequence to a list as described in this class' Javadoc above.
+   */
+  public static List<Object> toList(Cons head) {
+    List<Object> list = new ArrayList<>();
+    while (head != null) {
+      list.add(head.car());
+      head = (Cons) head.cdr();
+    }
+    return list;
   }
 }

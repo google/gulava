@@ -24,50 +24,31 @@ package musubi;
 import static musubi.Goals.conj;
 import static musubi.Goals.same;
 
-import java.util.Arrays;
+import musubi.annotation.MakeGoalFactory;
 
-// TODO: Refactor this into test cases and proper documentation.
-public class MusubiDemo {
-  static void print(Stream s, int n, Var... requestedVars) {
-    while (n-- >= 0) {
-      SolveStep solve = s.solve();
-      if (solve == null) {
-        System.out.println("()");
-        break;
-      }
-      if (solve.subst() != null) {
-        System.out.println(new View.Builder()
-            .setSubst(solve.subst())
-            .addRequestedVar(requestedVars)
-            .build());
-      }
-      s = solve.rest();
+/**
+ * Defines a goal (see {@link Reverse}) where the first argument is the same sequence as the second
+ * argument, but in reverse order. Arguments are treated as {@link Cons} sequences.
+ */
+@MakeGoalFactory(name = "Reverse")
+public class ReverseClauses {
+  @MakeGoalFactory(name = "ReverseWithAccum")
+  public static class WithAccum {
+    static Goal finish(Object a, Object b, Object bTail) {
+      return conj(same(a, null), same(b, bTail));
+    }
+
+    static Goal iterate(Object a, Object b, Object bTail) {
+      Var aFirst = new Var();
+      Var aRest = new Var();
+
+      return conj(
+          same(a, new Cons(aFirst, aRest)),
+          ReverseWithAccum.d(aRest, b, new Cons(aFirst, bTail)));
     }
   }
 
-  public static void main(String... args) {
-    Var x = new Var();
-    Var y = new Var();
-
-    System.out.println("\nexample 5");
-    Var a = new Var();
-    Var b = new Var();
-    Goal g = conj(
-        same(x, y),
-        same(x, Cons.list(Arrays.asList(2, 3, 4))),
-        same(a, new Cons(42, x)),
-        same(b, new Cons(43, y)));
-    print(g.run(Subst.EMPTY), 10, a, b);
-
-    System.out.println("\nexample 10");
-    g = same(x, x);
-    print(g.run(Subst.EMPTY), 10, x, x);
-
-    System.out.println("\nexample 11");
-    g = conj(
-        same(x, 42),
-        same(y, Cons.list(Arrays.asList(5, 7, 9))),
-        same(a, new Cons(x, y)));
-    print(g.run(Subst.EMPTY), 10, a);
+  static Goal delegate(Object a, Object b) {
+    return ReverseWithAccum.i(a, b, null);
   }
 }

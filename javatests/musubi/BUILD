@@ -69,3 +69,13 @@ java_test(
         "//third_party/junit4",
     ],
 )
+
+java_test(
+    name = "ReverseTest",
+    srcs = ["ReverseTest.java"],
+    deps = [
+        "//java/musubi",
+        "//java/musubi/testing",
+        "//third_party/junit4",
+    ],
+)
