@@ -51,6 +51,16 @@ java_test(
 )
 
 java_test(
+    name = "GoalsTest",
+    srcs = ["GoalsTest.java"],
+    deps = [
+        "//java/musubi",
+        "//java/musubi/testing",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "OrderTest",
     srcs = ["OrderTest.java"],
     deps = [

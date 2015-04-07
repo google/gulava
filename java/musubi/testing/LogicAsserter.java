@@ -111,7 +111,8 @@ public final class LogicAsserter {
     boolean actualFinishes = false;
     int actualWorkUnits = 0;
 
-    while ((actualWorkUnits++ < expectedWorkUnits) || expectedFinishes) {
+    while (expectedFinishes || (actualWorkUnits < expectedWorkUnits)) {
+      actualWorkUnits += 1;
       SolveStep solve = stream.solve();
       if (solve == null) {
         actualFinishes = true;

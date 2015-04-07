@@ -29,10 +29,6 @@ import java.util.Arrays;
 
 // TODO: Refactor this into test cases and proper documentation.
 public class MusubiDemo {
-  static Stream unit(Subst s) {
-    return new SolveStep(s, EmptyStream.INSTANCE);
-  }
-
   static void print(Stream s, int n, Var... requestedVars) {
     while (n-- >= 0) {
       SolveStep solve = s.solve();
@@ -48,17 +44,6 @@ public class MusubiDemo {
       }
       s = solve.rest();
     }
-  }
-
-  static Goal repeat(final Goal repeated) {
-    return new Goal() {
-      private final Goal delayed = new DelayedGoal(this);
-
-      @Override
-      public Stream run(Subst s) {
-        return disj(repeated, delayed).run(s);
-      }
-    };
   }
 
   static Goal reverseo(Object a, Object b) {
@@ -88,22 +73,10 @@ public class MusubiDemo {
     Var x = new Var();
     Var y = new Var();
 
-    System.out.println("example 1");
-    Stream s = disj(repeat(same(x, 5)), repeat(same(x, 6))).run(Subst.EMPTY);
-    print(s, 10, x);
-
-    System.out.println("\nexample 2");
-    s = repeat(disj(same(x, 5), same(x, 6))).run(Subst.EMPTY);
-    print(s, 10, x);
-
-    System.out.println("\nexample 3");
-    Goal g = conj(same(x, y), same(x, 5));
-    print(g.run(Subst.EMPTY), 10, x, y);
-
     System.out.println("\nexample 5");
     Var a = new Var();
     Var b = new Var();
-    g = conj(
+    Goal g = conj(
         same(x, y),
         same(x, Cons.list(Arrays.asList(2, 3, 4))),
         same(a, new Cons(42, x)),
