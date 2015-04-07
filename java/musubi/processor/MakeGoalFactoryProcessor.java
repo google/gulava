@@ -21,12 +21,15 @@
  */
 package musubi.processor;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
 /**
  * An annotation processor that reads classes annoated with @{@code MakeGoalFactory} and creates
@@ -36,7 +39,17 @@ import javax.lang.model.element.TypeElement;
 public final class MakeGoalFactoryProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    // TODO: implement
+    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
+      MakeGoalFactoryMetadata metadata =
+          MakeGoalFactoryMetadata.of(annotatedType.getType(), processingEnv.getMessager());
+      try  (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+        // TODO: implement
+      } catch (IOException e) {
+        processingEnv.getMessager()
+            .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());
+        e.printStackTrace();
+      }
+    }
     return true;
   }
 }

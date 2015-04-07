@@ -27,13 +27,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import javax.tools.Diagnostic;
 
 /**
- * Contains information derived from the {@code MakeLogicValue} annotation.
+ * Contains information derived from a {@code @MakeLogicValue} annotation and the type that it
+ * annotates.
  */
 public final class MakeLogicValueMetadata {
   private final String name;
@@ -68,7 +71,7 @@ public final class MakeLogicValueMetadata {
   /**
    * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
    */
-  public static MakeLogicValueMetadata forInterface(TypeElement interfaze) {
+  public static MakeLogicValueMetadata forInterface(TypeElement interfaze, Messager messager) {
     MakeLogicValue annotation = interfaze.getAnnotation(MakeLogicValue.class);
     List<String> fields = new ArrayList<>();
     boolean autoDefineToString = true;
@@ -82,9 +85,10 @@ public final class MakeLogicValueMetadata {
     }
 
     String name = annotation.name();
-    if (name == null) {
-      throw new IllegalArgumentException(
-          "No name given for MakeLogicValue annotation on: " + interfaze.getQualifiedName());
+    if ((name == null) || name.isEmpty()) {
+      messager.printMessage(Diagnostic.Kind.ERROR,
+          "Require non-empty name in @MakeLogicValue annotation.", interfaze);
+      name = "";
     }
 
     return new MakeLogicValueMetadata(name, fields, interfaze, autoDefineToString);
