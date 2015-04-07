@@ -31,6 +31,16 @@ java_test(
 )
 
 java_test(
+    name = "AppendTest",
+    srcs = ["AppendTest.java"],
+    deps = [
+        "//java/musubi",
+        "//java/musubi/testing",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "ConsTest",
     srcs = ["ConsTest.java"],
     deps = [

@@ -61,27 +61,6 @@ public class MusubiDemo {
     };
   }
 
-  static Goal appendo(final Object a, final Object b, final Object ab) {
-    return new Goal() {
-      @Override
-      public Stream run(Subst s) {
-        Var afirst = new Var();
-        Var arest = new Var();
-        Var abrest = new Var();
-
-        return disj(
-            conj(
-                same(a, null),
-                same(b, ab)),
-            conj(
-                same(new Cons(afirst, arest), a),
-                same(new Cons(afirst, abrest), ab),
-                appendo(arest, b, abrest)))
-            .run(s);
-      }
-    };
-  }
-
   static Goal reverseo(Object a, Object b) {
     return reverseo(a, b, null);
   }
@@ -119,10 +98,6 @@ public class MusubiDemo {
 
     System.out.println("\nexample 3");
     Goal g = conj(same(x, y), same(x, 5));
-    print(g.run(Subst.EMPTY), 10, x, y);
-
-    System.out.println("\nexample 4");
-    g = appendo(x, y, Cons.list(Arrays.asList(1, 2, 3, 4)));
     print(g.run(Subst.EMPTY), 10, x, y);
 
     System.out.println("\nexample 5");
