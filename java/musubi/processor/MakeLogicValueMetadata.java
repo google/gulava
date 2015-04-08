@@ -74,11 +74,24 @@ public final class MakeLogicValueMetadata {
    * brackets, e.g. {@code "<FOO_TYPE, BAR_TYPE>"}.
    */
   public String typeParametersAlligator() {
+    if (fields.isEmpty()) {
+      return "";
+    }
     List<String> typeParameters = new ArrayList<>();
     for (LogicValueField field : fields) {
       typeParameters.add(field.getTypeParameter());
     }
     return "<" + Processors.join(", ", typeParameters) + ">";
+  }
+
+  /**
+   * Generates an instantiation expression given a list of arguments to pass to the constructor.
+   */
+  public String instantiation(Iterable<String> arguments) {
+    return String.format("new %s%s(%s)",
+        name,
+        fields.isEmpty() ? "" : "<>",
+        Processors.join(", ", arguments));
   }
 
   /**

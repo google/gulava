@@ -26,6 +26,7 @@ java_library(
     srcs = [
         "SimpleValueInterface.java",
         "HasStaticMethod.java",
+        "HasNoFields.java",
     ],
     deps = ["//java/musubi/processor"],
 )

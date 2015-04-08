@@ -43,6 +43,8 @@ import java.util.Set;
  */
 @RunWith(JUnit4.class)
 public class MakeLogicValueFunctionalTest {
+  private static final Var X = new Var();
+
   @Test
   public void unifyFields() {
     Var fooVar = new Var();
@@ -144,5 +146,33 @@ public class MakeLogicValueFunctionalTest {
   public void staticMethodsAreNotFields() {
     HasStaticMethodImpl x = new HasStaticMethodImpl<>(42);
     Assert.assertEquals(Collections.singletonMap("foo", 42), x.asMap());
+  }
+
+  @MakeLogicValue(name = "HasNoFields2Impl")
+  abstract static class HasNoFields2 {}
+
+  @Test
+  public void canUnifyNoFieldValues() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                same(X, new HasNoFieldsImpl()),
+                same(X, new HasNoFieldsImpl())))
+        .workUnits(2)
+        .addRequestedVar(X)
+        .startSubst()
+        .put(X, new HasNoFieldsImpl())
+        .test();
+  }
+
+  @Test
+  public void doesNotUnifyDifferingNoFieldTypes() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                same(X, new HasNoFieldsImpl()),
+                same(X, new HasNoFields2Impl())))
+        .workUnits(1)
+        .test();
   }
 }

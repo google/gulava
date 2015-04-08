@@ -23,6 +23,8 @@ package musubi.processor;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -149,14 +151,11 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         // LogicValue method: replace
         writer.write("  @Override public " + ClassNames.LOGIC_VALUE + " replace("
             + ClassNames.REPLACER + " replacer) {\n");
-        writer.write("    return new " + metadata.getName() + "<>(");
-        delimiter = "";
+        List<String> replaceInstantiateArgs = new ArrayList<>();
         for (LogicValueField field : metadata.getFields()) {
-          writer.write(delimiter);
-          writer.write("replacer.replace(" + field + ")");
-          delimiter = ", ";
+          replaceInstantiateArgs.add("replacer.replace(" + field + ")");
         }
-        writer.write(");\n");
+        writer.write("    return " + metadata.instantiation(replaceInstantiateArgs) + ";\n");
         writer.write("  }\n");
 
         // Object method: equals
