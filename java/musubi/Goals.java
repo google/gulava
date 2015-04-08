@@ -28,8 +28,19 @@ import java.util.List;
  * Basic {@link Goal} factories.
  */
 public class Goals {
+  /**
+   * A goal that simply succeeds once without affecting substitutions.
+   */
+  public static final Goal UNIT = new Goal() {
+    @Override
+    public Stream run(Subst s) {
+      return new SolveStep(s, EmptyStream.INSTANCE);
+    }
+  };
+
   public static Goal same(final Object u, final Object v) {
     return new Goal() {
+      @Override
       public Stream run(Subst state) {
         state = state.unify(u, v);
         if (state == null) {
@@ -53,6 +64,7 @@ public class Goals {
   public static Goal disj(Goal g1, Goal g2, Goal... gs) {
     final List<Goal> allGoals = goalList(g1, g2, gs);
     return new Goal() {
+      @Override
       public Stream run(Subst s) {
         Stream result = allGoals.get(0).run(s);
         for (int i = 1; i < allGoals.size(); i++) {
@@ -67,6 +79,7 @@ public class Goals {
     final List<Goal> allGoals = goalList(g1, g2, gs);
 
     return new Goal() {
+      @Override
       public Stream run(Subst s) {
         Stream result = allGoals.get(0).run(s);
         for (int i = 1; i < allGoals.size(); i++) {
@@ -96,4 +109,3 @@ public class Goals {
 
   private Goals() {}
 }
-

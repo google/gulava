@@ -88,4 +88,25 @@ public class GoalsTest {
         .startSubst()
         .test();
   }
+
+  @Test
+  public void unitGoalTest() {
+    new LogicAsserter()
+        .stream(Goals.UNIT)
+        .workUnits(2)
+        .startSubst()
+        .test();
+  }
+
+  @Test
+  public void repeatUnitGoalTest() {
+    new LogicAsserter()
+        .stream(Goals.repeat(Goals.UNIT))
+        .finishes(false)
+        .workUnits(5)
+        .startSubst()
+        .startSubst()
+        .startSubst()
+        .test();
+  }
 }
