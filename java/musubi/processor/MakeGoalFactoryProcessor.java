@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -56,6 +57,10 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
       parameters.add("final Object " + argName);
     }
     return Processors.join(", ", parameters);
+  }
+
+  @Override public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latestSupported();
   }
 
   @Override
