@@ -23,6 +23,9 @@ package musubi.processor;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 
 /**
@@ -69,6 +72,14 @@ public class Processors {
     }
 
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+  }
+
+  /**
+   * Returns the fully qualified name of the {@link TypeElement} indicated by the mirror
+   * {@code type}.
+   */
+  public static Name qualifiedName(DeclaredType type) {
+    return ((TypeElement) type.asElement()).getQualifiedName();
   }
 
   private Processors() {}

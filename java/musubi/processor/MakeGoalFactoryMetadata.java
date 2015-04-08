@@ -42,14 +42,14 @@ import javax.tools.Diagnostic;
 public final class MakeGoalFactoryMetadata {
   private final String name;
   private final List<String> argNames;
-  private final List<ExecutableElement> goalMethods;
+  private final List<ExecutableElement> clauseMethods;
   private final TypeElement annotatedType;
 
-  MakeGoalFactoryMetadata(String name, List<String> argNames, List<ExecutableElement> goalMethods,
+  MakeGoalFactoryMetadata(String name, List<String> argNames, List<ExecutableElement> clauseMethods,
       TypeElement annotatedType) {
     this.name = name;
     this.argNames = argNames;
-    this.goalMethods = Collections.unmodifiableList(new ArrayList<>(goalMethods));
+    this.clauseMethods = Collections.unmodifiableList(new ArrayList<>(clauseMethods));
     this.annotatedType = annotatedType;
   }
 
@@ -72,8 +72,8 @@ public final class MakeGoalFactoryMetadata {
    * The original methods which construct goals. This is not every method in the annotated type.
    * Non-static methods and private methods are filtered out.
    */
-  public List<ExecutableElement> getGoalMethods() {
-    return goalMethods;
+  public List<ExecutableElement> getClauseMethods() {
+    return clauseMethods;
   }
 
   public TypeElement getAnnotatedType() {
@@ -86,7 +86,7 @@ public final class MakeGoalFactoryMetadata {
    */
   public static MakeGoalFactoryMetadata of(TypeElement annotatedType, Messager messager) {
     MakeGoalFactory annotation = annotatedType.getAnnotation(MakeGoalFactory.class);
-    List<ExecutableElement> goalMethods = new ArrayList<>();
+    List<ExecutableElement> clauseMethods = new ArrayList<>();
 
     String name = annotation.name();
     if (name == null || name.isEmpty()) {
@@ -110,7 +110,7 @@ public final class MakeGoalFactoryMetadata {
         for (VariableElement parameters : method.getParameters()){
           argNames.add(parameters.getSimpleName().toString());
         }
-        goalMethods.add(method);
+        clauseMethods.add(method);
         continue;
       }
 
@@ -141,15 +141,15 @@ public final class MakeGoalFactoryMetadata {
         }
       }
 
-      goalMethods.add(method);
+      clauseMethods.add(method);
     }
 
-    if (goalMethods.isEmpty()) {
+    if (clauseMethods.isEmpty()) {
       messager.printMessage(Diagnostic.Kind.ERROR,
           "Expect at least one static, non-private method in class annotated with @MakeGoalFactory",
           annotatedType);
     }
 
-    return new MakeGoalFactoryMetadata(name, argNames, goalMethods, annotatedType);
+    return new MakeGoalFactoryMetadata(name, argNames, clauseMethods, annotatedType);
   }
 }

@@ -32,6 +32,18 @@ java_library(
 )
 
 java_test(
+    name = "MakeGoalFactoryFunctionalTest",
+    srcs = ["MakeGoalFactoryFunctionalTest.java"],
+    deps = [
+        ":generated",
+        "//java/musubi",
+        "//java/musubi/processor",
+        "//java/musubi/testing",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "MakeLogicValueProcessorBuilderTest",
     srcs = ["MakeLogicValueProcessorBuilderTest.java"],
     deps = [

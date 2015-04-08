@@ -32,18 +32,13 @@ import musubi.annotation.MakeGoalFactory;
  */
 @MakeGoalFactory(name = "Append")
 public class AppendClauses {
-  static Goal finish(Object a, Object b, Object ab) {
-    return conj(same(a, null), same(b, ab));
+  static Goal finish(Void a, Object b, Object ab) {
+    return same(b, ab);
   }
 
-  static Goal iterate(Object a, Object b, Object ab) {
-    Var afirst = new Var();
-    Var arest = new Var();
-    Var abrest = new Var();
-
+  static Goal iterate(Cons<?, ?> a, Object b, Cons<?, ?> ab) {
     return conj(
-        same(new Cons<>(afirst, arest), a),
-        same(new Cons<>(afirst, abrest), ab),
-        Append.o(arest, b, abrest));
+        same(a.car(), ab.car()),
+        Append.o(a.cdr(), b, ab.cdr()));
   }
 }

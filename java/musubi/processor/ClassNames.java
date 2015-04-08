@@ -43,5 +43,7 @@ public class ClassNames {
 
   public static final String REPLACER = "musubi.Replacer";
 
+  public static final String VAR = "musubi.Var";
+
   private ClassNames() {}
 }

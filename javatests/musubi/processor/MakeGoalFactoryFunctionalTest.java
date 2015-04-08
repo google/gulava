@@ -19,32 +19,44 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package musubi;
+package musubi.processor;
 
-import static musubi.Goals.conj;
-import static musubi.Goals.disj;
-import static musubi.Goals.same;
-
+import musubi.Cons;
+import musubi.Goal;
+import musubi.Goals;
 import musubi.annotation.MakeGoalFactory;
+import musubi.testing.LogicAsserter;
 
-/**
- * Defines a goal (see {@link Order}) which indicates the first argument ({@link Cons} sequence) is
- * a subset of the second argument (also {@link Cons} sequence) and the items in the former are in
- * the same order as the items in the latter.
- */
-@MakeGoalFactory(name = "Order")
-public class OrderClauses {
-  static Goal endOfLists(Void sub, Void full) {
-    return Goals.UNIT;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
+
+@RunWith(JUnit4.class)
+public class MakeGoalFactoryFunctionalTest {
+  @MakeGoalFactory(name = "HasAnAtom")
+  public static class HasAnAtomClauses {
+    static Goal found(Cons<HasNoFieldsImpl, ?> a) {
+      return Goals.UNIT;
+    }
+
+    static Goal iterate(Cons<?, ?> a) {
+      return HasAnAtom.o(a.cdr());
+    }
   }
 
-  static Goal select(Cons<?, ?> sub, Cons<?, ?> full) {
-    return conj(
-        same(sub.car(), full.car()),
-        Order.o(sub.cdr(), full.cdr()));
-  }
+  @Test
+  public void decomposeEmptyField() {
+    new LogicAsserter()
+        .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2))))
+        .workUnits(1)
+        .test();
 
-  static Goal skip(Object sub, Cons<?, ?> full) {
-    return Order.o(sub, full.cdr());
+    new LogicAsserter()
+        .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2, new HasNoFieldsImpl(), 3, 4))))
+        .workUnits(2)
+        .startSubst()
+        .test();
   }
 }

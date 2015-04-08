@@ -34,17 +34,12 @@ import musubi.annotation.MakeGoalFactory;
 public class ReverseClauses {
   @MakeGoalFactory(name = "ReverseWithAccum")
   public static class WithAccum {
-    static Goal finish(Object a, Object b, Object bTail) {
-      return conj(same(a, null), same(b, bTail));
+    static Goal finish(Void a, Object b, Object bTail) {
+      return same(b, bTail);
     }
 
-    static Goal iterate(Object a, Object b, Object bTail) {
-      Var aFirst = new Var();
-      Var aRest = new Var();
-
-      return conj(
-          same(a, new Cons<>(aFirst, aRest)),
-          ReverseWithAccum.d(aRest, b, new Cons<>(aFirst, bTail)));
+    static Goal iterate(Cons<?, ?> a, Object b, Object bTail) {
+      return ReverseWithAccum.d(a.cdr(), b, new Cons<>(a.car(), bTail));
     }
   }
 

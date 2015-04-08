@@ -19,32 +19,30 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package musubi;
-
-import static musubi.Goals.conj;
-import static musubi.Goals.disj;
-import static musubi.Goals.same;
-
-import musubi.annotation.MakeGoalFactory;
+package musubi.processor;
 
 /**
- * Defines a goal (see {@link Order}) which indicates the first argument ({@link Cons} sequence) is
- * a subset of the second argument (also {@link Cons} sequence) and the items in the former are in
- * the same order as the items in the latter.
+ * Generates symbols to be used in code generated for goal factories. This is not a completely
+ * thorough gensymer, as it may generate symbols that conflict with manually-chosen symbols by
+ * coincidence.
  */
-@MakeGoalFactory(name = "Order")
-public class OrderClauses {
-  static Goal endOfLists(Void sub, Void full) {
-    return Goals.UNIT;
+public final class Gensymer {
+  private final String format;
+  private int nextIndex;
+
+  /**
+   * @param format a format string which specifies where to place a unique index in a "base" name.
+   *     This should begin with a valid identifier character, like _ or a letter. For example:
+   *     {@code "__foo%s__"}.
+   */
+  public Gensymer(String format) {
+    this.format = format;
   }
 
-  static Goal select(Cons<?, ?> sub, Cons<?, ?> full) {
-    return conj(
-        same(sub.car(), full.car()),
-        Order.o(sub.cdr(), full.cdr()));
-  }
-
-  static Goal skip(Object sub, Cons<?, ?> full) {
-    return Order.o(sub, full.cdr());
+  /**
+   * Creates a unique symbol. Generates a new symbol whenever it is called.
+   */
+  public String gensym() {
+    return String.format(format, nextIndex++);
   }
 }
