@@ -21,7 +21,13 @@
  */
 package musubi.util;
 
+import static musubi.Goals.conj;
+import static musubi.Goals.same;
+
+import musubi.Goal;
+import musubi.ICons;
 import musubi.Var;
+import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
 
 /**
@@ -39,5 +45,18 @@ abstract class IDiffList<HEAD, HOLE> {
   public static IDiffList<Var, Var> empty() {
     Var node = new Var();
     return new DiffList<>(node, node);
+  }
+
+  /**
+   * Defines a goal that identifies the final element in a difference list.
+   */
+  @MakeGoalFactory(name = "DiffListLast")
+  static class DiffListLastClauses {
+    static Goal goal(Object element, IDiffList<?, ICons<?, ?>> without, IDiffList<?, ?> with) {
+      return conj(
+          same(without.hole().car(), element),
+          same(with.head(), without.head()),
+          same(with.hole(), without.hole().cdr()));
+    }
   }
 }

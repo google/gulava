@@ -21,7 +21,12 @@
  */
 package musubi.util;
 
+import static musubi.Goals.conj;
+import static musubi.Goals.same;
+
+import musubi.Goal;
 import musubi.Var;
+import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
 
 /**
@@ -36,5 +41,18 @@ abstract class IQueue<S, C> {
 
   public static IQueue<Void, IDiffList<Var, Var>> empty() {
     return new Queue<>(/*size=*/null, DiffList.empty());
+  }
+
+  /**
+   * Defines a goal that identifies the final element in a queue. This is based on the implementation
+   * in chapter 2 of The Craft of Prolog.
+   */
+  @MakeGoalFactory(name = "QueueLast")
+  static class LastClauses {
+    static Goal goal(Object element, IQueue<?, ?> without, IQueue<ICount<?>, ?> with) {
+      return conj(
+          same(without.size(), with.size().oneLess()),
+          DiffListLast.o(element, without.contents(), with.contents()));
+    }
   }
 }
