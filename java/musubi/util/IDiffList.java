@@ -42,6 +42,9 @@ abstract class IDiffList<HEAD, HOLE> {
   public abstract HEAD head();
   public abstract HOLE hole();
 
+  /**
+   * Returns a fresh, empty difference list. This returns a new list each time.
+   */
   public static IDiffList<Var, Var> empty() {
     Var node = new Var();
     return new DiffList<>(node, node);
@@ -57,6 +60,55 @@ abstract class IDiffList<HEAD, HOLE> {
           same(without.hole().car(), element),
           same(with.head(), without.head()),
           same(with.hole(), without.hole().cdr()));
+    }
+  }
+
+  /**
+   * Defines a goal that converts between a difference list and a plain ({@link ICons}) list.
+   * Note that this usually diverges when converting a difference list to a plain list (rather than
+   * the other direction). In that case, consider using {@link DiffListFinish}.
+   */
+  @MakeGoalFactory(name = "DiffListAsList")
+  static class AsListClauses {
+    static Goal delegate(IDiffList<?, ?> diffList, Object list) {
+      return DiffListAsList3.i(diffList.head(), diffList.hole(), list);
+    }
+  }
+
+  /**
+   * Defines a goal that converts between a difference list and a plain ({@link ICons}) list. This
+   * takes the fields of the difference list as separate arguments.
+   *
+   * <p>TODO: Figure out if this really needs to be a separate goal from {@link DiffListAsList}.
+   * Maybe with inlined goals it doesn't matter if we pattern-match on the fields of a DiffList for
+   * each iteration.
+   */
+  @MakeGoalFactory(name = "DiffListAsList3")
+  static class AsList3Clauses {
+    static Goal empty(Object head, Object hole, Void list) {
+      return same(head, hole);
+    }
+
+    static Goal iterate(ICons<?, ?> head, Object hole, ICons<?, ?> list) {
+      return conj(
+          same(head.car(), list.car()),
+          DiffListAsList3.o(head.cdr(), hole, list.cdr()));
+    }
+  }
+
+  /**
+   * Defines a goal that converts between a difference list and a plain list. This is slightly
+   * different from {@link DiffListAsList} in that it renders the difference list unavailable for
+   * further appending on the end, since the {@link #hole()} value is bound to {@code null}. As a
+   * result, this runs in O(1) while {@link DiffListAsList} runs in O(n) where n is the length of
+   * the list.
+   */
+  @MakeGoalFactory(name = "DiffListFinish")
+  static class FinishClauses {
+    static Goal goal(IDiffList<?, ?> diffList, Object list) {
+      return conj(
+          same(diffList.head(), list),
+          same(diffList.hole(), null));
     }
   }
 }

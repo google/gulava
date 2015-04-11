@@ -32,6 +32,17 @@ java_test(
 )
 
 java_test(
+    name = "DiffListTest",
+    srcs = ["DiffListTest.java"],
+    deps = [
+        "//java/musubi",
+        "//java/musubi/testing",
+        "//java/musubi/util",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "QueueTest",
     srcs = ["QueueTest.java"],
     deps = [
