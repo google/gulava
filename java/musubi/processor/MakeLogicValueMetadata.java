@@ -117,6 +117,14 @@ public final class MakeLogicValueMetadata {
       name = "";
     }
 
+    int typeParameterCount = interfaze.getTypeParameters().size();
+    if (typeParameterCount != fields.size()) {
+      messager.printMessage(Diagnostic.Kind.ERROR,
+          "Expect one generic type parameter for each field. There are "
+          + fields.size() + " field(s) and "
+          + typeParameterCount + " type parameter(s).", interfaze);
+    }
+
     return new MakeLogicValueMetadata(name, fields, interfaze, autoDefineToString);
   }
 }

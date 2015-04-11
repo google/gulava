@@ -30,11 +30,11 @@ import musubi.annotation.MakeLogicValue;
  * Johnson.
  */
 @MakeLogicValue(name = "Queue")
-abstract class QueueBase {
-  public abstract Object size();
-  public abstract Object contents();
+abstract class IQueue<S, C> {
+  public abstract S size();
+  public abstract C contents();
 
-  public static Queue<Void, DiffList<Var, Var>> empty() {
+  public static IQueue<Void, IDiffList<Var, Var>> empty() {
     return new Queue<>(/*size=*/null, DiffList.empty());
   }
 }

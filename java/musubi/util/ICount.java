@@ -33,11 +33,11 @@ import musubi.annotation.MakeLogicValue;
  * class).
  */
 @MakeLogicValue(name = "Count")
-abstract class CountBase {
+abstract class ICount<C> {
   /**
    * The value whose count is one less than this one.
    */
-  public abstract Object oneLess();
+  public abstract C oneLess();
 
   /**
    * Returns the string representation. This counts the number of nested instances of this
@@ -50,9 +50,9 @@ abstract class CountBase {
   public final String toString() {
     int countValue = 1;
     Object nested = oneLess();
-    while (nested instanceof CountBase) {
+    while (nested instanceof ICount) {
       countValue++;
-      nested = ((CountBase) nested).oneLess();
+      nested = ((ICount) nested).oneLess();
     }
     String maybePlusSymbol = "";
     Object maybeInnerVar = "";

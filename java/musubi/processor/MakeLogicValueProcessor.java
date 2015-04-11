@@ -54,10 +54,12 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         String implementsClause = " implements " + ClassNames.LOGIC_VALUE;
         switch (interfaze.getKind()) {
           case INTERFACE:
-            implementsClause += ", " + interfaze.getQualifiedName();
+            implementsClause += ", " + interfaze.getQualifiedName()
+                + metadata.typeParametersAlligator();
             break;
           case CLASS:
-            extendsClause += " extends " + interfaze.getQualifiedName();
+            extendsClause += " extends " + interfaze.getQualifiedName()
+                + metadata.typeParametersAlligator();
             break;
           default:
             throw new IllegalStateException("unexpected kind: " + interfaze.getKind());

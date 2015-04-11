@@ -112,9 +112,9 @@ public class MakeLogicValueFunctionalTest {
   }
 
   @MakeLogicValue(name = "NestedTypeLogicValueImpl")
-  interface NestedTypeLogicValue {
-    Object field1();
-    Object field2();
+  interface NestedTypeLogicValue<F1, F2> {
+    F1 field1();
+    F2 field2();
   }
 
   @Test

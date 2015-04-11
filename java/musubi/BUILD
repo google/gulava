@@ -27,42 +27,15 @@ java_binary(
     main_class = "musubi.Demo",
 )
 
-CLAUSES = ["AppendClauses.java", "OrderClauses.java", "ReverseClauses.java"]
-
 java_library(
-    name = "core",
-    srcs = glob(["*.java"], exclude = CLAUSES + ["Demo.java"]),
+    name = "musubi",
+    srcs = glob(["*.java"]),
     plugins = [
         "//java/musubi/processor:make_logic_value_plugin",
+        "//java/musubi/processor:make_goal_factory_plugin",
     ],
     deps = [
         "//java/musubi/annotation",
         "//third_party/pcollections",
-    ],
-    visibility = ["//visibility:private"],
-)
-
-# We build the clauses in a separate target for a sad reason. This is to make
-# the annotation processor get non-error TypeMirror instances when seeing
-# auto-generated logic value types in the signatures of decomposing clauses. For
-# instance, in a clause that decomposes a Cons cell into Cons<?, ?>, if Cons is
-# not properly resolved, the TypeMirror has a qualified name of "<any>" and
-# there seems to be no way to get to the "Cons" string.
-#
-# So we build the CLAUSES in a separate target, which means it gets valid
-# DeclaredType instances when it encounters Cons<FOO, BAR>.
-#
-# Note that Bazel does not appear to allow us to reorder the order in which
-# annotation processors are run, which may also solve the problem.
-java_library(
-    name = "musubi",
-    srcs = CLAUSES,
-    plugins = [
-        "//java/musubi/processor:make_goal_factory_plugin",
-    ],
-    exports = [":core"],
-    deps = [
-        ":core",
-        "//java/musubi/annotation",
     ],
 )

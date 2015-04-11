@@ -32,11 +32,11 @@ import musubi.annotation.MakeLogicValue;
  * means that no matter what the hole is bound to, the original list is still the same.
  */
 @MakeLogicValue(name = "DiffList")
-abstract class DiffListBase {
-  public abstract Object head();
-  public abstract Object hole();
+abstract class IDiffList<HEAD, HOLE> {
+  public abstract HEAD head();
+  public abstract HOLE hole();
 
-  public static DiffList<Var, Var> empty() {
+  public static IDiffList<Var, Var> empty() {
     Var node = new Var();
     return new DiffList<>(node, node);
   }

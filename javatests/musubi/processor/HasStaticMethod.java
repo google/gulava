@@ -24,8 +24,8 @@ package musubi.processor;
 import musubi.annotation.MakeLogicValue;
 
 @MakeLogicValue(name = "HasStaticMethodImpl")
-abstract class HasStaticMethod {
-  public abstract Object foo();
+abstract class HasStaticMethod<F> {
+  public abstract F foo();
 
   public static Object notAField() {
     return null;

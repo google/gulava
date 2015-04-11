@@ -22,21 +22,8 @@ package(default_visibility = ["//visibility:public"])
 
 # General data structures and algorithms for logic programs
 
-VALUES = ["CountBase.java", "DiffListBase.java", "QueueBase.java"]
-
-java_library(
-    name = "values",
-    srcs = VALUES,
-    deps = ["//java/musubi/processor"],
-    visibility = ["//visibility:private"],
-)
-
 java_library(
     name = "util",
-    exports = [":values"],
-    srcs = glob(["*.java"], exclude = VALUES),
-    deps = [
-        ":values",
-        "//java/musubi/processor",
-    ],
+    srcs = glob(["*.java"]),
+    deps = ["//java/musubi/processor"],
 )

@@ -24,7 +24,7 @@ package musubi.util;
 import static musubi.Goals.conj;
 import static musubi.Goals.same;
 
-import musubi.Cons;
+import musubi.ICons;
 import musubi.Goal;
 import musubi.annotation.MakeGoalFactory;
 
@@ -33,7 +33,7 @@ import musubi.annotation.MakeGoalFactory;
  */
 @MakeGoalFactory(name = "DiffListLast")
 class DiffListLastClauses {
-  static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
+  static Goal goal(Object element, IDiffList<?, ICons<?, ?>> without, IDiffList<?, ?> with) {
     return conj(
         same(without.hole().car(), element),
         same(with.head(), without.head()),

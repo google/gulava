@@ -36,14 +36,14 @@ import java.util.ListIterator;
  * so it looks like a normal list and not a nested data structure.
  */
 @MakeLogicValue(name = "Cons")
-public abstract class ConsBase {
+public abstract class ICons<CAR, CDR> {
   /**
-   * Package-protected constructor because only {@link ConsImpl} should subclass.
+   * Package-protected constructor because only {@link Cons} should subclass.
    */
-  ConsBase() {}
+  ICons() {}
 
-  public abstract Object car();
-  public abstract Object cdr();
+  public abstract CAR car();
+  public abstract CDR cdr();
 
   @Override
   public String toString() {

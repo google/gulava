@@ -71,6 +71,17 @@ public final class AnnotatedType {
   }
 
   /**
+   * Returns a new instance based on the given type, which is assumed to be annotated.
+   */
+  public static AnnotatedType of(TypeElement type) {
+    Element packageElement = type.getEnclosingElement();
+    while (!(packageElement instanceof PackageElement)) {
+      packageElement = packageElement.getEnclosingElement();
+    }
+    return new AnnotatedType(type, (PackageElement) packageElement);
+  }
+
+  /**
    * Returns a list representing each type that is annotated with an annotation in
    * {@code annotations}.
    */
@@ -82,11 +93,7 @@ public final class AnnotatedType {
       Iterable<? extends TypeElement> types =
           ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(annotation));
       for (TypeElement type : types) {
-        Element packageElement = type.getEnclosingElement();
-        while (!(packageElement instanceof PackageElement)) {
-          packageElement = packageElement.getEnclosingElement();
-        }
-        all.add(new AnnotatedType(type, (PackageElement) packageElement));
+        all.add(of(type));
       }
     }
 

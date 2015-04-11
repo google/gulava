@@ -24,7 +24,7 @@ package musubi.processor;
 import musubi.annotation.MakeLogicValue;
 
 @MakeLogicValue(name = "SimpleValue")
-public interface SimpleValueInterface {
-  Object foo();
-  Object bar();
+public interface SimpleValueInterface<FOO, BAR> {
+  FOO foo();
+  BAR bar();
 }

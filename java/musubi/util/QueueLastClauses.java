@@ -33,7 +33,7 @@ import musubi.annotation.MakeGoalFactory;
  */
 @MakeGoalFactory(name = "QueueLast")
 class QueueLastClauses {
-  static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
+  static Goal goal(Object element, IQueue<?, ?> without, IQueue<ICount<?>, ?> with) {
     return conj(
         same(without.size(), with.size().oneLess()),
         DiffListLast.o(element, without.contents(), with.contents()));
