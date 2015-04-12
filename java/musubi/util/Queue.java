@@ -31,8 +31,8 @@ import musubi.annotation.MakeLogicValue;
 
 /**
  * Represents a queue. This contains its size as a {@code Count} value and its contents as a
- * difference list. This is based on the implementation in The Craft of Prolog and attributed to Mark
- * Johnson.
+ * difference list. This is based on the implementation in chapter 2 of The Craft of Prolog and
+ * attributed to Mark Johnson.
  */
 @MakeLogicValue
 abstract class Queue<S, C> {
@@ -48,8 +48,7 @@ abstract class Queue<S, C> {
   }
 
   /**
-   * Defines a goal that identifies the final element in a queue. This is based on the implementation
-   * in chapter 2 of The Craft of Prolog.
+   * Defines a goal that identifies the final element in a queue.
    */
   @MakeGoalFactory(name = "QueueLast")
   static class LastClauses {
@@ -57,6 +56,18 @@ abstract class Queue<S, C> {
       return conj(
           same(without.size(), with.size().oneLess()),
           DiffListLast.o(element, without.contents(), with.contents()));
+    }
+  }
+
+  /**
+   * Defines a goal that identifies the first element in a queue.
+   */
+  @MakeGoalFactory(name = "QueueFirst")
+  static class FirstClauses {
+    static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
+      return conj(
+          same(without.size(), with.size().oneLess()),
+          DiffListFirst.o(element, without.contents(), with.contents()));
     }
   }
 }

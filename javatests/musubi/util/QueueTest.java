@@ -41,27 +41,51 @@ public class QueueTest {
   private static final Var C = new Var();
   private static final Var D = new Var();
   private static final Var E = new Var();
+  private static final Var F = new Var();
+  private static final Var G = new Var();
+  private static final Var H = new Var();
   private static final Object EMPTY = Queue.empty();
+  private static final Queue<Var, DiffList<?, ?>> FINISH_QUEUE =
+      Queue.of(new Var(), DiffList.of(new Var(), new Var()));
 
   @Test
   public void enqueue() {
-    Queue<Var, DiffList<?, ?>> finishQueue =
-        Queue.of(new Var(), DiffList.of(new Var(), new Var()));
     new LogicAsserter()
         .stream(
             conj(
                 QueueLast.o(42, EMPTY, A),
                 QueueLast.o("1011", A, B),
                 QueueLast.o(false, B, C),
-                QueueLast.o('a', C, finishQueue),
-                same(null, finishQueue.contents().hole()),
-                same(D, finishQueue.contents().head()),
-                same(E, finishQueue.size())))
+                QueueLast.o('a', C, FINISH_QUEUE),
+                same(null, FINISH_QUEUE.contents().hole()),
+                same(D, FINISH_QUEUE.contents().head()),
+                same(E, FINISH_QUEUE.size())))
         .addRequestedVar(D, E)
         .workUnits(2)
         .startSubst()
         .put(D, Cons.list(Arrays.asList(42, "1011", false, 'a')))
         .put(E, Count.of(Count.of(Count.of(Count.of(null)))))
+        .test();
+  }
+
+  @Test
+  public void enqueueDeque() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                QueueLast.o(42, EMPTY, A),
+                QueueLast.o("1011", A, B),
+                QueueLast.o(false, B, C),
+                QueueFirst.o(D, E, C),
+                QueueFirst.o(F, G, E),
+                QueueFirst.o(H, FINISH_QUEUE, G)))
+        .addRequestedVar(D, F, H, FINISH_QUEUE.size())
+        .workUnits(2)
+        .startSubst()
+        .put(D, 42)
+        .put(F, "1011")
+        .put(H, false)
+        .put(FINISH_QUEUE.size(), null)
         .test();
   }
 

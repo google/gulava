@@ -58,12 +58,24 @@ abstract class DiffList<HEAD, HOLE> {
    * Defines a goal that identifies the final element in a difference list.
    */
   @MakeGoalFactory(name = "DiffListLast")
-  static class DiffListLastClauses {
+  static class LastClauses {
     static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
       return conj(
           same(without.hole().car(), element),
           same(with.head(), without.head()),
           same(with.hole(), without.hole().cdr()));
+    }
+  }
+
+  /**
+   * Defines a goal that identifies the first element in a difference list.
+   */
+  @MakeGoalFactory(name = "DiffListFirst")
+  static class FirstClauses {
+    static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
+      return conj(
+          same(without.hole(), with.hole()),
+          same(Cons.of(element, without.head()), with.head()));
     }
   }
 
