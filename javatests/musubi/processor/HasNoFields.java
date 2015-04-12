@@ -23,5 +23,9 @@ package musubi.processor;
 
 import musubi.annotation.MakeLogicValue;
 
-@MakeLogicValue(name = "HasNoFieldsImpl")
-abstract class HasNoFields {}
+@MakeLogicValue
+abstract class HasNoFields {
+  static HasNoFields of() {
+    return new MakeLogicValue_HasNoFields();
+  }
+}

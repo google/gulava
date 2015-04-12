@@ -41,11 +41,11 @@ public class ConsTest {
 
   @Test
   public void testToString() {
-    Assert.assertEquals("[1]", new Cons<>(1, null).toString());
-    Assert.assertEquals("[1|2]", new Cons<>(1, 2).toString());
+    Assert.assertEquals("[1]", Cons.of(1, null).toString());
+    Assert.assertEquals("[1|2]", Cons.of(1, 2).toString());
     Assert.assertEquals("[1,2,3|foo]",
-        new Cons<>(1, new Cons<>(2, new Cons<>(3, "foo"))).toString());
-    Assert.assertEquals("[null|42]", new Cons<>(null, 42).toString());
+        Cons.of(1, Cons.of(2, Cons.of(3, "foo"))).toString());
+    Assert.assertEquals("[null|42]", Cons.of(null, 42).toString());
   }
 
   @Test
@@ -55,7 +55,7 @@ public class ConsTest {
             conj(
                 same(X, 42),
                 same(Y, Cons.list(Arrays.asList(5, 7, 9))),
-                same(Z, new Cons<>(X, Y))))
+                same(Z, Cons.of(X, Y))))
         .workUnits(2)
         .addRequestedVar(Z)
         .startSubst()

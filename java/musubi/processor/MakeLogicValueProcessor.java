@@ -65,42 +65,13 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
             throw new IllegalStateException("unexpected kind: " + interfaze.getKind());
         }
 
-        writer.write("public final class " + metadata.getName()
+        writer.write("final class " + metadata.getName()
             + metadata.typeParametersAlligator()
             + extendsClause + implementsClause + " {\n");
 
-        // Builder
-        writer.write("  public static final class Builder"
-            + metadata.typeParametersAlligator() + " {\n");
-        for (LogicValueField field : metadata.getFields()) {
-          writer.write("    private " + field.getTypeAndName() + ";\n");
-          writer.write("    public Builder" + metadata.typeParametersAlligator()
-              + " " + field.getSetterMethodName()
-              + "(" + field.getTypeAndName() + ") {\n");
-          writer.write("      this." + field + " = " + field + ";\n");
-          writer.write("      return this;\n");
-          writer.write("    }\n");
-          writer.write("\n");
-        }
-
-        writer.write("    public " + metadata.getName() + metadata.typeParametersAlligator()
-            + " build() {\n");
-        writer.write("      return new " + metadata.getName() + metadata.typeParametersAlligator()
-            + "(");
-        String delimiter = "";
-        for (LogicValueField field : metadata.getFields()) {
-          writer.write(delimiter);
-          writer.write(field.getName());
-          delimiter = ", ";
-        }
-        writer.write(");\n");
-        writer.write("    }\n");
-        writer.write("  }\n");
-        writer.write("\n");
-
         // Constructor
-        writer.write("  public " + metadata.getName() + "(");
-        delimiter = "";
+        writer.write("  " + metadata.getName() + "(");
+        String delimiter = "";
         for (LogicValueField field : metadata.getFields()) {
           writer.write(delimiter);
           writer.write(field.getTypeAndName());
@@ -193,7 +164,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
         if (metadata.autoDefineToString()) {
           writer.write("  @Override public String toString() {\n");
           writer.write("    StringBuilder s = new StringBuilder(\""
-              + metadata.getName() + "(\");\n");
+              + metadata.getInterface().getSimpleName() + "(\");\n");
           first = true;
           for (LogicValueField field : metadata.getFields()) {
             if (!first) {

@@ -37,9 +37,9 @@ public class CountTest {
 
   @Test
   public void testToString() {
-    Assert.assertEquals("Count{1}", new Count<>(null).toString());
-    Assert.assertEquals("Count{2}", new Count<>(new Count<>(null)).toString());
-    Assert.assertEquals("Count{3+foo}", new Count<>(new Count<>(new Count<>("foo"))).toString());
+    Assert.assertEquals("Count{1}", Count.of(null).toString());
+    Assert.assertEquals("Count{2}", Count.of(Count.of(null)).toString());
+    Assert.assertEquals("Count{3+foo}", Count.of(Count.of(Count.of("foo"))).toString());
   }
 
   @Test
@@ -47,11 +47,11 @@ public class CountTest {
     new LogicAsserter()
         .stream(
             same(
-                new Count<>(new Count<>(X)),
-                new Count<>(new Count<>(new Count<>(null)))))
+                Count.of(Count.of(X)),
+                Count.of(Count.of(Count.of(null)))))
         .workUnits(2)
         .startSubst()
-        .put(X, new Count<>(null))
+        .put(X, Count.of(null))
         .addRequestedVar(X)
         .test();
   }

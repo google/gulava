@@ -36,7 +36,7 @@ public class AppendClauses {
     return same(b, ab);
   }
 
-  static Goal iterate(ICons<?, ?> a, Object b, ICons<?, ?> ab) {
+  static Goal iterate(Cons<?, ?> a, Object b, Cons<?, ?> ab) {
     return conj(
         same(a.car(), ab.car()),
         Append.o(a.cdr(), b, ab.cdr()));

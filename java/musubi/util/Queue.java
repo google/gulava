@@ -19,33 +19,44 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package musubi.processor;
+package musubi.util;
 
+import static musubi.Goals.conj;
+import static musubi.Goals.same;
+
+import musubi.Goal;
+import musubi.Var;
+import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
-public class MakeLogicValueProcessorBuilderTest {
-  @Test
-  public void useBuilderToCreateValue() {
-    SimpleValue value = new SimpleValue.Builder<Object, Object>()
-        .setFoo(42)
-        .setBar("hello")
-        .build();
+/**
+ * Represents a queue. This contains its size as a {@code Count} value and its contents as a
+ * difference list. This is based on the implementation in The Craft of Prolog and attributed to Mark
+ * Johnson.
+ */
+@MakeLogicValue
+abstract class Queue<S, C> {
+  public abstract S size();
+  public abstract C contents();
 
-    Assert.assertEquals(42, value.foo());
-    Assert.assertEquals("hello", value.bar());
+  public static Queue<Void, DiffList<Var, Var>> empty() {
+    return of(/*size=*/null, DiffList.empty());
   }
 
-  @Test
-  public void fieldsDefaultToNull() {
-    SimpleValue value = new SimpleValue.Builder<Object, Object>()
-        .setFoo(9)
-        .build();
-    Assert.assertEquals(9, value.foo());
-    Assert.assertEquals(null, value.bar());
+  public static <S, C> Queue<S, C> of(S size, C contents) {
+    return new MakeLogicValue_Queue<>(size, contents);
+  }
+
+  /**
+   * Defines a goal that identifies the final element in a queue. This is based on the implementation
+   * in chapter 2 of The Craft of Prolog.
+   */
+  @MakeGoalFactory(name = "QueueLast")
+  static class LastClauses {
+    static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
+      return conj(
+          same(without.size(), with.size().oneLess()),
+          DiffListLast.o(element, without.contents(), with.contents()));
+    }
   }
 }

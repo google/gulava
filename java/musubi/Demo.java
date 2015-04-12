@@ -59,8 +59,8 @@ public class Demo {
     Goal g = conj(
         same(x, y),
         same(x, Cons.list(Arrays.asList(2, 3, 4))),
-        same(a, new Cons<>(42, x)),
-        same(b, new Cons<>(43, y)));
+        same(a, Cons.of(42, x)),
+        same(b, Cons.of(43, y)));
     print(g.run(Subst.EMPTY), 10, a, b);
   }
 }

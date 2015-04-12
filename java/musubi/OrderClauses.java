@@ -38,13 +38,13 @@ public class OrderClauses {
     return Goals.UNIT;
   }
 
-  static Goal select(ICons<?, ?> sub, ICons<?, ?> full) {
+  static Goal select(Cons<?, ?> sub, Cons<?, ?> full) {
     return conj(
         same(sub.car(), full.car()),
         Order.o(sub.cdr(), full.cdr()));
   }
 
-  static Goal skip(Object sub, ICons<?, ?> full) {
+  static Goal skip(Object sub, Cons<?, ?> full) {
     return Order.o(sub, full.cdr());
   }
 }

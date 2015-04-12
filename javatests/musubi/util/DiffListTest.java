@@ -25,7 +25,6 @@ import static musubi.Goals.conj;
 import static musubi.Goals.same;
 
 import musubi.Cons;
-import musubi.ICons;
 import musubi.Var;
 import musubi.testing.LogicAsserter;
 
@@ -38,7 +37,7 @@ import java.util.Arrays;
 
 @RunWith(JUnit4.class)
 public class DiffListTest {
-  private static final IDiffList<Var, Var> EMPTY = IDiffList.empty();
+  private static final DiffList<Var, Var> EMPTY = DiffList.empty();
   private static final Var A = new Var();
   private static final Var B = new Var();
   private static final Var C = new Var();
@@ -67,7 +66,7 @@ public class DiffListTest {
         .workUnits(2)
         .addRequestedVar(C)
         .startSubst()
-        .put(C, ICons.list(Arrays.asList(42, 'a')))
+        .put(C, Cons.list(Arrays.asList(42, 'a')))
         .test();
   }
 
@@ -77,7 +76,7 @@ public class DiffListTest {
         .stream(
             conj(
                 DiffListAsList.o(A, null),
-                same(A, new DiffList<>(B, C))))
+                same(A, DiffList.of(B, C))))
         .workUnits(2)
         .addRequestedVar(B, C)
         .startSubst()
@@ -87,13 +86,13 @@ public class DiffListTest {
 
   @Test
   public void fromList() {
-    IDiffList<Cons<?, Cons<?, ?>>, ?> diffList = new DiffList<>(
-        new Cons<>(new Var(), new Cons<>(new Var(), new Var())),
+    DiffList<Cons<?, Cons<?, ?>>, ?> diffList = DiffList.of(
+        Cons.of(new Var(), Cons.of(new Var(), new Var())),
         new Var());
     new LogicAsserter()
         .stream(
             conj(
-                DiffListAsList.o(diffList, ICons.list(Arrays.asList(42, 'a'))),
+                DiffListAsList.o(diffList, Cons.list(Arrays.asList(42, 'a'))),
                 same(diffList.head().car(), B),
                 same(diffList.head().cdr().car(), C)))
         .workUnits(2)

@@ -38,8 +38,8 @@ public class ReverseClauses {
       return same(b, bTail);
     }
 
-    static Goal iterate(ICons<?, ?> a, Object b, Object bTail) {
-      return ReverseWithAccum.d(a.cdr(), b, new Cons<>(a.car(), bTail));
+    static Goal iterate(Cons<?, ?> a, Object b, Object bTail) {
+      return ReverseWithAccum.d(a.cdr(), b, Cons.of(a.car(), bTail));
     }
   }
 

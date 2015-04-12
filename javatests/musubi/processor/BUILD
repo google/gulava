@@ -44,16 +44,6 @@ java_test(
 )
 
 java_test(
-    name = "MakeLogicValueProcessorBuilderTest",
-    srcs = ["MakeLogicValueProcessorBuilderTest.java"],
-    deps = [
-        ":generated",
-        "//java/musubi/processor",
-        "//third_party/junit4",
-    ],
-)
-
-java_test(
     name = "MakeLogicValueFunctionalTest",
     srcs = ["MakeLogicValueFunctionalTest.java"],
     deps = [

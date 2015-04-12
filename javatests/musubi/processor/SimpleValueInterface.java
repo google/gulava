@@ -23,8 +23,12 @@ package musubi.processor;
 
 import musubi.annotation.MakeLogicValue;
 
-@MakeLogicValue(name = "SimpleValue")
+@MakeLogicValue
 public interface SimpleValueInterface<FOO, BAR> {
   FOO foo();
   BAR bar();
+
+  public static <FOO, BAR> SimpleValueInterface<FOO, BAR> of(FOO foo, BAR bar) {
+    return new MakeLogicValue_SimpleValueInterface<>(foo, bar);
+  }
 }

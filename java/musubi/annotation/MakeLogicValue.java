@@ -33,12 +33,30 @@ import java.lang.annotation.Target;
  * pattern matching possible. For instance:
  *
  * <pre>
- * @MakeLogicValue(name = "PersonName")
- * public abstract class IPersonName<F, G> {
+ * @MakeLogicValue
+ * public abstract class PersonName<F, G> {
  *   public abstract F familyName();
  *   public abstract G givenName();
+ *
+ *   // A static factory method is required for pattern-matching clauses.
+ *   public static <F, G> PersonName<F, G> of(F familyName, G givenName) {
+ *     return new MakeLogicValue_PersonName<>(familyName, givenName);
+ *   }
  * }
  * </pre>
+ *
+ * The name of the generated type is several components joined by an underscore:
+ * {@code MakeLogicValue}, the enclosing classes of the annotated class, and the annotated class
+ * name itself. For instance, for
+ *
+ * <pre>
+ * class OuterClass {
+ *   @MakeLogicValue
+ *   static class InnerClass {...}
+ * }
+ * </pre>
+ *
+ * <p>The generated class will be named {@code MakeLogicValue_OuterClass_InnerClass}.
  *
  * <p>Generated logic value types are also generic. These fields are completely unbound, meaning
  * they can be {@link Object} or {@code Var} or some other implementation of {@code LogicValue}. If
@@ -51,9 +69,4 @@ import java.lang.annotation.Target;
  * Eclipse), you should qualify it as {@code MyValue<?, ?> v}.
  */
 @Target(ElementType.TYPE)
-public @interface MakeLogicValue {
-  /**
-   * The name of the implementation type to generate.
-   */
-  String name();
-}
+public @interface MakeLogicValue {}

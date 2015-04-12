@@ -28,11 +28,14 @@ import musubi.LogicValue;
 import musubi.Var;
 import musubi.annotation.MakeLogicValue;
 import musubi.testing.LogicAsserter;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +55,7 @@ public class MakeLogicValueFunctionalTest {
     Var simpleValueVar = new Var();
 
     new LogicAsserter()
-        .stream(same(new SimpleValue<>("Doe", "John"), new SimpleValue<>(fooVar, barVar)))
+        .stream(same(SimpleValueInterface.of("Doe", "John"), SimpleValueInterface.of(fooVar, barVar)))
         .startSubst()
         .put(fooVar, "Doe")
         .put(barVar, "John")
@@ -71,9 +74,9 @@ public class MakeLogicValueFunctionalTest {
         .stream(
             conj(
                 same(fooVar, "foo"),
-                same(new SimpleValue<>(fooVar, "bar"), simpleValueVar)))
+                same(SimpleValueInterface.of(fooVar, "bar"), simpleValueVar)))
         .startSubst()
-        .put(simpleValueVar, new SimpleValue<>("foo", "bar"))
+        .put(simpleValueVar, SimpleValueInterface.of("foo", "bar"))
         .addRequestedVar(simpleValueVar)
         .workUnits(2)
         .test();
@@ -81,24 +84,24 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void equality() {
-    Assert.assertNotEquals(new SimpleValue<>("", null), new SimpleValue<>(null, ""));
-    Assert.assertNotEquals(new SimpleValue<>("x", null), new SimpleValue<>("x", 42));
-    Assert.assertNotEquals(new SimpleValue<>("q", 42), new SimpleValue<>("x", 42));
-    Assert.assertEquals(new SimpleValue<>("x", "y"), new SimpleValue<>("x", "y"));
+    Assert.assertNotEquals(SimpleValueInterface.of("", null), SimpleValueInterface.of(null, ""));
+    Assert.assertNotEquals(SimpleValueInterface.of("x", null), SimpleValueInterface.of("x", 42));
+    Assert.assertNotEquals(SimpleValueInterface.of("q", 42), SimpleValueInterface.of("x", 42));
+    Assert.assertEquals(SimpleValueInterface.of("x", "y"), SimpleValueInterface.of("x", "y"));
 
-    Set<SimpleValue> values = new HashSet<SimpleValue>();
+    Set<SimpleValueInterface> values = new HashSet<SimpleValueInterface>();
     for (int i = 0; i < 2; i++) {
-      values.add(new SimpleValue<>("", null));
-      values.add(new SimpleValue<>(null, ""));
-      values.add(new SimpleValue<>(null, null));
-      values.add(new SimpleValue<>("x", "y"));
-      values.add(new SimpleValue<>("y", "x"));
+      values.add(SimpleValueInterface.of("", null));
+      values.add(SimpleValueInterface.of(null, ""));
+      values.add(SimpleValueInterface.of(null, null));
+      values.add(SimpleValueInterface.of("x", "y"));
+      values.add(SimpleValueInterface.of("y", "x"));
     }
 
     Assert.assertEquals(5, values.size());
 
     Set<Integer> hashCodes = new HashSet<Integer>();
-    for (SimpleValue value : values) {
+    for (SimpleValueInterface value : values) {
       hashCodes.add(value.hashCode());
     }
 
@@ -107,11 +110,12 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void testToString() {
-    Assert.assertEquals("SimpleValue(x, y)", new SimpleValue<>("x", "y").toString());
-    Assert.assertEquals("SimpleValue(x, null)", new SimpleValue<>("x", null).toString());
+    Assert.assertEquals("SimpleValueInterface(x, y)", SimpleValueInterface.of("x", "y").toString());
+    Assert.assertEquals(
+        "SimpleValueInterface(x, null)", SimpleValueInterface.of("x", null).toString());
   }
 
-  @MakeLogicValue(name = "NestedTypeLogicValueImpl")
+  @MakeLogicValue
   interface NestedTypeLogicValue<F1, F2> {
     F1 field1();
     F2 field2();
@@ -119,13 +123,16 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void nestedTypeLogicValue() {
-    Object value = new NestedTypeLogicValueImpl<>('a', 'b');
-    Assert.assertEquals(new NestedTypeLogicValueImpl<>('a', 'b'), value);
+    Object value = new MakeLogicValue_MakeLogicValueFunctionalTest_NestedTypeLogicValue<>('a', 'b');
+    Assert.assertEquals(
+        new MakeLogicValue_MakeLogicValueFunctionalTest_NestedTypeLogicValue<>('a', 'b'),
+        value);
     Var a = new Var();
     Var b = new Var();
 
     new LogicAsserter()
-        .stream(same(value, new NestedTypeLogicValueImpl<>(a, b)))
+        .stream(same(
+            value, new MakeLogicValue_MakeLogicValueFunctionalTest_NestedTypeLogicValue<>(a, b)))
         .startSubst()
         .put(a, 'a')
         .put(b, 'b')
@@ -136,19 +143,23 @@ public class MakeLogicValueFunctionalTest {
 
   @Test
   public void implementsInterfaces() {
-    Assert.assertTrue(new NestedTypeLogicValueImpl<>(null, null) instanceof LogicValue);
-    Assert.assertTrue(new NestedTypeLogicValueImpl<>(null, null) instanceof NestedTypeLogicValue);
-    Assert.assertTrue(new SimpleValue<>(null, null) instanceof LogicValue);
-    Assert.assertTrue(new SimpleValue<>(null, null) instanceof SimpleValueInterface);
+    Assert.assertTrue(
+        new MakeLogicValue_MakeLogicValueFunctionalTest_NestedTypeLogicValue<>(null, null)
+            instanceof LogicValue);
+    Assert.assertTrue(
+        new MakeLogicValue_MakeLogicValueFunctionalTest_NestedTypeLogicValue<>(null, null)
+            instanceof NestedTypeLogicValue);
+    Assert.assertTrue(SimpleValueInterface.of(null, null) instanceof LogicValue);
+    Assert.assertTrue(SimpleValueInterface.of(null, null) instanceof SimpleValueInterface);
   }
 
   @Test
   public void staticMethodsAreNotFields() {
-    HasStaticMethodImpl x = new HasStaticMethodImpl<>(42);
+    HasStaticMethod x = HasStaticMethod.of(42);
     Assert.assertEquals(Collections.singletonMap("foo", 42), x.asMap());
   }
 
-  @MakeLogicValue(name = "HasNoFields2Impl")
+  @MakeLogicValue
   abstract static class HasNoFields2 {}
 
   @Test
@@ -156,12 +167,12 @@ public class MakeLogicValueFunctionalTest {
     new LogicAsserter()
         .stream(
             conj(
-                same(X, new HasNoFieldsImpl()),
-                same(X, new HasNoFieldsImpl())))
+                same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2()),
+                same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())))
         .workUnits(2)
         .addRequestedVar(X)
         .startSubst()
-        .put(X, new HasNoFieldsImpl())
+        .put(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())
         .test();
   }
 
@@ -170,9 +181,28 @@ public class MakeLogicValueFunctionalTest {
     new LogicAsserter()
         .stream(
             conj(
-                same(X, new HasNoFieldsImpl()),
-                same(X, new HasNoFields2Impl())))
+                same(X, new MakeLogicValue_HasNoFields()),
+                same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())))
         .workUnits(1)
         .test();
+  }
+
+  private static void checkTypeAndConstructorModifiers(Class<?> clazz) {
+    Assert.assertEquals(0, clazz.getModifiers() & Modifier.PUBLIC);
+    Assert.assertEquals(Modifier.FINAL, clazz.getModifiers() & Modifier.FINAL);
+
+    Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    Assert.assertEquals(1, constructors.length);
+    Assert.assertEquals(0,
+        constructors[0].getModifiers()
+            & (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED));
+  }
+
+  @Test
+  public void generatedClassAndConstructorArePackageProtected() {
+    checkTypeAndConstructorModifiers(MakeLogicValue_SimpleValueInterface.class);
+    checkTypeAndConstructorModifiers(MakeLogicValue_HasStaticMethod.class);
+    checkTypeAndConstructorModifiers(
+        MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2.class);
   }
 }

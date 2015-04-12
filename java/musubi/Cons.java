@@ -35,15 +35,19 @@ import java.util.ListIterator;
  * car. The {@link #toString()} implementation formats the output nicely when used with sequences
  * so it looks like a normal list and not a nested data structure.
  */
-@MakeLogicValue(name = "Cons")
-public abstract class ICons<CAR, CDR> {
+@MakeLogicValue
+public abstract class Cons<CAR, CDR> {
   /**
    * Package-protected constructor because only {@link Cons} should subclass.
    */
-  ICons() {}
+  Cons() {}
 
   public abstract CAR car();
   public abstract CDR cdr();
+
+  public static <CAR, CDR> Cons<CAR, CDR> of(CAR car, CDR cdr) {
+    return new MakeLogicValue_Cons<>(car, cdr);
+  }
 
   @Override
   public String toString() {
@@ -71,7 +75,7 @@ public abstract class ICons<CAR, CDR> {
   public static Cons list(List<?> values) {
     Cons result = null;
     for (ListIterator<?> valueIter = values.listIterator(values.size()); valueIter.hasPrevious();) {
-      result = new Cons<>(valueIter.previous(), result);
+      result = Cons.of(valueIter.previous(), result);
     }
     return result;
   }

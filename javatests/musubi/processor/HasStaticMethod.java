@@ -21,11 +21,16 @@
  */
 package musubi.processor;
 
+import musubi.LogicValue;
 import musubi.annotation.MakeLogicValue;
 
-@MakeLogicValue(name = "HasStaticMethodImpl")
-abstract class HasStaticMethod<F> {
+@MakeLogicValue
+abstract class HasStaticMethod<F> implements LogicValue {
   public abstract F foo();
+
+  public static <F> HasStaticMethod<F> of(F foo) {
+    return new MakeLogicValue_HasStaticMethod<>(foo);
+  }
 
   public static Object notAField() {
     return null;

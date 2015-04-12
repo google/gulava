@@ -24,8 +24,8 @@ package musubi.util;
 import static musubi.Goals.conj;
 import static musubi.Goals.same;
 
+import musubi.Cons;
 import musubi.Goal;
-import musubi.ICons;
 import musubi.Var;
 import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
@@ -37,17 +37,21 @@ import musubi.annotation.MakeLogicValue;
  * means appending to a difference list is much faster than it would be with a regular list. It also
  * means that no matter what the hole is bound to, the original list is still the same.
  */
-@MakeLogicValue(name = "DiffList")
-abstract class IDiffList<HEAD, HOLE> {
+@MakeLogicValue
+abstract class DiffList<HEAD, HOLE> {
   public abstract HEAD head();
   public abstract HOLE hole();
+
+  public static <HEAD, HOLE> DiffList<HEAD, HOLE> of(HEAD head, HOLE hole) {
+    return new MakeLogicValue_DiffList<>(head, hole);
+  }
 
   /**
    * Returns a fresh, empty difference list. This returns a new list each time.
    */
-  public static IDiffList<Var, Var> empty() {
+  public static DiffList<Var, Var> empty() {
     Var node = new Var();
-    return new DiffList<>(node, node);
+    return of(node, node);
   }
 
   /**
@@ -55,7 +59,7 @@ abstract class IDiffList<HEAD, HOLE> {
    */
   @MakeGoalFactory(name = "DiffListLast")
   static class DiffListLastClauses {
-    static Goal goal(Object element, IDiffList<?, ICons<?, ?>> without, IDiffList<?, ?> with) {
+    static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
       return conj(
           same(without.hole().car(), element),
           same(with.head(), without.head()),
@@ -64,19 +68,19 @@ abstract class IDiffList<HEAD, HOLE> {
   }
 
   /**
-   * Defines a goal that converts between a difference list and a plain ({@link ICons}) list.
+   * Defines a goal that converts between a difference list and a plain ({@link Cons}) list.
    * Note that this usually diverges when converting a difference list to a plain list (rather than
    * the other direction). In that case, consider using {@link DiffListFinish}.
    */
   @MakeGoalFactory(name = "DiffListAsList")
   static class AsListClauses {
-    static Goal delegate(IDiffList<?, ?> diffList, Object list) {
+    static Goal delegate(DiffList<?, ?> diffList, Object list) {
       return DiffListAsList3.i(diffList.head(), diffList.hole(), list);
     }
   }
 
   /**
-   * Defines a goal that converts between a difference list and a plain ({@link ICons}) list. This
+   * Defines a goal that converts between a difference list and a plain ({@link Cons}) list. This
    * takes the fields of the difference list as separate arguments.
    *
    * <p>TODO: Figure out if this really needs to be a separate goal from {@link DiffListAsList}.
@@ -89,7 +93,7 @@ abstract class IDiffList<HEAD, HOLE> {
       return same(head, hole);
     }
 
-    static Goal iterate(ICons<?, ?> head, Object hole, ICons<?, ?> list) {
+    static Goal iterate(Cons<?, ?> head, Object hole, Cons<?, ?> list) {
       return conj(
           same(head.car(), list.car()),
           DiffListAsList3.o(head.cdr(), hole, list.cdr()));
@@ -105,7 +109,7 @@ abstract class IDiffList<HEAD, HOLE> {
    */
   @MakeGoalFactory(name = "DiffListFinish")
   static class FinishClauses {
-    static Goal goal(IDiffList<?, ?> diffList, Object list) {
+    static Goal goal(DiffList<?, ?> diffList, Object list) {
       return conj(
           same(diffList.head(), list),
           same(diffList.hole(), null));

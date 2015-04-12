@@ -37,7 +37,7 @@ import java.util.Arrays;
 public class MakeGoalFactoryFunctionalTest {
   @MakeGoalFactory(name = "HasAnAtom")
   public static class HasAnAtomClauses {
-    static Goal found(Cons<HasNoFieldsImpl, ?> a) {
+    static Goal found(Cons<HasNoFields, ?> a) {
       return Goals.UNIT;
     }
 
@@ -54,7 +54,7 @@ public class MakeGoalFactoryFunctionalTest {
         .test();
 
     new LogicAsserter()
-        .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2, new HasNoFieldsImpl(), 3, 4))))
+        .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2, HasNoFields.of(), 3, 4))))
         .workUnits(2)
         .startSubst()
         .test();

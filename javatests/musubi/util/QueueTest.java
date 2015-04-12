@@ -46,7 +46,7 @@ public class QueueTest {
   @Test
   public void enqueue() {
     Queue<Var, DiffList<?, ?>> finishQueue =
-        new Queue<>(new Var(), new DiffList<>(new Var(), new Var()));
+        Queue.of(new Var(), DiffList.of(new Var(), new Var()));
     new LogicAsserter()
         .stream(
             conj(
@@ -61,7 +61,7 @@ public class QueueTest {
         .workUnits(2)
         .startSubst()
         .put(D, Cons.list(Arrays.asList(42, "1011", false, 'a')))
-        .put(E, new Count<>(new Count<>(new Count<>(new Count<>(null)))))
+        .put(E, Count.of(Count.of(Count.of(Count.of(null)))))
         .test();
   }
 
@@ -70,7 +70,7 @@ public class QueueTest {
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(42, B, new Queue<>(new Count<>(null), new Var())),
+                QueueLast.o(42, B, Queue.of(Count.of(null), new Var())),
                 QueueLast.o(42, A, B)))
         .workUnits(1)
         .test();
@@ -78,14 +78,14 @@ public class QueueTest {
 
   @Test
   public void backwardsEnqueue_success() {
-    DiffList<Cons<Var, Cons<Var, Var>>, Var> startList = new DiffList<>(
-        new Cons<>(new Var(), new Cons<>(new Var(), new Var())),
+    DiffList<Cons<Var, Cons<Var, Var>>, Var> startList = DiffList.of(
+        Cons.of(new Var(), Cons.of(new Var(), new Var())),
         new Var());
 
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(10, A, new Queue<>(new Count<>(new Count<>(null)), startList)),
+                QueueLast.o(10, A, Queue.of(Count.of(Count.of(null)), startList)),
                 QueueLast.o(20, EMPTY, A),
                 same(startList.head().cdr().cdr(), null),
                 same(C, startList.head())))
