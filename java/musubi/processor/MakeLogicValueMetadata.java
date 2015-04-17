@@ -28,10 +28,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
@@ -96,23 +94,6 @@ public final class MakeLogicValueMetadata {
   }
 
   /**
-   * The simple name of the generated {@code LogicValue} implementation class. See the Javadoc of
-   * {@link MakeLogicValue}.
-   */
-  private static String generatedClassName(TypeElement interfaze) {
-    List<Object> components = new ArrayList<>();
-    Element element = interfaze;
-    while (element instanceof TypeElement) {
-      components.add(element.getSimpleName());
-
-      element = element.getEnclosingElement();
-    }
-    components.add("MakeLogicValue");
-    Collections.reverse(components);
-    return Processors.join("_", components);
-  }
-
-  /**
    * Returns the metadata stored in a single annotation of type {@code MakeLogicValue}.
    */
   public static MakeLogicValueMetadata forInterface(TypeElement interfaze, Messager messager) {
@@ -128,7 +109,7 @@ public final class MakeLogicValueMetadata {
       }
     }
 
-    String name = generatedClassName(interfaze);
+    String name = "MakeLogicValue_" + Processors.generatedClassName(interfaze);
     int typeParameterCount = interfaze.getTypeParameters().size();
 
     if (typeParameterCount != fields.size()) {

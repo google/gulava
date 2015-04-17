@@ -22,6 +22,7 @@
 package musubi.processor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
@@ -136,6 +137,24 @@ public class Processors {
     }
 
     return ClassNames.GOALS + "." + type + "(" + join(", ", subGoals) + ")";
+  }
+
+  /**
+   * The simple name of a generated implementation class. See the Javadoc of {@link MakeLogicValue}
+   * for an example name.
+   *
+   * @param annotated the annotated type which causes the class to be generated
+   */
+  public static String generatedClassName(TypeElement annotated) {
+    List<Object> components = new ArrayList<>();
+    Element element = annotated;
+    while (element instanceof TypeElement) {
+      components.add(element.getSimpleName());
+
+      element = element.getEnclosingElement();
+    }
+    Collections.reverse(components);
+    return Processors.join("_", components);
   }
 
   private Processors() {}

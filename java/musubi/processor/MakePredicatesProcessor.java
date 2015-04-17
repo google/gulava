@@ -23,6 +23,8 @@ package musubi.processor;
 
 import musubi.annotation.MakePredicates;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -30,6 +32,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 
 /**
  * An annotation processor that reads classes annoated with @{@link MakePredicates} and creates
@@ -43,6 +46,21 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
+      MakePredicatesMetadata metadata =
+          MakePredicatesMetadata.of(annotatedType.getType(), processingEnv.getMessager());
+      try (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+        writer.write("public class " + metadata.getName()
+            + " extends " + metadata.getAnnotatedType().getQualifiedName()
+            + " {\n");
+
+        writer.write("\n");
+      } catch (IOException e) {
+        processingEnv.getMessager()
+            .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());
+        e.printStackTrace();
+      }
+    }
     return true;
   }
 }
