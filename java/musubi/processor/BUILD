@@ -47,6 +47,7 @@ java_plugin(
     visibility = ["//java/musubi:__pkg__"],
 )
 
+# TODO: Delete and replace uses with MakePredicates processor once available.
 java_plugin(
     name = "make_goal_factory_plugin",
     processor_class = "musubi.processor.MakeGoalFactoryProcessor",
