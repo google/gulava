@@ -31,10 +31,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-import javax.tools.Diagnostic;
 
 /**
  * Metadata necessary to generate a predicates subclass. This contains information obtained from the
@@ -42,13 +39,13 @@ import javax.tools.Diagnostic;
  */
 public final class MakePredicatesMetadata {
   private final String name;
-  private final List<ExecutableElement> predicateMethods;
+  private final List<Predicate> predicates;
   private final TypeElement annotatedType;
 
   private MakePredicatesMetadata(
-      String name, List<ExecutableElement> predicateMethods, TypeElement annotatedType) {
+      String name, List<Predicate> predicates, TypeElement annotatedType) {
     this.name = name;
-    this.predicateMethods = Collections.unmodifiableList(new ArrayList<>(predicateMethods));
+    this.predicates = Collections.unmodifiableList(new ArrayList<>(predicates));
     this.annotatedType = annotatedType;
   }
 
@@ -57,45 +54,12 @@ public final class MakePredicatesMetadata {
     return name;
   }
 
-  public List<ExecutableElement> getPredicateMethods() {
-    return predicateMethods;
+  public List<Predicate> getPredicates() {
+    return predicates;
   }
 
   public TypeElement getAnnotatedType() {
     return annotatedType;
-  }
-
-  /**
-   * Prints errors for any invalid predicate methods found, and returns a list with only the valid
-   * ones.
-   */
-  private static List<ExecutableElement> validatePredicateMethods(
-      List<ExecutableElement> predicateMethods, Messager messager) {
-    List<ExecutableElement> validated = new ArrayList<>();
-    for (ExecutableElement predicateMethod : predicateMethods) {
-      int errors = 0;
-
-      if (predicateMethod.getParameters().isEmpty()) {
-        messager.printMessage(Diagnostic.Kind.ERROR,
-            "Predicate methods must have at least one argument.",
-            predicateMethod);
-        errors++;
-      }
-
-      for (VariableElement parameter : predicateMethod.getParameters()) {
-        if (!parameter.asType().toString().equals("java.lang.Object")) {
-          messager.printMessage(Diagnostic.Kind.ERROR,
-              "All parameters to predicate methods must be of type Object.",
-              parameter);
-          errors++;
-        }
-      }
-
-      if (errors == 0) {
-        validated.add(predicateMethod);
-      }
-    }
-    return validated;
   }
 
   /**
@@ -115,8 +79,15 @@ public final class MakePredicatesMetadata {
       }
     }
 
-    predicateMethods = validatePredicateMethods(predicateMethods, messager);
+    ClauseMethods clauseMethods = ClauseMethods.withPredicates(predicateMethods, messager);
 
-    return new MakePredicatesMetadata(name, predicateMethods, annotatedType);
+    for (ExecutableElement method : allMethods) {
+      if (method.getModifiers().contains(Modifier.FINAL)
+          && Processors.isPackageProtected(method)) {
+        clauseMethods.addClause(method);
+      }
+    }
+
+    return new MakePredicatesMetadata(name, clauseMethods.predicateMetadata(), annotatedType);
   }
 }

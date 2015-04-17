@@ -28,6 +28,7 @@ import java.util.List;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -155,6 +156,12 @@ public class Processors {
     }
     Collections.reverse(components);
     return Processors.join("_", components);
+  }
+
+  public static boolean isPackageProtected(Element element) {
+    return !element.getModifiers().contains(Modifier.PUBLIC)
+        && !element.getModifiers().contains(Modifier.PROTECTED)
+        && !element.getModifiers().contains(Modifier.PRIVATE);
   }
 
   private Processors() {}
