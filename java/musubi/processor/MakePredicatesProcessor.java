@@ -21,31 +21,28 @@
  */
 package musubi.processor;
 
+import musubi.annotation.MakePredicates;
+
+import java.util.Set;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.TypeElement;
+
 /**
- * Constants containing fully-qualified names of classes of concern to this processor.
+ * An annotation processor that reads classes annoated with @{@link MakePredicates} and creates
+ * a in implementing class for each annotated type.
  */
-public class ClassNames {
-  public static final String MAKE_LOGIC_VALUE = "musubi.annotation.MakeLogicValue";
+@SupportedAnnotationTypes(ClassNames.MAKE_PREDICATES)
+public final class MakePredicatesProcessor extends AbstractProcessor {
+  @Override public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latestSupported();
+  }
 
-  public static final String MAKE_GOAL_FACTORY = "musubi.annotation.MakeGoalFactory";
-
-  public static final String MAKE_PREDICATES = "musubi.annotation.MakePredicates";
-
-  public static final String DELAYED_GOAL = "musubi.DelayedGoal";
-
-  public static final String LOGIC_VALUE = "musubi.LogicValue";
-
-  public static final String GOAL = "musubi.Goal";
-
-  public static final String GOALS = "musubi.Goals";
-
-  public static final String STREAM = "musubi.Stream";
-
-  public static final String SUBST = "musubi.Subst";
-
-  public static final String REPLACER = "musubi.Replacer";
-
-  public static final String VAR = "musubi.Var";
-
-  private ClassNames() {}
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    return true;
+  }
 }

@@ -21,31 +21,20 @@
  */
 package musubi.processor;
 
+import musubi.annotation.MakePredicates;
+
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.TypeElement;
+
 /**
- * Constants containing fully-qualified names of classes of concern to this processor.
+ * Metadata necessary to generate a predicates subclass. This contains information obtained from the
+ * class annotated with @{@link MakePredicates}.
  */
-public class ClassNames {
-  public static final String MAKE_LOGIC_VALUE = "musubi.annotation.MakeLogicValue";
-
-  public static final String MAKE_GOAL_FACTORY = "musubi.annotation.MakeGoalFactory";
-
-  public static final String MAKE_PREDICATES = "musubi.annotation.MakePredicates";
-
-  public static final String DELAYED_GOAL = "musubi.DelayedGoal";
-
-  public static final String LOGIC_VALUE = "musubi.LogicValue";
-
-  public static final String GOAL = "musubi.Goal";
-
-  public static final String GOALS = "musubi.Goals";
-
-  public static final String STREAM = "musubi.Stream";
-
-  public static final String SUBST = "musubi.Subst";
-
-  public static final String REPLACER = "musubi.Replacer";
-
-  public static final String VAR = "musubi.Var";
-
-  private ClassNames() {}
+public final class MakePredicatesMetadata {
+  /**
+   * Returns the metadata stored in a type annotated with @{@link MakePredicates}.
+   */
+  public static MakePredicatesMetadata of(TypeElement annotatedType, Messager messager) {
+    return new MakePredicatesMetadata();
+  }
 }

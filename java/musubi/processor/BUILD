@@ -26,6 +26,7 @@ java_library(
     exported_plugins = [
         ":make_goal_factory_plugin",
         ":make_logic_value_plugin",
+        ":make_predicates_plugin",
     ],
     exports = [
         "//java/musubi",
@@ -43,6 +44,13 @@ java_library(
 java_plugin(
     name = "make_logic_value_plugin",
     processor_class = "musubi.processor.MakeLogicValueProcessor",
+    deps = [":processor_lib"],
+    visibility = ["//java/musubi:__pkg__"],
+)
+
+java_plugin(
+    name = "make_predicates_plugin",
+    processor_class = "musubi.processor.MakePredicatesProcessor",
     deps = [":processor_lib"],
     visibility = ["//java/musubi:__pkg__"],
 )
