@@ -99,22 +99,17 @@ public final class MakeGoalFactoryMetadata {
     List<String> argNames = null;
     List<? extends ExecutableElement> allMethods =
         ElementFilter.methodsIn(annotatedType.getEnclosedElements());
-    METHODS: for (ExecutableElement method : allMethods) {
+    for (ExecutableElement method : allMethods) {
       if (method.getModifiers().contains(Modifier.PRIVATE)
           || !method.getModifiers().contains(Modifier.STATIC)) {
-        continue;
-      }
-
-      if (argNames == null) {
+        // Ignore this method.
+      } else if (argNames == null) {
         argNames = new ArrayList<>();
         for (VariableElement parameters : method.getParameters()){
           argNames.add(parameters.getSimpleName().toString());
         }
         clauseMethods.add(method);
-        continue;
-      }
-
-      if (method.getParameters().size() != argNames.size()) {
+      } else if (method.getParameters().size() != argNames.size()) {
         // This method appears to be a clause but does not have the same number of parameters as the
         // first clause. That means it cannot be used in conjunction to form a single goal, so we
         // exclude it.
@@ -123,25 +118,14 @@ public final class MakeGoalFactoryMetadata {
             + allMethods.get(0).getSimpleName() + " but there are only "
             + method.getParameters().size() + " on this method.",
             method);
-        continue;
-      }
 
       // Make sure the argument names match the names of the first clause method. This not only
       // makes generating code easier (since we can use the VariableElement for the parameters of
       // the methods more interchangeably), but it also keeps the manually-written code consistent
       // and sane-looking.
-      for (int i = 0; i < argNames.size(); i++) {
-        VariableElement parameter = method.getParameters().get(i);
-        if (!parameter.getSimpleName().contentEquals(argNames.get(i))) {
-          messager.printMessage(Diagnostic.Kind.ERROR,
-              "Expected this argument to have the name " + argNames.get(i) + " to match "
-              + allMethods.get(0),
-              parameter);
-          continue METHODS;
-        }
+      } else if (!Processors.printArgNamesMatchError(messager, allMethods.get(0), method)) {
+        clauseMethods.add(method);
       }
-
-      clauseMethods.add(method);
     }
 
     if (clauseMethods.isEmpty()) {

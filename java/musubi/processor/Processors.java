@@ -23,8 +23,10 @@ package musubi.processor;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 
@@ -80,6 +82,29 @@ public class Processors {
    */
   public static Name qualifiedName(DeclaredType type) {
     return ((TypeElement) type.asElement()).getQualifiedName();
+  }
+
+  /**
+   * Checks if the argument names match between two methods. If they do not match, prints
+   * an error to {@code messager} and returns {@code true}. Otherwise, returns {@code false}.
+   * This method assumes that the number of arguments is the same.
+   */
+  public static boolean printArgNamesMatchError(
+      Messager messager, ExecutableElement base, ExecutableElement toCheck) {
+    for (int i = 0; i < base.getParameters().size(); i++) {
+      Name expectedName = base.getParameters().get(i).getSimpleName();
+      VariableElement parameter = toCheck.getParameters().get(i);
+      if (!parameter.getSimpleName().contentEquals(expectedName)) {
+        messager.printMessage(Diagnostic.Kind.ERROR,
+            "Expected this argument to have the name " + expectedName + " to match the argument at "
+            + "the same position on "
+            + base.getSimpleName(),
+            parameter);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private Processors() {}
