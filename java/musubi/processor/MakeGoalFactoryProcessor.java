@@ -44,32 +44,6 @@ import javax.tools.Diagnostic;
  */
 @SupportedAnnotationTypes(ClassNames.MAKE_GOAL_FACTORY)
 public final class MakeGoalFactoryProcessor extends AbstractProcessor {
-  /**
-   * Returns each argument name as it would appear in a signature as the type {@link Object}.
-   * Includes comma delimiters if there is more than one argument. Does not include enclosing
-   * parenthesis.
-   */
-  private static String paramList(Iterable<String> argNames) {
-    List<String> parameters = new ArrayList<>();
-    for (String argName : argNames) {
-      // Prepend "Object" in generated argument list with "final"
-
-      // This makes the generated source code valid when compiling with JDK 7. Otherwise,
-      // we are trying to access a non-final variable from within an anonymous inner
-      // class, which is not supported until JDK 8.
-      parameters.add("final Object " + argName);
-    }
-    return Processors.join(", ", parameters);
-  }
-
-  private static String compoundGoal(String type, List<String> subGoals) {
-    if (subGoals.size() == 1) {
-      return subGoals.get(0);
-    }
-
-    return ClassNames.GOALS + "." + type + "(" + Processors.join(", ", subGoals) + ")";
-  }
-
   @Override public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
   }
@@ -101,7 +75,7 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
   private ClauseInvocation clauseInvocation(
       MakeGoalFactoryMetadata metadata, ExecutableElement clauseMethod, Gensymer boundIds) {
     // The actual arguments to pass to the clause method. If the clause method accepts
-    // "Object" for an argument, this can just be the same value passed to the goal factory
+    // "Object" for an argument, this can just be the same value passed to the predicate
     // method.
     List<String> decomposedArgList = new ArrayList<>();
 
@@ -146,7 +120,7 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
     for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
       MakeGoalFactoryMetadata metadata =
           MakeGoalFactoryMetadata.of(annotatedType.getType(), processingEnv.getMessager());
-      String paramList = paramList(metadata.getArgNames());
+      String paramList = Processors.objectParamList(metadata.getArgNames());
       String argList = Processors.join(", ", metadata.getArgNames());
 
       try  (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
@@ -163,9 +137,10 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
           for (String preparationStatement : invocation.preparationStatements) {
             writer.write("    " + preparationStatement + "\n");
           }
-          clauseInvocationExpressions.add(compoundGoal("conj", invocation.subGoals));
+          clauseInvocationExpressions.add(Processors.compoundGoal("conj", invocation.subGoals));
         }
-        writer.write("    return " + compoundGoal("disj", clauseInvocationExpressions) + ";\n");
+        writer.write("    return "
+            + Processors.compoundGoal("disj", clauseInvocationExpressions) + ";\n");
         writer.write("  }\n");
 
         // Goal factory method: o (normal)

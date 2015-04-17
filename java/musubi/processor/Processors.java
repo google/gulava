@@ -21,6 +21,9 @@
  */
 package musubi.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -105,6 +108,34 @@ public class Processors {
     }
 
     return false;
+  }
+
+  /**
+   * Returns each argument name as it would appear in a signature as the type {@link Object}.
+   * Includes comma delimiters if there is more than one argument. Does not include enclosing
+   * parenthesis.
+   *
+   * <p>This method makes each argument {@code final} since only {@code final} arguments can be
+   * accessed in an anonymous inner class before JDK 8.
+   */
+  public static String objectParamList(Iterable<String> argNames) {
+    List<String> parameters = new ArrayList<>();
+    for (String argName : argNames) {
+      parameters.add("final java.lang.Object " + argName);
+    }
+    return join(", ", parameters);
+  }
+
+  /**
+   * Returns a compound goal expression, which is either of type {@code "conj"} or {@code "disj"}.
+   * If there is only one sub-goal, then it just returns that one goal.
+   */
+  public static String compoundGoal(String type, List<String> subGoals) {
+    if (subGoals.size() == 1) {
+      return subGoals.get(0);
+    }
+
+    return ClassNames.GOALS + "." + type + "(" + join(", ", subGoals) + ")";
   }
 
   private Processors() {}
