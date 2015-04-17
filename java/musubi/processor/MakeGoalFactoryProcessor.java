@@ -23,19 +23,13 @@ package musubi.processor;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 /**
@@ -46,73 +40,6 @@ import javax.tools.Diagnostic;
 public final class MakeGoalFactoryProcessor extends AbstractProcessor {
   @Override public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
-  }
-
-  /**
-   * Information about the invocation of a certain clause required by the goal factory method. A
-   * goal factory method needs at least one clause to be valid - each clause represents an
-   * alternative to reaching the goal. This means each clause invocation should be disj'd together
-   * to create the final {@code Goal}.
-   */
-  private static final class ClauseInvocation {
-    /**
-     * The goal expressions which are needed to conj together to fulfill this clause. This
-     * includes the clause invocation itself as well as "same()" (unification) goals which
-     * unify the Object reference given to the goal factory method with the kind of reference
-     * required by the clause method.
-     */
-    final List<String> subGoals;
-
-    /** Lines, each holding a statement, that should appear before the invocation. */
-    final List<String> preparationStatements;
-
-    ClauseInvocation(List<String> subGoals, List<String> preparationStatements) {
-      this.subGoals = subGoals;
-      this.preparationStatements = preparationStatements;
-    }
-  }
-
-  private ClauseInvocation clauseInvocation(
-      MakeGoalFactoryMetadata metadata, ExecutableElement clauseMethod, Gensymer boundIds) {
-    // The actual arguments to pass to the clause method. If the clause method accepts
-    // "Object" for an argument, this can just be the same value passed to the predicate
-    // method.
-    List<String> decomposedArgList = new ArrayList<>();
-
-    List<String> subGoals = new ArrayList<>();
-    List<String> preparationStatements = new ArrayList<>();
-
-    for (VariableElement parameter : clauseMethod.getParameters()) {
-      TypeMirror parameterType = parameter.asType();
-      String parameterName = parameter.getSimpleName().toString();
-
-      if ((parameterType instanceof DeclaredType)
-          && Processors.qualifiedName((DeclaredType) parameterType)
-              .contentEquals("java.lang.Object")) {
-        // No need to decompose because the clause method accepts an Object reference.
-        decomposedArgList.add(parameterName);
-      } else {
-        // We need to decompose this argument. Unify the Object reference passed to the goal
-        // factory method to a reference of the desired type.
-        String boundId = boundIds.gensym();
-        decomposedArgList.add(boundId);
-        String fresh = new FreshInstantiation(parameter, processingEnv.getMessager())
-            .visit(parameterType);
-
-        preparationStatements.add(String.format("%s %s = %s;", parameterType, boundId, fresh));
-        subGoals.add(String.format("%s.same(%s, %s)", ClassNames.GOALS, boundId, parameterName));
-      }
-    }
-
-    // subGoals already has all the unification goals needed, if any. Now just add the
-    // delegation to the clause method.
-    subGoals.add(
-        String.format("%s.%s(%s)",
-            metadata.getAnnotatedType().getQualifiedName(),
-            clauseMethod.getSimpleName(),
-            Processors.join(", ", decomposedArgList)));
-
-    return new ClauseInvocation(subGoals, preparationStatements);
   }
 
   @Override
@@ -128,19 +55,13 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
 
         // Goal factory method: i (inline)
         writer.write("  public static " + ClassNames.GOAL + " i(" + paramList + ") {\n");
-        Gensymer boundIds = new Gensymer("__bound%s__");
-
-        List<String> clauseInvocationExpressions = new ArrayList<>();
-
-        for (ExecutableElement clauseMethod : metadata.getClauseMethods()) {
-          ClauseInvocation invocation = clauseInvocation(metadata, clauseMethod, boundIds);
-          for (String preparationStatement : invocation.preparationStatements) {
-            writer.write("    " + preparationStatement + "\n");
-          }
-          clauseInvocationExpressions.add(Processors.compoundGoal("conj", invocation.subGoals));
-        }
-        writer.write("    return "
-            + Processors.compoundGoal("disj", clauseInvocationExpressions) + ";\n");
+        GoalExpressions expressions = new GoalExpressions(
+              metadata.getAnnotatedType().getQualifiedName().toString(),
+              new Gensymer("__bound%s__"),
+              processingEnv.getMessager());
+        PreparedExpression predicate = expressions.predicate(metadata.getClauseMethods());
+        predicate.writePreparationStatements(writer);
+        writer.write("    return " + predicate.getExpression() + ";\n");
         writer.write("  }\n");
 
         // Goal factory method: o (normal)
