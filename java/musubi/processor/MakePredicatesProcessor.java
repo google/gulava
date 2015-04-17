@@ -54,7 +54,26 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
             + " extends " + metadata.getAnnotatedType().getQualifiedName()
             + " {\n");
 
-        writer.write("\n");
+        for (Predicate predicate : metadata.getPredicates()) {
+          GoalExpressions expressions = new GoalExpressions("this", processingEnv.getMessager());
+          String inlineName = "__" + predicate.getName() + "Inline__";
+          expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses());
+          writer.write("\n");
+          writer.write("  @java.lang.Override\n");
+          writer.write("  public " + ClassNames.GOAL + " " + predicate.getName() + "("
+              + Processors.objectParamList(predicate.argNames()) + ") {\n");
+          writer.write("    return new " + ClassNames.GOAL + "() {\n");
+          writer.write("      @java.lang.Override\n");
+          writer.write("      public " + ClassNames.STREAM + " run("
+              + ClassNames.SUBST + " __subst__) {\n");
+          writer.write("        return " + metadata.getName() + ".this." + inlineName + "("
+              + Processors.join(", ", predicate.argNames()) + ").run(__subst__);\n");
+          writer.write("      }\n");
+          writer.write("    };\n");
+          writer.write("  }\n");
+        }
+
+        writer.write("}\n");
       } catch (IOException e) {
         processingEnv.getMessager()
             .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());

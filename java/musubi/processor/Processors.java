@@ -128,6 +128,14 @@ public class Processors {
     return join(", ", parameters);
   }
 
+  public static List<String> argNames(ExecutableElement element) {
+    List<String> names = new ArrayList<>();
+    for (VariableElement parameter : element.getParameters()) {
+      names.add(parameter.getSimpleName().toString());
+    }
+    return names;
+  }
+
   /**
    * Returns a compound goal expression, which is either of type {@code "conj"} or {@code "disj"}.
    * If there is only one sub-goal, then it just returns that one goal.

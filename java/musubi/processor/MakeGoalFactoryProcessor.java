@@ -54,23 +54,18 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
         writer.write("public class " + metadata.getName() + " {\n");
 
         // Goal factory method: i (inline)
-        writer.write("  public static " + ClassNames.GOAL + " i(" + paramList + ") {\n");
         GoalExpressions expressions = new GoalExpressions(
-              metadata.getAnnotatedType().getQualifiedName().toString(),
-              new Gensymer("__bound%s__"),
-              processingEnv.getMessager());
-        PreparedExpression predicate = expressions.predicate(metadata.getClauseMethods());
-        predicate.writePreparationStatements(writer);
-        writer.write("    return " + predicate.getExpression() + ";\n");
-        writer.write("  }\n");
+            metadata.getAnnotatedType().getQualifiedName().toString(),
+            processingEnv.getMessager());
+        expressions.writeInlineMethod(writer, "public static", "i", metadata.getClauseMethods());
 
         // Goal factory method: o (normal)
         writer.write("  public static " + ClassNames.GOAL + " o(" + paramList + ") {\n");
         writer.write("    return new " + ClassNames.GOAL + "() {\n");
         writer.write("      @java.lang.Override\n");
         writer.write("      public " + ClassNames.STREAM + " run("
-            + ClassNames.SUBST + " __stream__) {\n");
-        writer.write("        return i(" + argList + ").run(__stream__);\n");
+            + ClassNames.SUBST + " __subst__) {\n");
+        writer.write("        return i(" + argList + ").run(__subst__);\n");
         writer.write("      }\n");
         writer.write("    };\n");
         writer.write("  }\n");

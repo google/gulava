@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.VariableElement;
 
 /**
  * Contains metadata about a particular predicate. This includes the predicate method and the
@@ -42,6 +44,21 @@ public final class Predicate {
 
   public ExecutableElement getMethod() {
     return method;
+  }
+
+  /**
+   * The name of the predicate. This is derived from the method name.
+   */
+  public Name getName() {
+    return method.getSimpleName();
+  }
+
+  /**
+   * The names of the parameters to the predicate. These names are shared between the predicate
+   * method and all clause methods.
+   */
+  public List<String> argNames() {
+    return Processors.argNames(method);
   }
 
   public List<ExecutableElement> getClauses() {

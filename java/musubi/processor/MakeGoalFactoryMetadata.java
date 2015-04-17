@@ -104,10 +104,7 @@ public final class MakeGoalFactoryMetadata {
           || !method.getModifiers().contains(Modifier.STATIC)) {
         // Ignore this method.
       } else if (argNames == null) {
-        argNames = new ArrayList<>();
-        for (VariableElement parameters : method.getParameters()){
-          argNames.add(parameters.getSimpleName().toString());
-        }
+        argNames = Processors.argNames(method);
         clauseMethods.add(method);
       } else if (method.getParameters().size() != argNames.size()) {
         // This method appears to be a clause but does not have the same number of parameters as the
