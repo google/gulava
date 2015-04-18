@@ -32,7 +32,7 @@ java_library(
     srcs = glob(["*.java"]),
     plugins = [
         "//java/musubi/processor:make_logic_value_plugin",
-        "//java/musubi/processor:make_goal_factory_plugin",
+        "//java/musubi/processor:make_predicates_plugin",
     ],
     deps = [
         "//java/musubi/annotation",

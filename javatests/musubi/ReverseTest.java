@@ -40,7 +40,7 @@ public class ReverseTest {
   @Test
   public void plainReverse() {
     new LogicAsserter()
-        .stream(Reverse.o(Cons.list(Arrays.asList(4, 5, 6)), X))
+        .stream(Cons.O.reverse(Cons.list(Arrays.asList(4, 5, 6)), X))
         .workUnits(5)
         .addRequestedVar(X)
         .startSubst()
@@ -51,7 +51,7 @@ public class ReverseTest {
   @Test
   public void noBoundVars() {
     List<Map<Var, Object>> substs = new LogicAsserter()
-        .stream(Reverse.o(X, Y))
+        .stream(Cons.O.reverse(X, Y))
         .workUnits(11)
         .finishes(false)
         .addRequestedVar(X, Y)

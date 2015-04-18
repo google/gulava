@@ -36,7 +36,7 @@ public class AppendTest {
   @Test
   public void onlyLastArgBound() {
     new LogicAsserter()
-        .stream(Append.o(X, Y, Cons.list(Arrays.asList(1, 2, 3, 4))))
+        .stream(Cons.O.append(X, Y, Cons.list(Arrays.asList(1, 2, 3, 4))))
         .workUnits(6)
         .startSubst()
         .put(X, null).put(Y, Cons.list(Arrays.asList(1, 2, 3, 4)))

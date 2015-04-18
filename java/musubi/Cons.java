@@ -21,7 +21,12 @@
  */
 package musubi;
 
+import static musubi.Goals.UNIT;
+import static musubi.Goals.conj;
+import static musubi.Goals.same;
+
 import musubi.annotation.MakeLogicValue;
+import musubi.annotation.MakePredicates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,5 +95,70 @@ public abstract class Cons<CAR, CDR> {
       head = (Cons) head.cdr();
     }
     return list;
+  }
+
+  public static final Goals O = new MakePredicates_Cons_Goals();
+
+  /** Goals related to {@link Cons} cells and sequences thereof. */
+  @MakePredicates
+  public static abstract class Goals {
+    /**
+     * Appends two sequences to create another sequence. In more general terms, identifies a
+     * sequence as the concatenation of two other sequences.
+     */
+    public abstract Goal append(Object a, Object b, Object ab);
+
+    final Goal append_baseCase(Void a, Object b, Object ab) {
+      return same(b, ab);
+    }
+
+    final Goal append_iterate(Cons<?, ?> a, Object b, Cons<?, ?> ab) {
+      return conj(
+          same(a.car(), ab.car()),
+          append(a.cdr(), b, ab.cdr()));
+    }
+
+    /**
+     * Identifies one sequence as a subset of another sequence, and that the subset has the items in
+     * the same order as the other sequence.
+     *
+     * @param sub the ordered subsequence
+     * @param full the full sequence
+     */
+    public abstract Goal order(Object sub, Object full);
+
+    final Goal order_endOfLists(Void sub, Void full) {
+      return UNIT;
+    }
+
+    final Goal order_select(Cons<?, ?> sub, Cons<?, ?> full) {
+      return conj(
+          same(sub.car(), full.car()),
+          order(sub.cdr(), full.cdr()));
+    }
+
+    final Goal order_skip(Object sub, Cons<?, ?> full) {
+      return order(sub, full.cdr());
+    }
+
+    /**
+     * Identifies two sequences as the reverse of each other.
+     */
+    public final Goal reverse(Object a, Object b) {
+      return reverse(a, b, null);
+    }
+
+    /**
+     * Identifies two sequences as the reverse of each other, and includes an accumulator argument.
+     */
+    public abstract Goal reverse(Object a, Object b, Object bTail);
+
+    final Goal reverse_baseCase(Void a, Object b, Object bTail) {
+      return same(b, bTail);
+    }
+
+    final Goal reverse_iterate(Cons<?, ?> a, Object b, Object bTail) {
+      return new DelayedGoal(reverse(a.cdr(), b, Cons.of(a.car(), bTail)));
+    }
   }
 }

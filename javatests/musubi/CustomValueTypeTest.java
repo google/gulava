@@ -138,7 +138,7 @@ public class CustomValueTypeTest {
     new LogicAsserter()
         .stream(
             conj(
-                Order.o(
+                Cons.O.order(
                     Cons.list(Arrays.asList(family, given)),
                     Cons.list(Arrays.asList(1, 2, 3, 4))),
                 same(new PersonName(family, given), name)))
