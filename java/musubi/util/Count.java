@@ -33,11 +33,25 @@ import musubi.annotation.MakeLogicValue;
  * class).
  */
 @MakeLogicValue
-abstract class Count<C> {
+public abstract class Count<C> {
   /**
    * The value whose count is one less than this one.
    */
   public abstract C oneLess();
+
+  public static Count<?> fromInt(int value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Must be non-negative: " + value);
+    }
+
+    Count<?> result = null;
+    while (value > 0) {
+      result = Count.of(result);
+      value--;
+    }
+
+    return result;
+  }
 
   public static <C> Count<C> of(C oneLess) {
     return new MakeLogicValue_Count<>(oneLess);

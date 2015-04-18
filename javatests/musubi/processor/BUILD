@@ -44,6 +44,19 @@ java_test(
 )
 
 java_test(
+    name = "MakePredicatesFunctionalTest",
+    srcs = ["MakePredicatesFunctionalTest.java"],
+    deps = [
+        ":generated",
+        "//java/musubi",
+        "//java/musubi/processor",
+        "//java/musubi/testing",
+        "//java/musubi/util",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "MakeLogicValueFunctionalTest",
     srcs = ["MakeLogicValueFunctionalTest.java"],
     deps = [
