@@ -53,10 +53,10 @@ public class QueueTest {
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(42, EMPTY, A),
-                QueueLast.o("1011", A, B),
-                QueueLast.o(false, B, C),
-                QueueLast.o('a', C, FINISH_QUEUE),
+                Queue.O.last(42, EMPTY, A),
+                Queue.O.last("1011", A, B),
+                Queue.O.last(false, B, C),
+                Queue.O.last('a', C, FINISH_QUEUE),
                 same(null, FINISH_QUEUE.contents().hole()),
                 same(D, FINISH_QUEUE.contents().head()),
                 same(E, FINISH_QUEUE.size())))
@@ -73,12 +73,12 @@ public class QueueTest {
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(42, EMPTY, A),
-                QueueLast.o("1011", A, B),
-                QueueLast.o(false, B, C),
-                QueueFirst.o(D, E, C),
-                QueueFirst.o(F, G, E),
-                QueueFirst.o(H, FINISH_QUEUE, G)))
+                Queue.O.last(42, EMPTY, A),
+                Queue.O.last("1011", A, B),
+                Queue.O.last(false, B, C),
+                Queue.O.first(D, E, C),
+                Queue.O.first(F, G, E),
+                Queue.O.first(H, FINISH_QUEUE, G)))
         .addRequestedVar(D, F, H, FINISH_QUEUE.size())
         .workUnits(2)
         .startSubst()
@@ -94,8 +94,8 @@ public class QueueTest {
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(42, B, Queue.of(Count.of(null), new Var())),
-                QueueLast.o(42, A, B)))
+                Queue.O.last(42, B, Queue.of(Count.of(null), new Var())),
+                Queue.O.last(42, A, B)))
         .workUnits(1)
         .test();
   }
@@ -109,8 +109,8 @@ public class QueueTest {
     new LogicAsserter()
         .stream(
             conj(
-                QueueLast.o(10, A, Queue.of(Count.of(Count.of(null)), startList)),
-                QueueLast.o(20, EMPTY, A),
+                Queue.O.last(10, A, Queue.of(Count.of(Count.of(null)), startList)),
+                Queue.O.last(20, EMPTY, A),
                 same(startList.head().cdr().cdr(), null),
                 same(C, startList.head())))
         .workUnits(2)

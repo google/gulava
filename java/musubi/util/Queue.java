@@ -26,8 +26,8 @@ import static musubi.Goals.same;
 
 import musubi.Goal;
 import musubi.Var;
-import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
+import musubi.annotation.MakePredicates;
 
 /**
  * Represents a queue. This contains its size as a {@code Count} value and its contents as a
@@ -47,24 +47,37 @@ abstract class Queue<S, C> {
     return new MakeLogicValue_Queue<>(size, contents);
   }
 
-  /**
-   * Defines a goal that identifies the final element in a queue.
-   */
-  @MakeGoalFactory(name = "QueueLast")
-  static class LastClauses {
-    static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
+
+  public static final Goals O = new MakePredicates_Queue_Goals();
+
+  /** Goals for queues */
+  @MakePredicates
+  public static abstract class Goals {
+    /**
+     * Identifies the final element in a queue.
+     *
+     * @param element the element that is the last
+     * @param without the queue without the element
+     * @param with the queue with the element
+     */
+    public abstract Goal last(Object element, Object without, Object with);
+
+    final Goal last_impl(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
       return conj(
           same(without.size(), with.size().oneLess()),
           DiffList.O.last(element, without.contents(), with.contents()));
     }
-  }
 
-  /**
-   * Defines a goal that identifies the first element in a queue.
-   */
-  @MakeGoalFactory(name = "QueueFirst")
-  static class FirstClauses {
-    static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
+    /**
+     * Identifies the first element in a queue.
+     *
+     * @param element the element that is the first
+     * @param without the queue without the element
+     * @param with the queue with the element
+     */
+    public abstract Goal first(Object element, Object without, Object with);
+
+    final Goal first_impl(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
       return conj(
           same(without.size(), with.size().oneLess()),
           DiffList.O.first(element, without.contents(), with.contents()));
