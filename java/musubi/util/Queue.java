@@ -55,7 +55,7 @@ abstract class Queue<S, C> {
     static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
       return conj(
           same(without.size(), with.size().oneLess()),
-          DiffListLast.o(element, without.contents(), with.contents()));
+          DiffList.O.last(element, without.contents(), with.contents()));
     }
   }
 
@@ -67,7 +67,7 @@ abstract class Queue<S, C> {
     static Goal goal(Object element, Queue<?, ?> without, Queue<Count<?>, ?> with) {
       return conj(
           same(without.size(), with.size().oneLess()),
-          DiffListFirst.o(element, without.contents(), with.contents()));
+          DiffList.O.first(element, without.contents(), with.contents()));
     }
   }
 }

@@ -27,8 +27,8 @@ import static musubi.Goals.same;
 import musubi.Cons;
 import musubi.Goal;
 import musubi.Var;
-import musubi.annotation.MakeGoalFactory;
 import musubi.annotation.MakeLogicValue;
+import musubi.annotation.MakePredicates;
 
 /**
  * Represents a difference list. A difference list contains two plain lists: the head and the hole.
@@ -54,76 +54,87 @@ abstract class DiffList<HEAD, HOLE> {
     return of(node, node);
   }
 
+  public static final Goals O = new MakePredicates_DiffList_Goals();
+
   /**
-   * Defines a goal that identifies the final element in a difference list.
+   * Goals related to difference lists.
    */
-  @MakeGoalFactory(name = "DiffListLast")
-  static class LastClauses {
-    static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
+  @MakePredicates
+  public static abstract class Goals {
+    /**
+     * Identifies the final element in a difference list.
+     *
+     * @param element the item that is last in the list
+     * @param without the difference list without the element
+     * @param with the difference list with the element
+     */
+    public abstract Goal last(Object element, Object without, Object with);
+
+    final Goal last_impl(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
       return conj(
           same(without.hole().car(), element),
           same(with.head(), without.head()),
           same(with.hole(), without.hole().cdr()));
     }
-  }
 
-  /**
-   * Defines a goal that identifies the first element in a difference list.
-   */
-  @MakeGoalFactory(name = "DiffListFirst")
-  static class FirstClauses {
-    static Goal goal(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
+    /**
+     * Identifies the first element in a difference list.
+     *
+     * @param element the item that is first in the list
+     * @param without the difference list without the element
+     * @param with the difference list with the element
+     */
+    public abstract Goal first(Object element, Object without, Object with);
+
+    final Goal first_impl(Object element, DiffList<?, Cons<?, ?>> without, DiffList<?, ?> with) {
       return conj(
           same(without.hole(), with.hole()),
           same(Cons.of(element, without.head()), with.head()));
     }
-  }
 
-  /**
-   * Defines a goal that converts between a difference list and a plain ({@link Cons}) list.
-   * Note that this usually diverges when converting a difference list to a plain list (rather than
-   * the other direction). In that case, consider using {@link DiffListFinish}.
-   */
-  @MakeGoalFactory(name = "DiffListAsList")
-  static class AsListClauses {
-    static Goal delegate(DiffList<?, ?> diffList, Object list) {
-      return DiffListAsList3.i(diffList.head(), diffList.hole(), list);
+    /**
+     * Converts between a difference list and a plain ({@link Cons}) list. Note that this usually
+     * diverges when converting a difference list to a plain list (rather than the other direction).
+     * In that case, consider using {@link #finish(Object, Object)}.
+     */
+    public abstract Goal asList(Object diffList, Object consList);
+
+    final Goal asList_delegate(DiffList<?, ?> diffList, Object consList) {
+      return asList(diffList.head(), diffList.hole(), consList);
     }
-  }
 
-  /**
-   * Defines a goal that converts between a difference list and a plain ({@link Cons}) list. This
-   * takes the fields of the difference list as separate arguments.
-   *
-   * <p>TODO: Figure out if this really needs to be a separate goal from {@link DiffListAsList}.
-   * Maybe with inlined goals it doesn't matter if we pattern-match on the fields of a DiffList for
-   * each iteration.
-   */
-  @MakeGoalFactory(name = "DiffListAsList3")
-  static class AsList3Clauses {
-    static Goal empty(Object head, Object hole, Void list) {
+    /**
+     * Converts between a difference list and a plain ({@link Cons}) list. This takes the fields of
+     * the difference list as separate arguments.
+     *
+     * <p>TODO: Figure out if this really needs to be a separate goal from {@link DiffListAsList}.
+     * Maybe with inlined goals it doesn't matter if we pattern-match on the fields of a DiffList
+     * for each iteration.
+     */
+    public abstract Goal asList(Object head, Object hole, Object consList);
+
+    final Goal asList_empty(Object head, Object hole, Void consList) {
       return same(head, hole);
     }
 
-    static Goal iterate(Cons<?, ?> head, Object hole, Cons<?, ?> list) {
+    final Goal asList_iterate(Cons<?, ?> head, Object hole, Cons<?, ?> consList) {
       return conj(
-          same(head.car(), list.car()),
-          DiffListAsList3.o(head.cdr(), hole, list.cdr()));
+          same(head.car(), consList.car()),
+          asList(head.cdr(), hole, consList.cdr()));
     }
-  }
 
-  /**
-   * Defines a goal that converts between a difference list and a plain list. This is slightly
-   * different from {@link DiffListAsList} in that it renders the difference list unavailable for
-   * further appending on the end, since the {@link #hole()} value is bound to {@code null}. As a
-   * result, this runs in O(1) while {@link DiffListAsList} runs in O(n) where n is the length of
-   * the list.
-   */
-  @MakeGoalFactory(name = "DiffListFinish")
-  static class FinishClauses {
-    static Goal goal(DiffList<?, ?> diffList, Object list) {
+    /**
+     * Converts between a difference list and a plain list. This is slightly
+     * different from {@link DiffListAsList} in that it renders the difference list unavailable for
+     * further appending on the end, since the {@link #hole()} value is bound to {@code null}. As a
+     * result, this runs in O(1) while {@link DiffListAsList} runs in O(n) where n is the length of
+     * the list.
+     */
+    public abstract Goal finish(Object diffList, Object consList);
+
+    final Goal finish_impl(DiffList<?, ?> diffList, Object consList) {
       return conj(
-          same(diffList.head(), list),
+          same(diffList.head(), consList),
           same(diffList.hole(), null));
     }
   }

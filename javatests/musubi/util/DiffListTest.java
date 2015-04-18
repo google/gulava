@@ -47,10 +47,10 @@ public class DiffListTest {
     new LogicAsserter()
         .stream(
             conj(
-                DiffListLast.o(42, EMPTY, A),
-                DiffListLast.o('a', A, B),
-                DiffListFinish.o(B, C),
-                DiffListLast.o("hello", B, new Var())))
+                DiffList.O.last(42, EMPTY, A),
+                DiffList.O.last('a', A, B),
+                DiffList.O.finish(B, C),
+                DiffList.O.last("hello", B, new Var())))
         .workUnits(1)
         .test();
   }
@@ -60,9 +60,9 @@ public class DiffListTest {
     new LogicAsserter()
         .stream(
             conj(
-                DiffListLast.o(42, EMPTY, A),
-                DiffListLast.o('a', A, B),
-                DiffListFinish.o(B, C)))
+                DiffList.O.last(42, EMPTY, A),
+                DiffList.O.last('a', A, B),
+                DiffList.O.finish(B, C)))
         .workUnits(2)
         .addRequestedVar(C)
         .startSubst()
@@ -75,7 +75,7 @@ public class DiffListTest {
     new LogicAsserter()
         .stream(
             conj(
-                DiffListAsList.o(A, null),
+                DiffList.O.asList(A, null),
                 same(A, DiffList.of(B, C))))
         .workUnits(2)
         .addRequestedVar(B, C)
@@ -92,7 +92,7 @@ public class DiffListTest {
     new LogicAsserter()
         .stream(
             conj(
-                DiffListAsList.o(diffList, Cons.list(Arrays.asList(42, 'a'))),
+                DiffList.O.asList(diffList, Cons.list(Arrays.asList(42, 'a'))),
                 same(diffList.head().car(), B),
                 same(diffList.head().cdr().car(), C)))
         .workUnits(2)
