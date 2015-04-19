@@ -1,0 +1,5 @@
+# Bazel output directories.
+/bazel-*
+
+# Bazel tools. Copy or symlink this from Bazel's base workspace.
+/tools
