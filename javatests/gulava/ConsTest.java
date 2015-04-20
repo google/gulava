@@ -62,4 +62,14 @@ public class ConsTest {
         .put(Z, Cons.list(Arrays.asList(42, 5, 7, 9)))
         .test();
   }
+
+  @Test
+  public void testList() {
+    Assert.assertEquals(null, Cons.s());
+    Assert.assertEquals(null, Cons.list(Arrays.asList()));
+    Assert.assertEquals(Cons.of(42, null), Cons.s(42));
+    Assert.assertEquals(Cons.of(42, null), Cons.list(Arrays.asList(42)));
+    Assert.assertEquals(Cons.of(42, Cons.of(99, null)), Cons.s(42, 99));
+    Assert.assertEquals(Cons.of(42, Cons.of(99, null)), Cons.list(Arrays.asList(42, 99)));
+  }
 }

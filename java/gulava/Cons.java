@@ -29,6 +29,7 @@ import gulava.annotation.MakeLogicValue;
 import gulava.annotation.MakePredicates;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -83,6 +84,13 @@ public abstract class Cons<CAR, CDR> {
       result = Cons.of(valueIter.previous(), result);
     }
     return result;
+  }
+
+  /**
+   * Syntactic sugar for {@code Cons.list(Arrays.asList(...))}.
+   */
+  public static Cons<?, ?> s(Object... o) {
+    return Cons.list(Arrays.asList(o));
   }
 
   /**
