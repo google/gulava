@@ -56,6 +56,8 @@ public abstract class Lisp {
    *   <li>{@code ([closure] [arg1] ... [argn])} - invokes the closure. The closure may be accessed
    *       from the environment (e.g. with {@code (car (cdr (cdr env)))}) or may be a literal
    *       {@code lambda} form.
+   *   <li>{@code (case [expr] [null-branch] [cons-pair-branch] [function-branch])} - evaluates
+   *       {@code expr}, and then executes one of the branches based on the value of {@code expr}.
    * </ul>
    */
   public abstract Goal eval(Object exp, Object env, Object result);
@@ -77,6 +79,7 @@ public abstract class Lisp {
   final Goal eval_builtin(Object exp, Object env, Object result) {
     return conj(
         disj(
+            same(exp, null),
             same(exp, "cons"),
             same(exp, "car"),
             same(exp, "cdr")),
@@ -95,6 +98,49 @@ public abstract class Lisp {
     return conj(
         evalEach(exp, env, evald),
         invoke(evald.car(), evald.cdr(), result));
+  }
+
+  final Goal eval_case(
+      Cons<?, // "case"
+      Cons<?, // expression to evaluate to get the selector value
+      Cons<?, // null branch
+      Cons<?, // cons pair branch
+      Cons<?, // function branch
+      Void>>>>> exp,
+      Object env,
+      Object result) {
+    Object selectorExp = exp.cdr().car();
+    Object nullBranch = exp.cdr().cdr().car();
+    Object consPairBranch = exp.cdr().cdr().cdr().car();
+    Object functionBranch = exp.cdr().cdr().cdr().cdr().car();
+
+    Object selector = new Var();
+
+    return conj(
+        same(exp.car(), "case"),
+        new DelayedGoal(
+            conj(
+                eval(selectorExp, env, selector),
+                disj(
+                    conj(same(null, selector), eval(nullBranch, env, result)),
+                    conj(same(Cons.of(new Var(), new Var()), selector), eval(consPairBranch, env, result)),
+                    conj(function(selector), eval(functionBranch, env, result))))));
+  }
+
+  /**
+   * Indicates that some value is invokeable as a function.
+   */
+  public abstract Goal function(Object value);
+
+  final Goal function_builtin(Object value) {
+    return disj(
+        same("cons", value),
+        same("car", value),
+        same("cdr", value));
+  }
+
+  final Goal function_user(Closure<?, ?> value) {
+    return UNIT;
   }
 
   /**
@@ -121,7 +167,7 @@ public abstract class Lisp {
   final Goal invoke_closure(Closure<?, ?> function, Object args, Object result) {
     Var newEnv = new Var();
     return conj(
-        pushEnv(args, function.env(), newEnv),
+        pushEnv(Cons.of(function, args), function.env(), newEnv),
         new DelayedGoal(eval(function.exp(), newEnv, result)));
   }
 

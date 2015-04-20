@@ -185,4 +185,65 @@ public class LispTest {
         .put(A, 42)
         .test();
   }
+
+  /**
+   * A Lisp function to append two lists. Usage:
+   *
+   * <pre>
+   * (append LEFT RIGHT)
+   * </pre>
+   *
+   * If {@code LEFT} is not terminated with a function (rather than {@code null} like a normal
+   * sequence), then that function is invoked, passing the appending of {@code LEFT'+RIGHT} as the
+   * only argument, where {@code LEFT'} is {@code LEFT} with the function terminator replaced with
+   * {@code null}.
+   */
+  private static class Append {
+    // env shortcut references:
+    static final Object THIS_FUNCTION = s("car", s("cdr", s("cdr", "env")));
+    static final Object LEFT = s("car", s("cdr", "env"));
+    static final Object RIGHT = s("car", "env");
+
+    static final Object FN =
+        s("lambda",
+            s("case", LEFT,
+                RIGHT,
+
+                s("cons",
+                    s("car", LEFT),
+                    s(THIS_FUNCTION, s("cdr", LEFT), RIGHT)),
+
+                s(LEFT, RIGHT)));
+  }
+
+  @Test
+  public void append() {
+    new LogicAsserter()
+        .stream(
+            O.eval(
+                s(Append.FN,
+                    s("cons", "car", s("cons", "car", null)),
+                    s("cons", "cdr", s("cons", "cdr", null))),
+                null,
+                A))
+        .workUnits(-1)
+        .addRequestedVar(A)
+        .startSubst()
+        .put(A, s("car", "car", "cdr", "cdr"))
+        .test();
+  }
+
+  @Test
+  public void append_useFunctionBranchInCaseForm() {
+    Object list = s("cons", "car", "cdr", null, "cons");
+    new LogicAsserter()
+        .stream(
+            O.eval(
+                s(Append.FN, s("lambda", s("quote", list)), s("lambda", new Var())),
+                null,
+                list))
+        .workUnits(-1)
+        .startSubst()
+        .test();
+  }
 }
