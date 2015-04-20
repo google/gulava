@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public final class LogicAsserter {
   private Stream stream;
-  private int expectedWorkUnits;
+  private int expectedWorkUnits = -1;
   private List<Map<Var, Object>> expectedSubsts = new ArrayList<>();
   private List<Var> requestedVars = new ArrayList<>();
   private boolean expectedFinishes = true;
@@ -133,7 +133,9 @@ public final class LogicAsserter {
       stream = solve.rest();
     }
 
-    Assert.assertEquals(expectedWorkUnits, actualWorkUnits);
+    if (expectedWorkUnits != -1) {
+      Assert.assertEquals(expectedWorkUnits, actualWorkUnits);
+    }
     Assert.assertEquals(expectedFinishes, actualFinishes);
     return actualSubsts;
   }
