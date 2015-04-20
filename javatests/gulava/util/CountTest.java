@@ -43,6 +43,14 @@ public class CountTest {
   }
 
   @Test
+  public void testStaticToString() {
+    Assert.assertEquals("zero?{0}", Count.toString("zero?", null));
+    Assert.assertEquals("lbl{1}", Count.toString("lbl", Count.of(null)));
+    Assert.assertEquals("bar{2}", Count.toString("bar", Count.of(Count.of(null))));
+    Assert.assertEquals("baz{3+foo}", Count.toString("baz", Count.of(Count.of(Count.of("foo")))));
+  }
+
+  @Test
   public void testUnify() {
     new LogicAsserter()
         .stream(

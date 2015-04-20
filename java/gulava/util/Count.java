@@ -66,18 +66,26 @@ public abstract class Count<C> {
    */
   @Override
   public final String toString() {
-    int countValue = 1;
-    Object nested = oneLess();
-    while (nested instanceof Count) {
+    return toString("Count", this);
+  }
+
+  /**
+   * Similar to {@link #toString()}, but allows using a label other than {@code "Count"} (this
+   * class' name) in the format. This method will give a meaningful result when {@code count} is
+   * {@code null}.
+   */
+  public static String toString(String label, Object count) {
+    int countValue = 0;
+    while (count instanceof Count) {
       countValue++;
-      nested = ((Count) nested).oneLess();
+      count = ((Count) count).oneLess();
     }
     String maybePlusSymbol = "";
     Object maybeInnerVar = "";
-    if (nested != null) {
+    if (count != null) {
       maybePlusSymbol = "+";
-      maybeInnerVar = nested;
+      maybeInnerVar = count;
     }
-    return String.format("Count{%d%s%s}", countValue, maybePlusSymbol, maybeInnerVar);
+    return String.format("%s{%d%s%s}", label, countValue, maybePlusSymbol, maybeInnerVar);
   }
 }
