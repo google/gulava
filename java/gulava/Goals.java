@@ -38,6 +38,16 @@ public class Goals {
     }
   };
 
+  /**
+   * A goal that fails, always returning an empty stream.
+   */
+  public static final Goal FAIL = new Goal() {
+    @Override
+    public Stream run(Subst s) {
+      return EmptyStream.INSTANCE;
+    }
+  };
+
   public static Goal same(final Object u, final Object v) {
     return new Goal() {
       @Override

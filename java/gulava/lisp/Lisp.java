@@ -21,6 +21,7 @@
  */
 package gulava.lisp;
 
+import static gulava.Goals.FAIL;
 import static gulava.Goals.UNIT;
 import static gulava.Goals.conj;
 import static gulava.Goals.disj;
@@ -37,7 +38,32 @@ import gulava.annotation.MakePredicates;
  */
 @MakePredicates
 public abstract class Lisp {
-  public static final Lisp O = new MakePredicates_Lisp();
+  public static final Lisp O = new MakePredicates_Lisp(
+      /*allowQuote=*/true,
+      /*allowCase=*/true,
+      /*allowLambda=*/true);
+
+  private final boolean allowQuote;
+  private final boolean allowCase;
+  private final boolean allowLambda;
+
+  Lisp(boolean allowQuote, boolean allowCase, boolean allowLambda) {
+    this.allowQuote = allowQuote;
+    this.allowCase = allowCase;
+    this.allowLambda = allowLambda;
+  }
+
+  public final Lisp allowQuote(boolean allowQuote) {
+    return new MakePredicates_Lisp(allowQuote, this.allowCase, this.allowLambda);
+  }
+
+  public final Lisp allowCase(boolean allowCase) {
+    return new MakePredicates_Lisp(this.allowQuote, allowCase, this.allowLambda);
+  }
+
+  public final Lisp allowLambda(boolean allowLambda) {
+    return new MakePredicates_Lisp(this.allowQuote, this.allowCase, allowLambda);
+  }
 
   /**
    * Evaluates the given expression with the given environment to obtain {@code result}. The
@@ -63,6 +89,9 @@ public abstract class Lisp {
   public abstract Goal eval(Object exp, Object env, Object result);
 
   final Goal eval_lambda(Cons<?, Cons<?, Void>> exp, Object env, Object result) {
+    if (!allowLambda) {
+      return FAIL;
+    }
     Object lambdaExp = exp.cdr().car();
 
     return conj(
@@ -71,6 +100,9 @@ public abstract class Lisp {
   }
 
   final Goal eval_quote(Cons<?, Cons<?, Void>> exp, Object env, Object result) {
+    if (!allowQuote) {
+      return FAIL;
+    }
     return conj(
         same("quote", exp.car()),
         same(result, exp.cdr().car()));
@@ -109,6 +141,10 @@ public abstract class Lisp {
       Void>>>>> exp,
       Object env,
       Object result) {
+    if (!allowCase) {
+      return FAIL;
+    }
+
     Object selectorExp = exp.cdr().car();
     Object nullBranch = exp.cdr().cdr().car();
     Object consPairBranch = exp.cdr().cdr().cdr().car();
