@@ -21,6 +21,7 @@
  */
 package gulava.processor;
 
+import static gulava.Goals.UNIT;
 import static gulava.Goals.conj;
 import static gulava.Goals.same;
 
@@ -33,9 +34,13 @@ import gulava.annotation.MakePredicates;
 import gulava.testing.LogicAsserter;
 import gulava.util.Count;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(JUnit4.class)
 public class MakePredicatesFunctionalTest {
@@ -163,5 +168,72 @@ public class MakePredicatesFunctionalTest {
         .startSubst()
         .put(A, Count.fromInt(19))
         .test();
+  }
+
+  @MakePredicates
+  public static abstract class HasNonDefaultConstructor {
+    private final Cons<?, ?> domain;
+
+    HasNonDefaultConstructor(List<?> domain) {
+      this.domain = Cons.list(domain);
+    }
+
+    public final Goal inDomain(Object o) {
+      return member(o, domain);
+    }
+
+    public abstract Goal member(Object o, Object seq);
+
+    final Goal member_select(Object o, Cons<?, ?> seq) {
+      return same(o, seq.car());
+    }
+
+    final Goal member_skip(Object o, Cons<?, ?> seq) {
+      return member(o, seq.cdr());
+    }
+  }
+
+  @MakePredicates
+  public static abstract class HasDefaultAndNonDefaultConstructor {
+    final int arg;
+
+    HasDefaultAndNonDefaultConstructor(int arg) {
+      this.arg = arg;
+    }
+
+    HasDefaultAndNonDefaultConstructor() {
+      this(1000);
+    }
+
+    public abstract Goal unit(Object o);
+
+    final Goal unit_impl(Object o) {
+      return UNIT;
+    }
+  }
+
+  @Test
+  public void hasNonDefaultConstructor() {
+    new LogicAsserter()
+        .stream(
+            new MakePredicates_MakePredicatesFunctionalTest_HasNonDefaultConstructor(
+                Arrays.asList(1, 2, 3))
+            .inDomain(A))
+        .addRequestedVar(A)
+        .startSubst()
+        .put(A, 1)
+        .startSubst()
+        .put(A, 2)
+        .startSubst()
+        .put(A, 3)
+        .test();
+  }
+
+  @Test
+  public void hasDefaultAndNonDefaultConstructor() {
+    Assert.assertEquals(1000,
+        new MakePredicates_MakePredicatesFunctionalTest_HasDefaultAndNonDefaultConstructor().arg);
+    Assert.assertEquals(42,
+        new MakePredicates_MakePredicatesFunctionalTest_HasDefaultAndNonDefaultConstructor(42).arg);
   }
 }

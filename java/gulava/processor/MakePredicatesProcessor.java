@@ -25,13 +25,16 @@ import gulava.annotation.MakePredicates;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 /**
@@ -53,6 +56,24 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
         writer.write("public class " + metadata.getName()
             + " extends " + metadata.getAnnotatedType().getQualifiedName()
             + " {\n");
+
+        // Write constructors that delegate to accessible superclass constructors
+        for (ExecutableElement constructor : metadata.getConstructors()) {
+          List<? extends VariableElement> parameters = constructor.getParameters();
+
+          writer.write("\n");
+          writer.write("  " + metadata.getName() + "(");
+          String delimiter = "";
+          for (VariableElement parameter : parameters) {
+            writer.write(delimiter);
+            delimiter = ", ";
+            writer.write(parameter.asType().toString() + " " + parameter.getSimpleName());
+          }
+          writer.write(") {\n");
+          writer.write("    super("
+              + Processors.join(", ", Processors.argNames(constructor)) + ");\n");
+          writer.write("  }\n");
+        }
 
         for (Predicate predicate : metadata.getPredicates()) {
           GoalExpressions expressions = new GoalExpressions("this", processingEnv.getMessager());

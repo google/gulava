@@ -41,12 +41,15 @@ public final class MakePredicatesMetadata {
   private final String name;
   private final List<Predicate> predicates;
   private final TypeElement annotatedType;
+  private final List<ExecutableElement> constructors;
 
   private MakePredicatesMetadata(
-      String name, List<Predicate> predicates, TypeElement annotatedType) {
+      String name, List<Predicate> predicates, TypeElement annotatedType,
+      List<ExecutableElement> constructors) {
     this.name = name;
     this.predicates = Collections.unmodifiableList(new ArrayList<>(predicates));
     this.annotatedType = annotatedType;
+    this.constructors = Collections.unmodifiableList(new ArrayList<>(constructors));
   }
 
   /** The name of the generated implementation class. */
@@ -60,6 +63,15 @@ public final class MakePredicatesMetadata {
 
   public TypeElement getAnnotatedType() {
     return annotatedType;
+  }
+
+  /**
+   * The constructors in the annotated type that are not private. For each such constructor, the
+   * generated class creates another constructor with the same arguments that delegates to the
+   * superclass' one.
+   */
+  public List<ExecutableElement> getConstructors() {
+    return constructors;
   }
 
   /**
@@ -88,6 +100,16 @@ public final class MakePredicatesMetadata {
       }
     }
 
-    return new MakePredicatesMetadata(name, clauseMethods.predicateMetadata(), annotatedType);
+    List<ExecutableElement> constructors = new ArrayList<>();
+    List<ExecutableElement> allConstructors =
+        ElementFilter.constructorsIn(annotatedType.getEnclosedElements());
+    for (ExecutableElement constructor : allConstructors) {
+      if (!constructor.getModifiers().contains(Modifier.PRIVATE)) {
+        constructors.add(constructor);
+      }
+    }
+
+    return new MakePredicatesMetadata(
+        name, clauseMethods.predicateMetadata(), annotatedType, constructors);
   }
 }
