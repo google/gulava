@@ -121,9 +121,10 @@ public abstract class Cons<CAR, CDR> {
     }
 
     final Goal append_iterate(Cons<?, ?> a, Object b, Cons<?, ?> ab) {
-      return conj(
-          same(a.car(), ab.car()),
-          append(a.cdr(), b, ab.cdr()));
+      return new DelayedGoal(
+          conj(
+              same(a.car(), ab.car()),
+              append(a.cdr(), b, ab.cdr())));
     }
 
     /**

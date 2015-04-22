@@ -21,12 +21,22 @@
  */
 package gulava;
 
+import static gulava.Goals.disj;
+import static gulava.Goals.same;
+
 import gulava.testing.LogicAsserter;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RunWith(JUnit4.class)
 public class AppendTest {
@@ -37,7 +47,7 @@ public class AppendTest {
   public void onlyLastArgBound() {
     new LogicAsserter()
         .stream(Cons.O.append(X, Y, Cons.list(Arrays.asList(1, 2, 3, 4))))
-        .workUnits(6)
+        .workUnits(10)
         .startSubst()
         .put(X, null).put(Y, Cons.list(Arrays.asList(1, 2, 3, 4)))
         .startSubst()
@@ -50,5 +60,25 @@ public class AppendTest {
         .put(X, Cons.list(Arrays.asList(1, 2, 3, 4))).put(Y, null)
         .addRequestedVar(X, Y)
         .test();
+  }
+
+  @Test
+  public void divergingAppendYieldsToNextGoalInDisj() {
+    List<Map<Var, Object>> substs = new LogicAsserter()
+        .stream(
+            disj(
+                Cons.O.append(new Var(), new Var(), new Var()),
+                same(X, 5)))
+        .finishes(false)
+        .workUnits(100)
+        .addRequestedVar(X)
+        .actualSubsts();
+
+    Set<Object> xValues = new HashSet<>();
+    for (Map<Var, Object> subst : substs) {
+      xValues.add(subst.get(X));
+    }
+    xValues.remove(null);
+    Assert.assertEquals(Collections.singleton(5), xValues);
   }
 }
