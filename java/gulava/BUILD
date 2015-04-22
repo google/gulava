@@ -29,7 +29,7 @@ java_binary(
 
 java_library(
     name = "gulava",
-    srcs = glob(["*.java"]),
+    srcs = glob(["*.java"], exclude = ["Demo.java"]),
     plugins = [
         "//java/gulava/processor:make_logic_value_plugin",
         "//java/gulava/processor:make_predicates_plugin",
