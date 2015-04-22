@@ -27,9 +27,17 @@ import static gulava.Goals.repeat;
 import static gulava.Goals.same;
 
 import gulava.testing.LogicAsserter;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RunWith(JUnit4.class)
 public class GoalsTest {
@@ -108,5 +116,51 @@ public class GoalsTest {
         .startSubst()
         .startSubst()
         .test();
+  }
+
+  @Test
+  public void conjingTwoDelayedDivergingGoalsDoesNotRequireDelaying() {
+    List<Map<Var, Object>> substs = new LogicAsserter()
+        .stream(
+            disj(
+                conj(
+                    repeat(same(new Var(), 10)),
+                    repeat(same(new Var(), 15))),
+                same(X, 5)))
+        .addRequestedVar(X)
+        .finishes(false)
+        .workUnits(500)
+        .actualSubsts();
+
+    Set<Object> xValues = new HashSet<>();
+    for (Map<Var, Object> subst : substs) {
+      xValues.add(subst.get(X));
+    }
+    xValues.remove(null);
+
+    Assert.assertEquals(Collections.singleton(5), xValues);
+  }
+
+  @Test
+  public void disjingTwoDelayedDivergingGoalsDoesNotRequireDelaying() {
+    List<Map<Var, Object>> substs = new LogicAsserter()
+        .stream(
+            disj(
+                disj(
+                    repeat(same(new Var(), 10)),
+                    repeat(same(new Var(), 15))),
+                same(X, 5)))
+        .addRequestedVar(X)
+        .finishes(false)
+        .workUnits(500)
+        .actualSubsts();
+
+    Set<Object> xValues = new HashSet<>();
+    for (Map<Var, Object> subst : substs) {
+      xValues.add(subst.get(X));
+    }
+    xValues.remove(null);
+
+    Assert.assertEquals(Collections.singleton(5), xValues);
   }
 }
