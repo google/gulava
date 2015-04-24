@@ -21,12 +21,15 @@
  */
 package gulava;
 
+import java.io.IOException;
+import java.io.Writer;
+
 /**
  * Represents a step in solving a logic problem. A step may or may not contain a valid substitution
  * (solution), but will always have a "rest" stream. Regardless of whether this step has a
  * substitution, there may be other solutions in the rest stream.
  */
-public final class SolveStep implements Stream {
+public final class SolveStep implements Dumpable, Stream {
   private final Subst subst;
   private final Stream rest;
 
@@ -65,5 +68,10 @@ public final class SolveStep implements Stream {
   @Override
   public SolveStep solve() {
     return this;
+  }
+
+  @Override
+  public void dump(Dumper dumper) throws IOException {
+    dumper.dump("SolveStep", subst, rest);
   }
 }

@@ -22,47 +22,19 @@
 package gulava;
 
 import java.io.IOException;
-import java.io.Writer;
 
-public abstract class ImmatureStream implements Dumpable, Stream {
-  protected abstract Stream realize();
-
-  @Override
-  public final Stream mplus(final Stream s2) {
-    final ImmatureStream outer = this;
-
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return s2.mplus(outer.realize());
-      }
-
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(mplus)", s2, outer);
-      }
-    };
-  }
-
-  @Override
-  public final Stream bind(final Goal goal) {
-    final ImmatureStream outer = this;
-
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return outer.realize().bind(goal);
-      }
-
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(bind)", outer, goal);
-      }
-    };
-  }
-
-  @Override
-  public final SolveStep solve() {
-    return new SolveStep(null, realize());
-  }
+/**
+ * An object that can be dumped using the functionality in {@link Dumper} with output that is richer
+ * than {@link Object#toString()}. While overriding {@code toString()} can give reasonable results
+ * if the object to represent has no structure, no subfields, and has a single-line String
+ * representation, you should implement this interface in order to recursively dump subfields and
+ * get readable output. This interface is invoked implicitly by
+ * {@link Dumper#dump(String, Object...)} and {@link Dumper#dump(Object)}.
+ */
+public interface Dumpable {
+  /**
+   * Dumps a tree of objects rooted at this object. Usually, an implementation should delegate to
+   * {@link Dumper#dump(String, Object...)}.
+   */
+  void dump(Dumper dumper) throws IOException;
 }

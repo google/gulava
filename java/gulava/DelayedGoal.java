@@ -21,16 +21,23 @@
  */
 package gulava;
 
+import java.io.IOException;
+
 /**
  * A goal which evaluates equivalently to some other goal, but requires realization of an
  * {@link ImmatureStream}. This can be useful for solving stack overflow exceptions when running
  * a logic program.
  */
-public final class DelayedGoal implements Goal {
+public final class DelayedGoal implements Dumpable, Goal {
   private final Goal g;
 
   public DelayedGoal(Goal g) {
     this.g = g;
+  }
+
+  @Override
+  public void dump(Dumper dumper) throws IOException {
+    dumper.dump("DelayedGoal", g);
   }
 
   @Override
@@ -39,6 +46,11 @@ public final class DelayedGoal implements Goal {
       @Override
       protected Stream realize() {
         return g.run(s);
+      }
+
+      @Override
+      public void dump(Dumper dumper) throws IOException {
+        dumper.dump("ImmatureStream(DelayedGoal)", g, s);
       }
     };
   }

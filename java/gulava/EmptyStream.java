@@ -43,4 +43,9 @@ public final class EmptyStream implements Stream {
   public SolveStep solve() {
     return null;
   }
+
+  @Override
+  public String toString() {
+    return "EmptyStream";
+  }
 }

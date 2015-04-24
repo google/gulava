@@ -23,7 +23,6 @@ package gulava;
 
 import static gulava.Goals.conj;
 import static gulava.Goals.disj;
-import static gulava.Goals.repeat;
 import static gulava.Goals.same;
 
 import gulava.testing.LogicAsserter;
@@ -47,7 +46,7 @@ public class GoalsTest {
   @Test
   public void intersperseRepeated() {
     new LogicAsserter()
-        .stream(disj(repeat(same(X, 5)), repeat(same(X, 6))))
+        .stream(disj(new RepeatedGoal(same(X, 5)), new RepeatedGoal(same(X, 6))))
         .workUnits(11)
         .finishes(false)
         .addRequestedVar(X)
@@ -63,7 +62,7 @@ public class GoalsTest {
   @Test
   public void repeatInterspersed() {
     new LogicAsserter()
-        .stream(repeat(disj(same(X, 5), same(X, 6))))
+        .stream(new RepeatedGoal(disj(same(X, 5), same(X, 6))))
         .workUnits(11)
         .finishes(false)
         .addRequestedVar(X)
@@ -109,7 +108,7 @@ public class GoalsTest {
   @Test
   public void repeatUnitGoalTest() {
     new LogicAsserter()
-        .stream(Goals.repeat(Goals.UNIT))
+        .stream(new RepeatedGoal(Goals.UNIT))
         .finishes(false)
         .workUnits(5)
         .startSubst()
@@ -124,8 +123,8 @@ public class GoalsTest {
         .stream(
             disj(
                 conj(
-                    repeat(same(new Var(), 10)),
-                    repeat(same(new Var(), 15))),
+                    new RepeatedGoal(same(new Var(), 10)),
+                    new RepeatedGoal(same(new Var(), 15))),
                 same(X, 5)))
         .addRequestedVar(X)
         .finishes(false)
@@ -147,8 +146,8 @@ public class GoalsTest {
         .stream(
             disj(
                 disj(
-                    repeat(same(new Var(), 10)),
-                    repeat(same(new Var(), 15))),
+                    new RepeatedGoal(same(new Var(), 10)),
+                    new RepeatedGoal(same(new Var(), 15))),
                 same(X, 5)))
         .addRequestedVar(X)
         .finishes(false)
