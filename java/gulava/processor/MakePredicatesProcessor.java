@@ -90,6 +90,17 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
           writer.write("        return " + metadata.getName() + ".this." + inlineName + "("
               + Processors.join(", ", predicate.argNames()) + ").run(__subst__);\n");
           writer.write("      }\n");
+          writer.write("\n");
+          writer.write("      @java.lang.Override\n");
+          writer.write("      public java.lang.String toString() {\n");
+          writer.write("        return \"" + predicate.getName() + "(\"");
+          String delimiter = "";
+          for (String argName : predicate.argNames()) {
+            writer.write(" + " + delimiter + argName);
+            delimiter = " \", \" + ";
+          }
+          writer.write(" + \")\";\n");
+          writer.write("      }\n");
           writer.write("    };\n");
           writer.write("  }\n");
         }

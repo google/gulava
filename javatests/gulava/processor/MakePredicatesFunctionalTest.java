@@ -45,6 +45,7 @@ import java.util.List;
 @RunWith(JUnit4.class)
 public class MakePredicatesFunctionalTest {
   private static final Var A = new Var();
+  private static final Var B = new Var();
 
   @MakePredicates
   public static abstract class IsCons {
@@ -235,5 +236,20 @@ public class MakePredicatesFunctionalTest {
         new MakePredicates_MakePredicatesFunctionalTest_HasDefaultAndNonDefaultConstructor().arg);
     Assert.assertEquals(42,
         new MakePredicates_MakePredicatesFunctionalTest_HasDefaultAndNonDefaultConstructor(42).arg);
+  }
+
+  @Test
+  public void testToString() {
+    HasNonDefaultConstructor nonDefaultConstructor =
+        new MakePredicates_MakePredicatesFunctionalTest_HasNonDefaultConstructor(
+            Arrays.asList(1, 2, 3));
+    Assert.assertEquals("member(" + A + ", [1,2,3])", nonDefaultConstructor.inDomain(A).toString());
+
+    OverloadOnArity overload = new MakePredicates_MakePredicatesFunctionalTest_OverloadOnArity();
+    Assert.assertEquals("sum(" + A + ", " + B + ", Count{10})",
+        overload.sum(A, B, Count.fromInt(10)).toString());
+
+    IsCons isCons = new MakePredicates_MakePredicatesFunctionalTest_IsCons();
+    Assert.assertEquals("isCons(" + A + ")", isCons.isCons(A).toString());
   }
 }
