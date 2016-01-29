@@ -24,7 +24,14 @@ package gulava;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
-public final class Subst {
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+public final class Subst implements Dumpable {
   public static final Subst EMPTY = new Subst(Empty.map());
 
   private final PMap<Var, Object> map;
@@ -85,5 +92,22 @@ public final class Subst {
   public boolean equals(Object other) {
     return (other instanceof Subst)
         && ((Subst) other).map.equals(map);
+  }
+
+  @Override
+  public void dump(Dumper dumper) throws IOException {
+    List<Map.Entry<Var, Object>> entries = new ArrayList(map.entrySet());
+
+    // When dumping, we want the variables to appear in a predictable order. This makes the output
+    // more consistent between runs. Rather than rely on the map's iteration order, which is
+    // affected by hash buckets, we sort the map entries by the Var's index.
+    Collections.sort(entries, new Comparator<Map.Entry<Var, Object>>() {
+      @Override
+      public int compare(Map.Entry<Var, Object> a, Map.Entry<Var, Object> b) {
+        return a.getKey().compareTo(b.getKey());
+      }
+    });
+
+    dumper.dump("Subst", entries.toArray());
   }
 }

@@ -21,12 +21,17 @@
  */
 package gulava;
 
-public final class Var {
+public final class Var implements Comparable<Var> {
   private static int nextC = 0;
   private final int c = nextC++;
 
   @Override
   public String toString() {
     return String.format("_.%x", c);
+  }
+
+  @Override
+  public int compareTo(Var other) {
+    return c - other.c;
   }
 }
