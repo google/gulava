@@ -49,13 +49,13 @@ public final class ConsPStack<E> extends AbstractSequentialList<E> implements PS
 			return (ConsPStack<E>)list; //(actually we only know it's ConsPStack<? extends E>)
 									// but that's good enough for an immutable
 									// (i.e. we can't mess someone else up by adding the wrong type to it)
-		return from(list.iterator());
+		return ConsPStack.<E>from(list.iterator());
 	}
 	
 	private static <E> ConsPStack<E> from(final Iterator<? extends E> i) {
 		if(!i.hasNext()) return empty();
 		E e = i.next();
-		return from(i).plus(e);
+		return ConsPStack.<E>from(i).plus(e);
 	}
 
 	
@@ -174,7 +174,11 @@ public final class ConsPStack<E> extends AbstractSequentialList<E> implements PS
 	}
 
 	public ConsPStack<E> minus(final int i) {
-		return minus(get(i));
+		if (i < 0 || i >= size)
+			throw new IndexOutOfBoundsException("Index: " + i + "; size: " + size);
+		else if (i == 0)
+			return rest;
+		else return new ConsPStack<E>(first, rest.minus(i-1));
 	}
 
 	public ConsPStack<E> minusAll(final Collection<?> list) {

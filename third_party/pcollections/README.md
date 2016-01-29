@@ -3,6 +3,9 @@ PCollections
 
 A Persistent Java Collections Library
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.pcollections/pcollections.svg)](https://maven-badges.herokuapp.com/maven-central/org.pcollections/pcollections/)
+[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.pcollections/pcollections/badge.svg)](http://www.javadoc.io/doc/org.pcollections/pcollections)
+
 ###Overview
 
 PCollections serves as a [persistent](http://en.wikipedia.org/wiki/Persistent_data_structure) and immutable analogue of the [Java Collections Framework](http://java.sun.com/javase/6/docs/technotes/guides/collections/index.html). This includes **efficient**, **thread-safe**, **generic**, **immutable**, and **persistent** stacks, maps, vectors, sets, and bags, **compatible** with their Java Collections counterparts.
@@ -68,6 +71,18 @@ Running this program gives the following output:
 
 [something]
 ```
+
+###Building form source
+For building the project from source [clone the repository](https://github.com/pcollections/pcollections.git) and then execute
+```
+ ./gradlew build
+```
+This will compile all files, execute the tests and create a jar in ./build/libs. usefull targets are:
+* jar - to create the jar
+* clean - to clean all build files, including the jar
+* test - to build the project and run the test files
+* compileJava - to only compile the Java files
+
 ###Related Work
 
 [Clojure](http://clojure.googlecode.com/) also provides persistent collections in Java, but for now they are less interoperable with Java Collections, and seem more designed to be used within the Clojure language itself. Both [Guava](http://guava-libraries.googlecode.com/) and Java's [Collections](http://java.sun.com/javase/6/docs/api/java/util/Collections.html) utility class provide immutable collections but they are not persistent, that is they do not provide efficient producers, so they are not nearly as useful. See [Persistent versus Unmodifiable](#persistent-versus-unmodifiable) above. 
