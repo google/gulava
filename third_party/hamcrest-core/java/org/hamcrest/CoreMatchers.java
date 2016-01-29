@@ -18,7 +18,7 @@ public class CoreMatchers {
    * <pre>assertThat("myValue", allOf(startsWith("my"), containsString("Val")))</pre>
    */
   public static <T> org.hamcrest.Matcher<T> allOf(org.hamcrest.Matcher<? super T>... matchers) {
-    return org.hamcrest.core.AllOf.allOf(matchers);
+    return org.hamcrest.core.AllOf.<T>allOf(matchers);
   }
 
   /**
@@ -81,7 +81,7 @@ public class CoreMatchers {
    * <pre>assertThat("myValue", anyOf(startsWith("foo"), containsString("Val")))</pre>
    */
   public static <T> org.hamcrest.core.AnyOf<T> anyOf(org.hamcrest.Matcher<? super T>... matchers) {
-    return org.hamcrest.core.AnyOf.anyOf(matchers);
+    return org.hamcrest.core.AnyOf.<T>anyOf(matchers);
   }
 
   /**
@@ -272,7 +272,7 @@ public class CoreMatchers {
    *     the matchers to apply to items provided by the examined {@link Iterable}
    */
   public static <T> org.hamcrest.Matcher<java.lang.Iterable<T>> hasItems(org.hamcrest.Matcher<? super T>... itemMatchers) {
-    return org.hamcrest.core.IsCollectionContaining.hasItems(itemMatchers);
+    return org.hamcrest.core.IsCollectionContaining.<T>hasItems(itemMatchers);
   }
 
   /**

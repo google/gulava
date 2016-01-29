@@ -47,7 +47,7 @@ public class AnyOf<T> extends ShortcutCombination<T> {
      */
     @Factory
     public static <T> AnyOf<T> anyOf(Matcher<? super T>... matchers) {
-        return anyOf(Arrays.asList(matchers));
+        return AnyOf.<T>anyOf(Arrays.asList(matchers));
     }
 
     /**

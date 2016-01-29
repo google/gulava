@@ -10,3 +10,7 @@ Notes:
   https://raw.githubusercontent.com/hamcrest/JavaHamcrest/89b17d8f3c020a3ba94c60328eee9c368289bbb5/hamcrest-core/src/main/java/org/hamcrest/CoreMatchers.java
   And deleted some methods to fix compiler errors. This file was auto-generated
   in v1.3 but I couldn't find the logic to do that locally.
+
+Local modifications:
+- Fixes to make code compile after fix of
+  https://bugs.openjdk.java.net/browse/JDK-8039214
