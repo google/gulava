@@ -21,8 +21,13 @@
  */
 package gulava.util;
 
+import static gulava.Goals.UNIT;
+import static gulava.Goals.same;
+
+import gulava.Goal;
 import gulava.Var;
 import gulava.annotation.MakeLogicValue;
+import gulava.annotation.MakePredicates;
 
 /**
  * Represents a numeric count. This structure is useful if you are not performing any non-trivial
@@ -87,5 +92,39 @@ public abstract class Count<C> {
       maybeInnerVar = count;
     }
     return String.format("%s{%d%s%s}", label, countValue, maybePlusSymbol, maybeInnerVar);
+  }
+
+  public static final Goals O = new MakePredicates_Count_Goals();
+
+  /**
+   * Goals related to numbers expressed as {@link Count} instances.
+   */
+  @MakePredicates
+  public static abstract class Goals {
+    /**
+     * Indicates that {@code a} is a lesser count than {@code b}.
+     */
+    public abstract Goal less(Object a, Object b);
+
+    final Goal less_nonZero(Count<?> a, Count<?> b) {
+      return less(a.oneLess(), b.oneLess());
+    }
+
+    final Goal less_zero(Void a, Count<?> b) {
+      return UNIT;
+    }
+
+    /**
+     * Indicates that {@code a} is a lesser or equal count to {@code b}.
+     */
+    public abstract Goal lessOrEqual(Object a, Object b);
+
+    final Goal lessOrEqual_base(Void a, Object b) {
+      return UNIT;
+    }
+
+    final Goal lessOrEqual_iterate(Count<?> a, Count<?> b) {
+      return lessOrEqual(a.oneLess(), b.oneLess());
+    }
   }
 }

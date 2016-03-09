@@ -23,7 +23,10 @@ package(default_visibility = ["//visibility:public"])
 java_binary(
     name = "Demo",
     srcs = ["Demo.java"],
-    deps = [":gulava"],
+    deps = [
+        ":gulava",
+        "//java/gulava/util",
+    ],
     main_class = "gulava.Demo",
 )
 

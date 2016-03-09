@@ -43,6 +43,17 @@ java_test(
 )
 
 java_test(
+    name = "InsertionSortTest",
+    srcs = ["InsertionSortTest.java"],
+    deps = [
+        "//java/gulava",
+        "//java/gulava/testing",
+        "//java/gulava/util",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "QueueTest",
     srcs = ["QueueTest.java"],
     deps = [
