@@ -6,7 +6,7 @@ Gulava allows you to write relational predicates in Java. You can write
 Prolog-style predicates and use them from normal Java code, seamlessly
 integrated with the magic of annotation processors.
 
-See the GitHub wiki for some how-tos.
+See the [GitHub wiki](https://github.com/google/gulava/wiki/How-to-write-a-logic-value-type-and-predicate) for some how-tos and to get started writing your own predicates and logic value types.
 
 This repository requires [Bazel](https://github.com/bazelbuild/bazel) to build,
 test, and run. After you have set up Bazel, you can run the demo:
