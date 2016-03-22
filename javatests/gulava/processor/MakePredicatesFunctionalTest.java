@@ -252,4 +252,42 @@ public class MakePredicatesFunctionalTest {
     IsCons isCons = new MakePredicates_MakePredicatesFunctionalTest_IsCons();
     Assert.assertEquals("isCons(" + A + ")", isCons.isCons(A).toString());
   }
+
+  @MakePredicates
+  public static abstract class ClausesThatReturnVoid {
+    public abstract Goal isList(Object list);
+
+    final void isList_end(Void list) {}
+
+    final Goal isList_iterate(Cons<?, ?> list) {
+      return isList(list.cdr());
+    }
+
+    public abstract Goal sameLength(Object list1, Object list2);
+
+    final void sameLength_end(Void list1, Void list2) {}
+
+    final Goal sameLength_iterate(Cons<?, ?> list1, Cons<?, ?> list2) {
+      return sameLength(list1.cdr(), list2.cdr());
+    }
+  }
+
+  @Test
+  public void clausesThatReturnVoid() {
+    ClausesThatReturnVoid clauses =
+        new MakePredicates_MakePredicatesFunctionalTest_ClausesThatReturnVoid();
+    new LogicAsserter()
+        .stream(clauses.isList(Cons.s(1, 2, 3)))
+        .workUnits(2)
+        .finishes(true)
+        .startSubst()
+        .test();
+
+    new LogicAsserter()
+        .stream(clauses.sameLength(Cons.s(1, 2), Cons.s(4, 5)))
+        .workUnits(2)
+        .finishes(true)
+        .startSubst()
+        .test();
+  }
 }

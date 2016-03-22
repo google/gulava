@@ -30,6 +30,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 /**
@@ -145,11 +146,13 @@ public final class GoalExpressions {
 
     // subGoals already has all the unification goals needed, if any. Now just add the
     // delegation to the clause method.
-    subGoals.add(
-        String.format("%s.%s(%s)",
-            clauseInstance,
-            clauseMethod.getSimpleName(),
-            Processors.join(", ", decomposedArgList)));
+    if (clauseMethod.getReturnType().getKind() != TypeKind.VOID) {
+      subGoals.add(
+          String.format("%s.%s(%s)",
+              clauseInstance,
+              clauseMethod.getSimpleName(),
+              Processors.join(", ", decomposedArgList)));
+    }
 
     return new PreparedExpression(Processors.compoundGoal("conj", subGoals), preparationStatements);
   }
