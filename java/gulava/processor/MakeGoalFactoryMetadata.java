@@ -32,6 +32,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 
@@ -41,16 +43,26 @@ import javax.tools.Diagnostic;
  */
 public final class MakeGoalFactoryMetadata {
   private final String name;
-  private final List<String> argNames;
+  private final List<Param> params;
   private final List<ExecutableElement> clauseMethods;
   private final TypeElement annotatedType;
 
-  MakeGoalFactoryMetadata(String name, List<String> argNames, List<ExecutableElement> clauseMethods,
+  MakeGoalFactoryMetadata(String name, List<Param> params, List<ExecutableElement> clauseMethods,
       TypeElement annotatedType) {
     this.name = name;
-    this.argNames = argNames;
+    this.params = Collections.unmodifiableList(new ArrayList<>(params));
     this.clauseMethods = Collections.unmodifiableList(new ArrayList<>(clauseMethods));
     this.annotatedType = annotatedType;
+  }
+
+  private static final class Param {
+    final String type;
+    final String name;
+
+    Param(String type, String name) {
+      this.type = type;
+      this.name = name;
+    }
   }
 
   /**
@@ -64,8 +76,20 @@ public final class MakeGoalFactoryMetadata {
    * Names of the arguments of the goal. Each goal method should have the same number and names of
    * each argument.
    */
-  public List<String> getArgNames() {
-    return argNames;
+  public String getParamNames() {
+    List<String> names = new ArrayList<>();
+    for (Param param : params) {
+      names.add(param.name);
+    }
+    return Processors.join(",", names);
+  }
+
+  public String getParamList() {
+    List<String> parameters = new ArrayList<>();
+    for (Param param : params) {
+      parameters.add(String.format("final %s %s", param.type, param.name));
+    }
+    return Processors.join(",", parameters);
   }
 
   /**
@@ -96,22 +120,29 @@ public final class MakeGoalFactoryMetadata {
       name = "";
     }
 
-    List<String> argNames = null;
+    List<Param> params = null;
     List<? extends ExecutableElement> allMethods =
         ElementFilter.methodsIn(annotatedType.getEnclosedElements());
     for (ExecutableElement method : allMethods) {
       if (method.getModifiers().contains(Modifier.PRIVATE)
           || !method.getModifiers().contains(Modifier.STATIC)) {
         // Ignore this method.
-      } else if (argNames == null) {
-        argNames = Processors.argNames(method);
+        continue;
+      } else if (params == null) {
+        params = new ArrayList<>();
+        for (VariableElement param : method.getParameters()) {
+          TypeMirror rawType = param.asType();
+          String type = (rawType instanceof PrimitiveType)
+              ? rawType.toString() : "java.lang.Object";
+          params.add(new Param(type, param.getSimpleName().toString()));
+        }
         clauseMethods.add(method);
-      } else if (method.getParameters().size() != argNames.size()) {
+      } else if (method.getParameters().size() != params.size()) {
         // This method appears to be a clause but does not have the same number of parameters as the
         // first clause. That means it cannot be used in conjunction to form a single goal, so we
         // exclude it.
         messager.printMessage(Diagnostic.Kind.ERROR,
-            "Expected this method to have " + argNames.size() + " parameters to match "
+            "Expected this method to have " + params.size() + " parameters to match "
             + allMethods.get(0).getSimpleName() + " but there are only "
             + method.getParameters().size() + " on this method.",
             method);
@@ -131,6 +162,6 @@ public final class MakeGoalFactoryMetadata {
           annotatedType);
     }
 
-    return new MakeGoalFactoryMetadata(name, argNames, clauseMethods, annotatedType);
+    return new MakeGoalFactoryMetadata(name, params, clauseMethods, annotatedType);
   }
 }

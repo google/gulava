@@ -47,32 +47,30 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
     for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
       MakeGoalFactoryMetadata metadata =
           MakeGoalFactoryMetadata.of(annotatedType.getType(), processingEnv.getMessager());
-      String paramList = Processors.objectParamList(metadata.getArgNames());
-      String argList = Processors.join(", ", metadata.getArgNames());
-
-      try  (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+      try (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
         writer.write("public class " + metadata.getName() + " {\n");
 
         // Goal factory method: i (inline)
         GoalExpressions expressions = new GoalExpressions(
             metadata.getAnnotatedType().getQualifiedName().toString(),
             processingEnv.getMessager());
-        expressions.writeInlineMethod(writer, "public static", "i", metadata.getClauseMethods());
+        expressions.writeInlineMethod(writer, "public static", "i", metadata.getClauseMethods(),
+            metadata.getParamList());
 
         // Goal factory method: o (normal)
-        writer.write("  public static " + ClassNames.GOAL + " o(" + paramList + ") {\n");
+        writer.write("  public static " + ClassNames.GOAL + " o(" + metadata.getParamList() + ") {\n");
         writer.write("    return new " + ClassNames.GOAL + "() {\n");
         writer.write("      @java.lang.Override\n");
         writer.write("      public " + ClassNames.STREAM + " run("
             + ClassNames.SUBST + " __subst__) {\n");
-        writer.write("        return i(" + argList + ").run(__subst__);\n");
+        writer.write("        return i(" + metadata.getParamNames() + ").run(__subst__);\n");
         writer.write("      }\n");
         writer.write("    };\n");
         writer.write("  }\n");
 
         // Goal factory method: d (delayed)
-        writer.write("  public static " + ClassNames.GOAL + " d(" + paramList + ") {\n");
-        writer.write("    return new " + ClassNames.DELAYED_GOAL + "(o(" + argList + "));\n");
+        writer.write("  public static " + ClassNames.GOAL + " d(" + metadata.getParamList() + ") {\n");
+        writer.write("    return new " + ClassNames.DELAYED_GOAL + "(o(" + metadata.getParamNames() + "));\n");
         writer.write("  }\n");
 
         writer.write("}\n");

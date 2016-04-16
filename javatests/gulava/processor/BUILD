@@ -44,6 +44,18 @@ java_test(
 )
 
 java_test(
+    name = "MakeGoalFactoryNonLogicArgsTest",
+    srcs = ["MakeGoalFactoryNonLogicArgsTest.java"],
+    deps = [
+        ":generated",
+        "//java/gulava",
+        "//java/gulava/processor",
+        "//java/gulava/testing",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "MakePredicatesFunctionalTest",
     srcs = ["MakePredicatesFunctionalTest.java"],
     deps = [

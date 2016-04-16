@@ -78,7 +78,8 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
         for (Predicate predicate : metadata.getPredicates()) {
           GoalExpressions expressions = new GoalExpressions("this", processingEnv.getMessager());
           String inlineName = "__" + predicate.getName() + "Inline__";
-          expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses());
+          expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses(),
+              Processors.objectParamList(predicate.argNames()));
           writer.write("\n");
           writer.write("  @java.lang.Override\n");
           writer.write("  public " + ClassNames.GOAL + " " + predicate.getName() + "("

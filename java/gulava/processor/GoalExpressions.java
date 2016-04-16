@@ -30,6 +30,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
@@ -91,9 +92,8 @@ public final class GoalExpressions {
    * @param clauseMethods the clauses to construct the goal based on
    */
   public void writeInlineMethod(
-      Writer writer, String modifiers, String name, List<ExecutableElement> clauseMethods)
-      throws IOException {
-    String paramList = Processors.objectParamList(Processors.argNames(clauseMethods.get(0)));
+      Writer writer, String modifiers, String name, List<ExecutableElement> clauseMethods,
+      String paramList) throws IOException {
     writer.write("  " + modifiers + " " + ClassNames.GOAL + " " + name + "(" + paramList + ") {\n");
     PreparedExpression predicate = predicate(clauseMethods);
     predicate.writePreparationStatements(writer);
@@ -129,6 +129,9 @@ public final class GoalExpressions {
           && Processors.qualifiedName((DeclaredType) parameterType)
               .contentEquals("java.lang.Object")) {
         // No need to decompose because the clause method accepts an Object reference.
+        decomposedArgList.add(parameterName);
+      } else if (parameterType instanceof PrimitiveType) {
+        // This is a primitive type. Just pass it through unaltered.
         decomposedArgList.add(parameterName);
       } else {
         // We need to decompose this argument. Unify the Object reference passed to the goal
