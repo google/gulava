@@ -42,38 +42,46 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
     return SourceVersion.latestSupported();
   }
 
+  /**
+   * Generates a goal factory class and writes the Java code to {@code writer}.
+   */
+  private void write(Writer writer, MakeGoalFactoryMetadata metadata) throws IOException {
+    writer.write("public class " + metadata.getName() + " {\n");
+
+    // Goal factory method: i (inline)
+    GoalExpressions expressions = new GoalExpressions(
+        metadata.getAnnotatedType().getQualifiedName().toString(),
+        processingEnv.getMessager());
+    expressions.writeInlineMethod(
+        writer, "public static", "i", metadata.getClauseMethods(), metadata.getParamList());
+
+    // Goal factory method: o (normal)
+    writer.write("  public static " + ClassNames.GOAL + " o(" + metadata.getParamList() + ") {\n");
+    writer.write("    return new " + ClassNames.GOAL + "() {\n");
+    writer.write("      @java.lang.Override\n");
+    writer.write("      public " + ClassNames.STREAM + " run("
+        + ClassNames.SUBST + " __subst__) {\n");
+    writer.write("        return i(" + metadata.getParamNames() + ").run(__subst__);\n");
+    writer.write("      }\n");
+    writer.write("    };\n");
+    writer.write("  }\n");
+
+    // Goal factory method: d (delayed)
+    writer.write("  public static " + ClassNames.GOAL + " d(" + metadata.getParamList() + ") {\n");
+    writer.write("    return new " + ClassNames.DELAYED_GOAL
+        + "(o(" + metadata.getParamNames() + "));\n");
+    writer.write("  }\n");
+
+    writer.write("}\n");
+  }
+
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
       MakeGoalFactoryMetadata metadata =
           MakeGoalFactoryMetadata.of(annotatedType.getType(), processingEnv.getMessager());
       try (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
-        writer.write("public class " + metadata.getName() + " {\n");
-
-        // Goal factory method: i (inline)
-        GoalExpressions expressions = new GoalExpressions(
-            metadata.getAnnotatedType().getQualifiedName().toString(),
-            processingEnv.getMessager());
-        expressions.writeInlineMethod(writer, "public static", "i", metadata.getClauseMethods(),
-            metadata.getParamList());
-
-        // Goal factory method: o (normal)
-        writer.write("  public static " + ClassNames.GOAL + " o(" + metadata.getParamList() + ") {\n");
-        writer.write("    return new " + ClassNames.GOAL + "() {\n");
-        writer.write("      @java.lang.Override\n");
-        writer.write("      public " + ClassNames.STREAM + " run("
-            + ClassNames.SUBST + " __subst__) {\n");
-        writer.write("        return i(" + metadata.getParamNames() + ").run(__subst__);\n");
-        writer.write("      }\n");
-        writer.write("    };\n");
-        writer.write("  }\n");
-
-        // Goal factory method: d (delayed)
-        writer.write("  public static " + ClassNames.GOAL + " d(" + metadata.getParamList() + ") {\n");
-        writer.write("    return new " + ClassNames.DELAYED_GOAL + "(o(" + metadata.getParamNames() + "));\n");
-        writer.write("  }\n");
-
-        writer.write("}\n");
+        write(writer, metadata);
       } catch (IOException e) {
         processingEnv.getMessager()
             .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());
