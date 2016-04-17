@@ -130,18 +130,6 @@ public class Processors {
     return join(", ", parameters);
   }
 
-  /**
-   * Returns true if clauses should pass through a value of this type unchanged to individual
-   * predicates. These are generally types that are not logic value types.
-   * <p>
-   * TODO: Make this more universal. It currently only recognizes ints and Strings as non-logic
-   * types.
-   */
-  public static boolean isPassThroughType(TypeMirror type) {
-    return (type instanceof PrimitiveType)
-        || type.toString().equals("java.lang.String");
-  }
-
   public static List<String> argNames(ExecutableElement element) {
     List<String> names = new ArrayList<>();
     for (VariableElement parameter : element.getParameters()) {

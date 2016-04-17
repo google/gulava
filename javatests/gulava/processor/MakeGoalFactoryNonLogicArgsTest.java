@@ -86,4 +86,28 @@ public class MakeGoalFactoryNonLogicArgsTest {
         .put(C, "abcabcabcabc")
         .test();
   }
+
+  @MakeGoalFactory(name = "ContainsGrowingByChar")
+  public static class ContainsGrowingByCharClauses {
+    static void finish(Void a, Cons<String, Character> x) {}
+
+    static Goal iterate(Cons<?, ?> a, Cons<String, Character> x) {
+      return Goals.conj(
+          Goals.same(a.car(), x.car()),
+          ContainsGrowingByChar.d(
+              a.cdr(), Cons.of(x.car() + x.cdr(), x.cdr())));
+    }
+  }
+
+  @Test
+  public void solveWithContainsGrowingByChar() {
+    new LogicAsserter()
+        .stream(ContainsGrowingByChar.o(Cons.s(A, B, C), Cons.of("a", 'b')))
+        .addRequestedVar(A, B, C)
+        .startSubst()
+        .put(A, "a")
+        .put(B, "ab")
+        .put(C, "abb")
+        .test();
+  }
 }

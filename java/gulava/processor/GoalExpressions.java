@@ -130,7 +130,7 @@ public final class GoalExpressions {
               .contentEquals("java.lang.Object")) {
         // No need to decompose because the clause method accepts an Object reference.
         decomposedArgList.add(parameterName);
-      } else if (Processors.isPassThroughType(parameterType)) {
+      } else if (new IsPassThroughType().visit(parameterType)) {
         // This is a primitive type. Just pass it through unaltered.
         decomposedArgList.add(parameterName);
       } else {
