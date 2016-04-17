@@ -36,6 +36,7 @@ import org.junit.runners.JUnit4;
 public class MakeGoalFactoryNonLogicArgsTest {
   private static final Var A = new Var();
   private static final Var B = new Var();
+  private static final Var C = new Var();
 
   @MakeGoalFactory(name = "ContainsIntLiteral")
   public static class ContainsIntLiteralClauses {
@@ -49,7 +50,7 @@ public class MakeGoalFactoryNonLogicArgsTest {
   }
 
   @Test
-  public void solve() {
+  public void solveWithContainsIntLiteral() {
     new LogicAsserter()
         .stream(ContainsIntLiteral.o(42, Cons.s(A, B)))
         .addRequestedVar(A, B)
@@ -58,6 +59,31 @@ public class MakeGoalFactoryNonLogicArgsTest {
         .put(A, 42)
         .startSubst()
         .put(B, 42)
+        .test();
+  }
+
+  @MakeGoalFactory(name = "ContainsGrowingString")
+  public static class ContainsGrowingStringClauses {
+    static Goal finish(Void a, String x) {
+      return Goals.UNIT;
+    }
+
+    static Goal iterate(Cons<?, ?> a, String x) {
+      return Goals.conj(
+          Goals.same(x, a.car()),
+          ContainsGrowingString.d(a.cdr(), x + x));
+    }
+  }
+
+  @Test
+  public void solveWithContainsGrowingString() {
+    new LogicAsserter()
+        .stream(ContainsGrowingString.o(Cons.s(A, B, C), "abc"))
+        .addRequestedVar(A, B, C)
+        .startSubst()
+        .put(A, "abc")
+        .put(B, "abcabc")
+        .put(C, "abcabcabcabc")
         .test();
   }
 }

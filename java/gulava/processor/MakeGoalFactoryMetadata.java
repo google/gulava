@@ -132,7 +132,7 @@ public final class MakeGoalFactoryMetadata {
         params = new ArrayList<>();
         for (VariableElement param : method.getParameters()) {
           TypeMirror rawType = param.asType();
-          String type = (rawType instanceof PrimitiveType)
+          String type = Processors.isPassThroughType(rawType)
               ? rawType.toString() : "java.lang.Object";
           params.add(new Param(type, param.getSimpleName().toString()));
         }
