@@ -65,6 +65,12 @@ java_test(
 )
 
 java_test(
+    name = "MakeLogicValueErrorsTest",
+    srcs = ["MakeLogicValueErrorsTest.java"],
+    deps = COMMON_DEPS,
+)
+
+java_test(
     name = "MakeLogicValueFunctionalTest",
     srcs = ["MakeLogicValueFunctionalTest.java"],
     deps = COMMON_DEPS,
