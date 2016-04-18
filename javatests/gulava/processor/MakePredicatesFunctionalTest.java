@@ -290,4 +290,31 @@ public class MakePredicatesFunctionalTest {
         .startSubst()
         .test();
   }
+
+  @MakePredicates
+  public static abstract class PredicateWithZeroArity {
+    public abstract Goal thePredicate();
+
+    final Goal thePredicate_aEqualsB() {
+      return same(A, B);
+    }
+
+    final Goal thePredicate_bIs42() {
+      return same(B, 42);
+    }
+  }
+
+  @Test
+  public void predicateWithZeroArity() {
+    PredicateWithZeroArity clauses =
+        new MakePredicates_MakePredicatesFunctionalTest_PredicateWithZeroArity();
+    new LogicAsserter()
+        .stream(clauses.thePredicate())
+        .addRequestedVar(A, B)
+        .startSubst()
+        .put(A, B)
+        .startSubst()
+        .put(B, 42)
+        .test();
+  }
 }

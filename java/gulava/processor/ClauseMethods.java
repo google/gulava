@@ -58,13 +58,6 @@ public final class ClauseMethods {
     for (ExecutableElement predicateMethod : predicateMethods) {
       int errors = 0;
 
-      if (predicateMethod.getParameters().isEmpty()) {
-        messager.printMessage(Diagnostic.Kind.ERROR,
-            "Predicate methods must have at least one argument.",
-            predicateMethod);
-        errors++;
-      }
-
       for (VariableElement parameter : predicateMethod.getParameters()) {
         if (!parameter.asType().toString().equals("java.lang.Object")) {
           messager.printMessage(Diagnostic.Kind.ERROR,
