@@ -21,6 +21,8 @@
  */
 package gulava.processor;
 
+import gulava.annotation.MakeGoalFactory;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
@@ -77,15 +79,14 @@ public final class MakeGoalFactoryProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
+    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv, processingEnv)) {
       MakeGoalFactoryMetadata metadata =
-          MakeGoalFactoryMetadata.of(annotatedType.getType(), processingEnv.getMessager());
-      try (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+          MakeGoalFactoryMetadata.of(annotatedType.getType(), annotatedType.getMessager());
+      try (Writer writer = annotatedType.openWriter(metadata.getName())) {
         write(writer, metadata);
+        annotatedType.saveErrors();
       } catch (IOException e) {
-        processingEnv.getMessager()
-            .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());
-        e.printStackTrace();
+        Processors.print(processingEnv.getMessager(), e, annotatedType.getType());
       }
     }
     return true;

@@ -49,10 +49,10 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
+    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv, processingEnv)) {
       MakePredicatesMetadata metadata =
-          MakePredicatesMetadata.of(annotatedType.getType(), processingEnv.getMessager());
-      try (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+          MakePredicatesMetadata.of(annotatedType.getType(), annotatedType.getMessager());
+      try (Writer writer = annotatedType.openWriter(metadata.getName())) {
         writer.write("public class " + metadata.getName()
             + " extends " + metadata.getAnnotatedType().getQualifiedName()
             + " {\n");
@@ -76,7 +76,7 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
         }
 
         for (Predicate predicate : metadata.getPredicates()) {
-          GoalExpressions expressions = new GoalExpressions("this", processingEnv.getMessager());
+          GoalExpressions expressions = new GoalExpressions("this", annotatedType.getMessager());
           String inlineName = "__" + predicate.getName() + "Inline__";
           expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses(),
               Processors.objectParamList(predicate.argNames()));
@@ -107,10 +107,9 @@ public final class MakePredicatesProcessor extends AbstractProcessor {
         }
 
         writer.write("}\n");
+        annotatedType.saveErrors();
       } catch (IOException e) {
-        processingEnv.getMessager()
-            .printMessage(Diagnostic.Kind.ERROR, e.toString(), annotatedType.getType());
-        e.printStackTrace();
+        Processors.print(processingEnv.getMessager(), e, annotatedType.getType());
       }
     }
     return true;

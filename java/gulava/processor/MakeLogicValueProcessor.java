@@ -45,11 +45,11 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv)) {
+    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv, processingEnv)) {
       TypeElement interfaze = annotatedType.getType();
       MakeLogicValueMetadata metadata =
-          MakeLogicValueMetadata.forInterface(interfaze, processingEnv.getMessager());
-      try  (Writer writer = annotatedType.openWriter(processingEnv, metadata.getName())) {
+          MakeLogicValueMetadata.forInterface(interfaze, annotatedType.getMessager());
+      try  (Writer writer = annotatedType.openWriter(metadata.getName())) {
         String extendsClause = "";
         String implementsClause = " implements " + ClassNames.LOGIC_VALUE;
         switch (interfaze.getKind()) {
@@ -178,6 +178,7 @@ public final class MakeLogicValueProcessor extends AbstractProcessor {
           writer.write("  }\n");
         }
         writer.write("}\n");
+        annotatedType.saveErrors();
       } catch (IOException e) {
         Processors.print(processingEnv.getMessager(), e, interfaze);
       }

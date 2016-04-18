@@ -120,7 +120,7 @@ public final class MakeGoalFactoryMetadata {
       name = "";
     }
 
-    List<Param> params = null;
+    List<Param> params = new ArrayList<>();
     List<? extends ExecutableElement> allMethods =
         ElementFilter.methodsIn(annotatedType.getEnclosedElements());
     for (ExecutableElement method : allMethods) {
@@ -128,8 +128,8 @@ public final class MakeGoalFactoryMetadata {
           || !method.getModifiers().contains(Modifier.STATIC)) {
         // Ignore this method.
         continue;
-      } else if (params == null) {
-        params = new ArrayList<>();
+      } else if (clauseMethods.isEmpty()) {
+        // This is the first clause method. Get parameter information.
         for (VariableElement param : method.getParameters()) {
           TypeMirror rawType = param.asType();
           String type = new IsPassThroughType().visit(rawType)
@@ -142,9 +142,9 @@ public final class MakeGoalFactoryMetadata {
         // first clause. That means it cannot be used in conjunction to form a single goal, so we
         // exclude it.
         messager.printMessage(Diagnostic.Kind.ERROR,
-            "Expected this method to have " + params.size() + " parameters to match "
-            + allMethods.get(0).getSimpleName() + " but there are only "
-            + method.getParameters().size() + " on this method.",
+            "Expected this method to have " + params.size() + " parameter(s) to match "
+            + allMethods.get(0).getSimpleName() + " but it has: "
+            + method.getParameters().size(),
             method);
 
       // Make sure the argument names match the names of the first clause method. This not only

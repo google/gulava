@@ -21,12 +21,16 @@
  */
 package gulava.processor;
 
+import gulava.annotation.CollectErrors;
+
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -38,12 +42,17 @@ import javax.lang.model.util.ElementFilter;
  * Represents a {@link TypeElement} that is annotated with some particular annotation.
  */
 public final class AnnotatedType {
+  private final ProcessingEnvironment env;
   private final TypeElement type;
   private final PackageElement pkg;
+  private final ClassGeneratingMessager classGeneratingMessager;
 
-  private AnnotatedType(TypeElement type, PackageElement pkg) {
+  private AnnotatedType(ProcessingEnvironment env, TypeElement type, PackageElement pkg,
+      ClassGeneratingMessager classGeneratingMessager) {
+    this.env = env;
     this.type = type;
     this.pkg = pkg;
+    this.classGeneratingMessager = classGeneratingMessager;
   }
 
   /** The annotated type. */
@@ -57,28 +66,54 @@ public final class AnnotatedType {
   }
 
   /**
+   * The messager that should be used when generating code from this annotated type.
+   */
+  public Messager getMessager() {
+    if (classGeneratingMessager != null) {
+      return classGeneratingMessager;
+    }
+    return env.getMessager();
+  }
+
+  /**
+   * Saves the errors that have been generated using the messager of this object. This is a no-op
+   * unless running in {@code @CollectErrors} mode.
+   */
+  public void saveErrors() throws IOException {
+    if (classGeneratingMessager != null) {
+      classGeneratingMessager.close();
+    }
+  }
+
+  /**
    * Opens a new writer to generate a class in the same package as the annotated type. This
    * automatically adds a {@code package} line.
    */
-  public Writer openWriter(ProcessingEnvironment processingEnv, String generatedClassName)
-      throws IOException {
-    Writer writer = processingEnv.getFiler()
-        .createSourceFile(pkg.getQualifiedName() + "." + generatedClassName)
-        .openWriter();
-    writer.write("package " + pkg.getQualifiedName() + ";\n");
-    writer.write("\n");
-    return writer;
+  public ClassWriter openWriter(String generatedClassName) throws IOException {
+    if (classGeneratingMessager != null) {
+      return new ClassWriter(new StringWriter(), generatedClassName);
+    } else {
+      return new ClassWriter(env, pkg, generatedClassName);
+    }
   }
 
   /**
    * Returns a new instance based on the given type, which is assumed to be annotated.
    */
-  public static AnnotatedType of(TypeElement type) {
+  public static AnnotatedType of(TypeElement type, ProcessingEnvironment env) throws IOException {
     Element packageElement = type.getEnclosingElement();
     while (!(packageElement instanceof PackageElement)) {
       packageElement = packageElement.getEnclosingElement();
     }
-    return new AnnotatedType(type, (PackageElement) packageElement);
+    PackageElement pkg = (PackageElement) packageElement;
+
+    ClassGeneratingMessager classGeneratingMessager = null;
+    if (type.getAnnotation(CollectErrors.class) != null) {
+      String className = Processors.generatedClassName(type) + "_Errors";
+      classGeneratingMessager = new ClassGeneratingMessager(new ClassWriter(env, pkg, className));
+    }
+
+    return new AnnotatedType(env, type, pkg, classGeneratingMessager);
   }
 
   /**
@@ -86,14 +121,19 @@ public final class AnnotatedType {
    * {@code annotations}.
    */
   public static List<AnnotatedType> all(
-      Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+      Set<? extends TypeElement> annotations, RoundEnvironment roundEnv,
+      ProcessingEnvironment env) {
     List<AnnotatedType> all = new ArrayList<>();
 
     for (TypeElement annotation : annotations) {
       Iterable<? extends TypeElement> types =
           ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(annotation));
       for (TypeElement type : types) {
-        all.add(of(type));
+        try {
+          all.add(of(type, env));
+        } catch (IOException e) {
+          Processors.print(env.getMessager(), e, type);
+        }
       }
     }
 

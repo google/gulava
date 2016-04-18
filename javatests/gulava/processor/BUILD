@@ -21,6 +21,15 @@
 # Unit tests for annotation processors
 package(default_testonly = 1)
 
+COMMON_DEPS = [
+    ":generated",
+    "//java/gulava",
+    "//java/gulava/processor",
+    "//java/gulava/testing",
+    "//java/gulava/util",
+    "//third_party/junit4",
+]
+
 java_library(
     name = "generated",
     srcs = [
@@ -32,50 +41,31 @@ java_library(
 )
 
 java_test(
+    name = "MakeGoalFactoryErrorsTest",
+    srcs = ["MakeGoalFactoryErrorsTest.java"],
+    deps = COMMON_DEPS,
+)
+
+java_test(
     name = "MakeGoalFactoryFunctionalTest",
     srcs = ["MakeGoalFactoryFunctionalTest.java"],
-    deps = [
-        ":generated",
-        "//java/gulava",
-        "//java/gulava/processor",
-        "//java/gulava/testing",
-        "//third_party/junit4",
-    ],
+    deps = COMMON_DEPS,
 )
 
 java_test(
     name = "MakeGoalFactoryNonLogicArgsTest",
     srcs = ["MakeGoalFactoryNonLogicArgsTest.java"],
-    deps = [
-        ":generated",
-        "//java/gulava",
-        "//java/gulava/processor",
-        "//java/gulava/testing",
-        "//third_party/junit4",
-    ],
+    deps = COMMON_DEPS,
 )
 
 java_test(
     name = "MakePredicatesFunctionalTest",
     srcs = ["MakePredicatesFunctionalTest.java"],
-    deps = [
-        ":generated",
-        "//java/gulava",
-        "//java/gulava/processor",
-        "//java/gulava/testing",
-        "//java/gulava/util",
-        "//third_party/junit4",
-    ],
+    deps = COMMON_DEPS,
 )
 
 java_test(
     name = "MakeLogicValueFunctionalTest",
     srcs = ["MakeLogicValueFunctionalTest.java"],
-    deps = [
-        ":generated",
-        "//java/gulava",
-        "//java/gulava/processor",
-        "//java/gulava/testing",
-        "//third_party/junit4",
-    ],
+    deps = COMMON_DEPS,
 )
