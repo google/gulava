@@ -98,13 +98,6 @@ public final class ClauseMethods {
   }
 
   public void addClause(ExecutableElement clause) {
-    if (-1 == clause.getSimpleName().toString().indexOf('_')) {
-      messager.printMessage(Diagnostic.Kind.ERROR,
-          "Invalid clause method name. Should be in the format [PREDICATE_NAME]_[DESCRIPTION]",
-          clause);
-      return;
-    }
-
     String nameArity = nameArity(clause);
     List<ExecutableElement> priorClauses = clausesByPredicate.get(nameArity);
     if (priorClauses == null) {

@@ -94,8 +94,7 @@ public final class MakePredicatesMetadata {
     ClauseMethods clauseMethods = ClauseMethods.withPredicates(predicateMethods, messager);
 
     for (ExecutableElement method : allMethods) {
-      if (method.getModifiers().contains(Modifier.FINAL)
-          && Processors.isPackageProtected(method)) {
+      if (method.getSimpleName().toString().indexOf('_') != -1) {
         clauseMethods.addClause(method);
       }
     }

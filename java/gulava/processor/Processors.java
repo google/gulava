@@ -153,11 +153,5 @@ public class Processors {
     return Processors.join("_", components);
   }
 
-  public static boolean isPackageProtected(Element element) {
-    return !element.getModifiers().contains(Modifier.PUBLIC)
-        && !element.getModifiers().contains(Modifier.PROTECTED)
-        && !element.getModifiers().contains(Modifier.PRIVATE);
-  }
-
   private Processors() {}
 }

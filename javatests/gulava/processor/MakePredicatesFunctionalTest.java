@@ -317,4 +317,25 @@ public class MakePredicatesFunctionalTest {
         .put(B, 42)
         .test();
   }
+
+  @MakePredicates
+  public static abstract class PublicNonFinalClause {
+    public abstract Goal thePredicate(Object a);
+
+    public Goal thePredicate_foo(Object a) {
+      return same(a, A);
+    }
+  }
+
+  @Test
+  public void publicNonFinalClause() {
+    PublicNonFinalClause clauses =
+        new MakePredicates_MakePredicatesFunctionalTest_PublicNonFinalClause();
+    new LogicAsserter()
+        .stream(clauses.thePredicate(B))
+        .addRequestedVar(B)
+        .startSubst()
+        .put(B, A)
+        .test();
+  }
 }
