@@ -59,6 +59,12 @@ java_test(
 )
 
 java_test(
+    name = "MakePredicatesErrorsTest",
+    srcs = ["MakePredicatesErrorsTest.java"],
+    deps = COMMON_DEPS,
+)
+
+java_test(
     name = "MakePredicatesFunctionalTest",
     srcs = ["MakePredicatesFunctionalTest.java"],
     deps = COMMON_DEPS,
