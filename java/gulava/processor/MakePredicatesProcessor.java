@@ -26,92 +26,77 @@ import gulava.annotation.MakePredicates;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
-import java.util.Set;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * An annotation processor that reads classes annoated with @{@link MakePredicates} and creates
  * a in implementing class for each annotated type.
  */
 @SupportedAnnotationTypes(ClassNames.MAKE_PREDICATES)
-public final class MakePredicatesProcessor extends AbstractProcessor {
-  @Override public SourceVersion getSupportedSourceVersion() {
-    return SourceVersion.latestSupported();
-  }
-
+public final class MakePredicatesProcessor extends AnnotatedType.Processor {
   @Override
-  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    for (AnnotatedType annotatedType : AnnotatedType.all(annotations, roundEnv, processingEnv)) {
-      MakePredicatesMetadata metadata =
-          MakePredicatesMetadata.of(annotatedType.getType(), annotatedType.getMessager());
-      try (Writer writer = annotatedType.openWriter(metadata.getName())) {
-        writer.write("public class " + metadata.getName()
-            + " extends " + metadata.getAnnotatedType().getQualifiedName()
-            + " {\n");
+  protected void process(AnnotatedType annotatedType, Messager messager) throws IOException {
+    MakePredicatesMetadata metadata =
+        MakePredicatesMetadata.of(annotatedType.getType(), messager);
+    try (Writer writer = annotatedType.openWriter(metadata.getName())) {
+      writer.write("public class " + metadata.getName()
+          + " extends " + metadata.getAnnotatedType().getQualifiedName()
+          + " {\n");
 
-        // Write constructors that delegate to accessible superclass constructors
-        for (ExecutableElement constructor : metadata.getConstructors()) {
-          List<? extends VariableElement> parameters = constructor.getParameters();
+      // Write constructors that delegate to accessible superclass constructors
+      for (ExecutableElement constructor : metadata.getConstructors()) {
+        List<? extends VariableElement> parameters = constructor.getParameters();
 
-          writer.write("\n");
-          writer.write("  " + metadata.getName() + "(");
-          String delimiter = "";
-          for (VariableElement parameter : parameters) {
-            writer.write(delimiter);
-            delimiter = ", ";
-            writer.write(parameter.asType().toString() + " " + parameter.getSimpleName());
-          }
-          writer.write(") {\n");
-          writer.write("    super("
-              + Processors.join(", ", Processors.argNames(constructor)) + ");\n");
-          writer.write("  }\n");
+        writer.write("\n");
+        writer.write("  " + metadata.getName() + "(");
+        String delimiter = "";
+        for (VariableElement parameter : parameters) {
+          writer.write(delimiter);
+          delimiter = ", ";
+          writer.write(parameter.asType().toString() + " " + parameter.getSimpleName());
         }
-
-        for (Predicate predicate : metadata.getPredicates()) {
-          GoalExpressions expressions = new GoalExpressions("this", annotatedType.getMessager());
-          String inlineName = "__" + predicate.getName() + "Inline__";
-          expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses(),
-              Processors.objectParamList(predicate.argNames()));
-          writer.write("\n");
-          writer.write("  @java.lang.Override\n");
-          writer.write("  public " + ClassNames.GOAL + " " + predicate.getName() + "("
-              + Processors.objectParamList(predicate.argNames()) + ") {\n");
-          writer.write("    return new " + ClassNames.GOAL + "() {\n");
-          writer.write("      @java.lang.Override\n");
-          writer.write("      public " + ClassNames.STREAM + " run("
-              + ClassNames.SUBST + " __subst__) {\n");
-          writer.write("        return " + metadata.getName() + ".this." + inlineName + "("
-              + Processors.join(", ", predicate.argNames()) + ").run(__subst__);\n");
-          writer.write("      }\n");
-          writer.write("\n");
-          writer.write("      @java.lang.Override\n");
-          writer.write("      public java.lang.String toString() {\n");
-          writer.write("        return \"" + predicate.getName() + "(\"");
-          String delimiter = "";
-          for (String argName : predicate.argNames()) {
-            writer.write(" + " + delimiter + argName);
-            delimiter = " \", \" + ";
-          }
-          writer.write(" + \")\";\n");
-          writer.write("      }\n");
-          writer.write("    };\n");
-          writer.write("  }\n");
-        }
-
-        writer.write("}\n");
-        annotatedType.saveErrors();
-      } catch (IOException e) {
-        Processors.print(processingEnv.getMessager(), e, annotatedType.getType());
+        writer.write(") {\n");
+        writer.write("    super("
+            + Processors.join(", ", Processors.argNames(constructor)) + ");\n");
+        writer.write("  }\n");
       }
+
+      for (Predicate predicate : metadata.getPredicates()) {
+        GoalExpressions expressions = new GoalExpressions("this", messager);
+        String inlineName = "__" + predicate.getName() + "Inline__";
+        expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses(),
+            Processors.objectParamList(predicate.argNames()));
+        writer.write("\n");
+        writer.write("  @java.lang.Override\n");
+        writer.write("  public " + ClassNames.GOAL + " " + predicate.getName() + "("
+            + Processors.objectParamList(predicate.argNames()) + ") {\n");
+        writer.write("    return new " + ClassNames.GOAL + "() {\n");
+        writer.write("      @java.lang.Override\n");
+        writer.write("      public " + ClassNames.STREAM + " run("
+            + ClassNames.SUBST + " __subst__) {\n");
+        writer.write("        return " + metadata.getName() + ".this." + inlineName + "("
+            + Processors.join(", ", predicate.argNames()) + ").run(__subst__);\n");
+        writer.write("      }\n");
+        writer.write("\n");
+        writer.write("      @java.lang.Override\n");
+        writer.write("      public java.lang.String toString() {\n");
+        writer.write("        return \"" + predicate.getName() + "(\"");
+        String delimiter = "";
+        for (String argName : predicate.argNames()) {
+          writer.write(" + " + delimiter + argName);
+          delimiter = " \", \" + ";
+        }
+        writer.write(" + \")\";\n");
+        writer.write("      }\n");
+        writer.write("    };\n");
+        writer.write("  }\n");
+      }
+
+      writer.write("}\n");
     }
-    return true;
   }
 }
