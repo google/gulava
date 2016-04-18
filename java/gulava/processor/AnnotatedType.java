@@ -36,6 +36,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import javax.tools.Diagnostic;
 
 /**
  * Represents a {@link TypeElement} that is annotated with some particular annotation.
@@ -118,7 +119,7 @@ public final class AnnotatedType {
               process(annotatedType, messager);
             }
           } catch (IOException e) {
-            Processors.print(processingEnv.getMessager(), e, type);
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.toString(), type);
           }
         }
       }

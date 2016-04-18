@@ -33,27 +33,12 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.PrimitiveType;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 /**
  * Utility code for implementing annotation processors.
  */
 public class Processors {
-  /**
-   * Reports an exception as an error to the given messager. This includes printing the stacktrace
-   * to stderr.
-   *
-   * @param messager the messager to report the error to
-   * @param throwable the exception to report
-   * @param element the element which the exception is related to
-   */
-  public static void print(Messager messager, Throwable throwable, Element element) {
-    messager.printMessage(Diagnostic.Kind.ERROR, throwable.toString(), element);
-    throwable.printStackTrace();
-  }
-
   /**
    * Joins the string representation of each object in {@code objects} into a single string.
    * {@code delimiter} is used to separate the objects, but is not added before the first or after
