@@ -71,6 +71,12 @@ java_test(
 )
 
 java_test(
+    name = "MakePredicatesNonLogicArgsTest",
+    srcs = ["MakePredicatesNonLogicArgsTest.java"],
+    deps = COMMON_DEPS,
+)
+
+java_test(
     name = "MakeLogicValueErrorsTest",
     srcs = ["MakeLogicValueErrorsTest.java"],
     deps = COMMON_DEPS,

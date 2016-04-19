@@ -57,8 +57,8 @@ public final class Predicate {
    * The names of the parameters to the predicate. These names are shared between the predicate
    * method and all clause methods.
    */
-  public List<String> argNames() {
-    return Processors.argNames(method);
+  public Parameters getParameters() {
+    return Parameters.from(method);
   }
 
   public List<ExecutableElement> getClauses() {

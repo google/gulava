@@ -38,7 +38,10 @@ java_library(
 java_library(
     name = "processor_lib",
     srcs = glob(["*.java"]),
-    deps = ["//java/gulava/annotation"],
+    deps = [
+        "//java/gulava/annotation",
+        "//third_party/pcollections",
+    ],
 )
 
 java_plugin(

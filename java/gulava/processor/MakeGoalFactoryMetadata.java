@@ -32,7 +32,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
@@ -43,26 +42,16 @@ import javax.tools.Diagnostic;
  */
 public final class MakeGoalFactoryMetadata {
   private final String name;
-  private final List<Param> params;
+  private final Parameters parameters;
   private final List<ExecutableElement> clauseMethods;
   private final TypeElement annotatedType;
 
-  MakeGoalFactoryMetadata(String name, List<Param> params, List<ExecutableElement> clauseMethods,
+  MakeGoalFactoryMetadata(String name, Parameters parameters, List<ExecutableElement> clauseMethods,
       TypeElement annotatedType) {
     this.name = name;
-    this.params = Collections.unmodifiableList(new ArrayList<>(params));
+    this.parameters = parameters;
     this.clauseMethods = Collections.unmodifiableList(new ArrayList<>(clauseMethods));
     this.annotatedType = annotatedType;
-  }
-
-  private static final class Param {
-    final String type;
-    final String name;
-
-    Param(String type, String name) {
-      this.type = type;
-      this.name = name;
-    }
   }
 
   /**
@@ -72,24 +61,8 @@ public final class MakeGoalFactoryMetadata {
     return name;
   }
 
-  /**
-   * Names of the arguments of the goal. Each goal method should have the same number and names of
-   * each argument.
-   */
-  public String getParamNames() {
-    List<String> names = new ArrayList<>();
-    for (Param param : params) {
-      names.add(param.name);
-    }
-    return Processors.join(",", names);
-  }
-
-  public String getParamList() {
-    List<String> parameters = new ArrayList<>();
-    for (Param param : params) {
-      parameters.add(String.format("final %s %s", param.type, param.name));
-    }
-    return Processors.join(",", parameters);
+  public Parameters getParameters() {
+    return parameters;
   }
 
   /**
@@ -120,7 +93,7 @@ public final class MakeGoalFactoryMetadata {
       name = "";
     }
 
-    List<Param> params = new ArrayList<>();
+    Parameters parameters = Parameters.EMPTY;
     List<? extends ExecutableElement> allMethods =
         ElementFilter.methodsIn(annotatedType.getEnclosedElements());
     for (ExecutableElement method : allMethods) {
@@ -134,15 +107,15 @@ public final class MakeGoalFactoryMetadata {
           TypeMirror rawType = param.asType();
           String type = new IsPassThroughType().visit(rawType)
               ? rawType.toString() : "java.lang.Object";
-          params.add(new Param(type, param.getSimpleName().toString()));
+          parameters = parameters.plus(type, param.getSimpleName().toString());
         }
         clauseMethods.add(method);
-      } else if (method.getParameters().size() != params.size()) {
+      } else if (method.getParameters().size() != parameters.getCount()) {
         // This method appears to be a clause but does not have the same number of parameters as the
         // first clause. That means it cannot be used in conjunction to form a single goal, so we
         // exclude it.
         messager.printMessage(Diagnostic.Kind.ERROR,
-            "Expected this method to have " + params.size() + " parameter(s) to match "
+            "Expected this method to have " + parameters.getCount() + " parameter(s) to match "
             + allMethods.get(0).getSimpleName() + " but it has: "
             + method.getParameters().size(),
             method);
@@ -162,6 +135,6 @@ public final class MakeGoalFactoryMetadata {
           annotatedType);
     }
 
-    return new MakeGoalFactoryMetadata(name, params, clauseMethods, annotatedType);
+    return new MakeGoalFactoryMetadata(name, parameters, clauseMethods, annotatedType);
   }
 }

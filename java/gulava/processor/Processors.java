@@ -28,7 +28,6 @@ import java.util.List;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -97,30 +96,6 @@ public class Processors {
     }
 
     return false;
-  }
-
-  /**
-   * Returns each argument name as it would appear in a signature as the type {@link Object}.
-   * Includes comma delimiters if there is more than one argument. Does not include enclosing
-   * parenthesis.
-   *
-   * <p>This method makes each argument {@code final} since only {@code final} arguments can be
-   * accessed in an anonymous inner class before JDK 8.
-   */
-  public static String objectParamList(Iterable<String> argNames) {
-    List<String> parameters = new ArrayList<>();
-    for (String argName : argNames) {
-      parameters.add("final java.lang.Object " + argName);
-    }
-    return join(", ", parameters);
-  }
-
-  public static List<String> argNames(ExecutableElement element) {
-    List<String> names = new ArrayList<>();
-    for (VariableElement parameter : element.getParameters()) {
-      names.add(parameter.getSimpleName().toString());
-    }
-    return names;
   }
 
   /**

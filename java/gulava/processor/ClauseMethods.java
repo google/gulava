@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 /**
@@ -49,32 +48,6 @@ public final class ClauseMethods {
   }
 
   /**
-   * Prints errors for any invalid predicate methods found, and returns a list with only the valid
-   * ones.
-   */
-  private static List<ExecutableElement> validatePredicates(
-      List<ExecutableElement> predicateMethods, Messager messager) {
-    List<ExecutableElement> validated = new ArrayList<>();
-    for (ExecutableElement predicateMethod : predicateMethods) {
-      int errors = 0;
-
-      for (VariableElement parameter : predicateMethod.getParameters()) {
-        if (!parameter.asType().toString().equals("java.lang.Object")) {
-          messager.printMessage(Diagnostic.Kind.ERROR,
-              "All parameters to predicate methods must be of type Object.",
-              parameter);
-          errors++;
-        }
-      }
-
-      if (errors == 0) {
-        validated.add(predicateMethod);
-      }
-    }
-    return validated;
-  }
-
-  /**
    * Returns a new instance for collecting clauses for the given predicates. The returned instance
    * initially has no clause methods and they can be added with
    * {@link addClause(ExecutableElement)}. This method will print errors for any invalid predicates
@@ -83,8 +56,6 @@ public final class ClauseMethods {
   public static ClauseMethods withPredicates(
       List<ExecutableElement> predicates, Messager messager) {
     Map<String, List<ExecutableElement>> clausesByPredicate = new HashMap<>();
-
-    predicates = validatePredicates(predicates, messager);
 
     for (ExecutableElement predicate : predicates) {
       if (null != clausesByPredicate.put(nameArity(predicate), new ArrayList<>())) {

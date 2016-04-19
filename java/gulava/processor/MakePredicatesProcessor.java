@@ -25,12 +25,10 @@ import gulava.annotation.MakePredicates;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 
 /**
  * An annotation processor that reads classes annoated with @{@link MakePredicates} and creates
@@ -49,48 +47,35 @@ public final class MakePredicatesProcessor extends AnnotatedType.Processor {
 
       // Write constructors that delegate to accessible superclass constructors
       for (ExecutableElement constructor : metadata.getConstructors()) {
-        List<? extends VariableElement> parameters = constructor.getParameters();
+        Parameters parameters = Parameters.from(constructor);
 
         writer.write("\n");
-        writer.write("  " + metadata.getName() + "(");
-        String delimiter = "";
-        for (VariableElement parameter : parameters) {
-          writer.write(delimiter);
-          delimiter = ", ";
-          writer.write(parameter.asType().toString() + " " + parameter.getSimpleName());
-        }
-        writer.write(") {\n");
-        writer.write("    super("
-            + Processors.join(", ", Processors.argNames(constructor)) + ");\n");
+        writer.write("  " + metadata.getName() + "(" + parameters + ") {\n");
+        writer.write("    super(" + parameters.getNames() + ");\n");
         writer.write("  }\n");
       }
 
       for (Predicate predicate : metadata.getPredicates()) {
         GoalExpressions expressions = new GoalExpressions("this", messager);
         String inlineName = "__" + predicate.getName() + "Inline__";
-        expressions.writeInlineMethod(writer, "private", inlineName, predicate.getClauses(),
-            Processors.objectParamList(predicate.argNames()));
+        expressions.writeInlineMethod(
+            writer, "private", inlineName, predicate.getClauses(), predicate.getParameters());
         writer.write("\n");
         writer.write("  @java.lang.Override\n");
         writer.write("  public " + ClassNames.GOAL + " " + predicate.getName() + "("
-            + Processors.objectParamList(predicate.argNames()) + ") {\n");
+            + predicate.getParameters() + ") {\n");
         writer.write("    return new " + ClassNames.GOAL + "() {\n");
         writer.write("      @java.lang.Override\n");
         writer.write("      public " + ClassNames.STREAM + " run("
             + ClassNames.SUBST + " __subst__) {\n");
         writer.write("        return " + metadata.getName() + ".this." + inlineName + "("
-            + Processors.join(", ", predicate.argNames()) + ").run(__subst__);\n");
+            + predicate.getParameters().getNames() + ").run(__subst__);\n");
         writer.write("      }\n");
         writer.write("\n");
         writer.write("      @java.lang.Override\n");
         writer.write("      public java.lang.String toString() {\n");
-        writer.write("        return \"" + predicate.getName() + "(\"");
-        String delimiter = "";
-        for (String argName : predicate.argNames()) {
-          writer.write(" + " + delimiter + argName);
-          delimiter = " \", \" + ";
-        }
-        writer.write(" + \")\";\n");
+        writer.write("        return \"" + predicate.getName() + "(\" + "
+            + predicate.getParameters().stringExpression() + " + \")\";\n");
         writer.write("      }\n");
         writer.write("    };\n");
         writer.write("  }\n");

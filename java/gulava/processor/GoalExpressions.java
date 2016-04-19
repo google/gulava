@@ -93,8 +93,9 @@ public final class GoalExpressions {
    */
   public void writeInlineMethod(
       Writer writer, String modifiers, String name, List<ExecutableElement> clauseMethods,
-      String paramList) throws IOException {
-    writer.write("  " + modifiers + " " + ClassNames.GOAL + " " + name + "(" + paramList + ") {\n");
+      Parameters parameters) throws IOException {
+    writer.write("  " + modifiers + " " + ClassNames.GOAL + " " + name + "("
+        + parameters + ") {\n");
     PreparedExpression predicate = predicate(clauseMethods);
     predicate.writePreparationStatements(writer);
     writer.write("    return " + predicate.getExpression() + ";\n");
