@@ -51,6 +51,17 @@ java_test(
 )
 
 java_test(
+    name = "DelayedGoalTest",
+    srcs = ["DelayedGoalTest.java"],
+    deps = [
+        "//java/gulava",
+        "//java/gulava/processor",
+        "//java/gulava/testing",
+        "//third_party/junit4",
+    ],
+)
+
+java_test(
     name = "DumperTest",
     srcs = ["DumperTest.java"],
     deps = [
