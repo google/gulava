@@ -26,7 +26,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -36,7 +36,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -46,7 +46,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -57,7 +57,7 @@ java_test(
         "//java/gulava",
         "//java/gulava/processor",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -66,7 +66,7 @@ java_test(
     srcs = ["DumperTest.java"],
     deps = [
         "//java/gulava",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -76,7 +76,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -86,7 +86,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )
 
@@ -96,6 +96,6 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )

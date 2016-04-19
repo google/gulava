@@ -27,6 +27,6 @@ java_library(
     srcs = glob(["*.java"]),
     deps = [
         "//java/gulava:gulava",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )

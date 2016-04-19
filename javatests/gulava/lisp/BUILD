@@ -27,6 +27,6 @@ java_test(
         "//java/gulava",
         "//java/gulava/lisp",
         "//java/gulava/testing",
-        "//third_party/junit4",
+        "@bazel_tools//third_party:junit4",
     ],
 )

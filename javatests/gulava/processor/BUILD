@@ -27,7 +27,7 @@ COMMON_DEPS = [
     "//java/gulava/processor",
     "//java/gulava/testing",
     "//java/gulava/util",
-    "//third_party/junit4",
+    "@bazel_tools//third_party:junit4",
 ]
 
 java_library(
