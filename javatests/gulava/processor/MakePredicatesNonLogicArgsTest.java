@@ -75,6 +75,26 @@ public class MakePredicatesNonLogicArgsTest {
           containsGrowingByChar(
               a.cdr(), Cons.of(x.car() + x.cdr(), x.cdr())));
     }
+
+    public abstract Goal isOverloadedByPassThrough(int x, Object y);
+
+    void isOverloadedByPassThrough_finish(int x, Void y) {}
+
+    Goal isOverloadedByPassThrough_iterate(int x, Cons<?, ?> y) {
+      return Goals.conj(
+          Goals.same(y.car(), "int:" + x),
+          isOverloadedByPassThrough(x + 1, y.cdr()));
+    }
+
+    public abstract Goal isOverloadedByPassThrough(String x, Object y);
+
+    void isOverloadedByPassThrough_finish(String x, Void y) {}
+
+    Goal isOverloadedByPassThrough_iterate(String x, Cons<?, ?> y) {
+      return Goals.conj(
+          Goals.same(y.car(), "String:" + x),
+          isOverloadedByPassThrough(x + x, y.cdr()));
+    }
   }
 
   @Test
@@ -111,6 +131,25 @@ public class MakePredicatesNonLogicArgsTest {
         .put(A, "a")
         .put(B, "ab")
         .put(C, "abb")
+        .test();
+  }
+
+  @Test
+  public void isOverloadedByPassThrough() {
+    new LogicAsserter()
+        .stream(CLAUSES.isOverloadedByPassThrough(999, Cons.s(A, B)))
+        .addRequestedVar(A, B)
+        .startSubst()
+        .put(A, "int:999")
+        .put(B, "int:1000")
+        .test();
+
+    new LogicAsserter()
+        .stream(CLAUSES.isOverloadedByPassThrough("a", Cons.s(A, B)))
+        .addRequestedVar(A, B)
+        .startSubst()
+        .put(A, "String:a")
+        .put(B, "String:aa")
         .test();
   }
 }

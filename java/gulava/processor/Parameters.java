@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Represents a list of parameters, including the type and name of each one.
@@ -54,14 +55,6 @@ public final class Parameters {
    * An instance that represents an empty list.
    */
   public static final Parameters EMPTY = new Parameters(Empty.vector());
-
-  /**
-   * Returns an instance that is equivalent to this one but with one more parameter added to the end
-   * of the list. This instance is unaffected.
-   */
-  public Parameters plus(String type, String name) {
-    return new Parameters(params.plus(new Param(type, name)));
-  }
 
   /**
    * Returns the number of parameters in this list.
@@ -100,6 +93,22 @@ public final class Parameters {
     return Processors.join(delimiter, names);
   }
 
+  private String signatureString(String prefix) {
+    List<String> parameters = new ArrayList<>();
+    for (Param param : params) {
+      parameters.add(String.format("%s%s %s", prefix, param.type, param.name));
+    }
+    return Processors.join(",", parameters);
+  }
+
+  /**
+   * Returns each argument name as it would appear in a signature. Includes comma delimiters if
+   * there is more than one argument. Does not include enclosing parenthesis.
+   */
+  public String nonFinalSignatureString() {
+    return signatureString("");
+  }
+
   /**
    * Returns each argument name as it would appear in a signature. Includes comma delimiters if
    * there is more than one argument. Does not include enclosing parenthesis.
@@ -109,21 +118,34 @@ public final class Parameters {
    */
   @Override
   public String toString() {
-    List<String> parameters = new ArrayList<>();
-    for (Param param : params) {
-      parameters.add(String.format("final %s %s", param.type, param.name));
-    }
-    return Processors.join(",", parameters);
+    return signatureString("final ");
   }
 
   /**
    * Returns a list comprised of the parameters of the given method.
    */
   public static Parameters from(ExecutableElement method) {
-    Parameters result = EMPTY;
+    PVector<Param> params = Empty.<Param>vector();
     for (VariableElement parameter : method.getParameters()) {
-      result = result.plus(parameter.asType().toString(), parameter.getSimpleName().toString());
+      params = params.plus(
+          new Param(parameter.asType().toString(), parameter.getSimpleName().toString()));
     }
-    return result;
+    return new Parameters(params);
+  }
+
+  /**
+   * Returns the parameters for a predicate, given the method corresponding to a clause or
+   * predicate. This is similar to {@link #from(ExecutableElement)}, but non-pass-through types
+   * are changed to {@code java.lang.Object}.
+   */
+  public static Parameters forPredicate(ExecutableElement method) {
+    PVector<Param> params = Empty.<Param>vector();
+    for (VariableElement parameter : method.getParameters()) {
+      TypeMirror rawType = parameter.asType();
+      String type = new IsPassThroughType().visit(rawType)
+          ? rawType.toString() : "java.lang.Object";
+      params = params.plus(new Param(type, parameter.getSimpleName().toString()));
+    }
+    return new Parameters(params);
   }
 }

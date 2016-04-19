@@ -58,10 +58,10 @@ public final class ClauseMethods {
     Map<String, List<ExecutableElement>> clausesByPredicate = new HashMap<>();
 
     for (ExecutableElement predicate : predicates) {
-      if (null != clausesByPredicate.put(nameArity(predicate), new ArrayList<>())) {
+      if (null != clausesByPredicate.put(predicateSignature(predicate), new ArrayList<>())) {
         throw new IllegalStateException(
             "Possibly a user error was detected too late. Predicates with duplicate name/arity"
-            + " String: " + predicate.getSimpleName() + " - " + nameArity(predicate));
+            + " String: " + predicate.getSimpleName() + " - " + predicateSignature(predicate));
       }
     }
 
@@ -69,12 +69,12 @@ public final class ClauseMethods {
   }
 
   public void addClause(ExecutableElement clause) {
-    String nameArity = nameArity(clause);
-    List<ExecutableElement> priorClauses = clausesByPredicate.get(nameArity);
+    String predicateSignature = predicateSignature(clause);
+    List<ExecutableElement> priorClauses = clausesByPredicate.get(predicateSignature);
     if (priorClauses == null) {
       messager.printMessage(Diagnostic.Kind.ERROR,
-          "Clause method without predicate method. Expect an abstract method with name and arity"
-          + " of: " + nameArity,
+          "Clause method without predicate method. Expect an abstract method with signature"
+          + " of: " + predicateSignature,
           clause);
       return;
     }
@@ -90,7 +90,7 @@ public final class ClauseMethods {
   public List<Predicate> predicateMetadata() {
     List<Predicate> metadata = new ArrayList<>();
     for (ExecutableElement predicate : predicates) {
-      List<ExecutableElement> clauses = clausesByPredicate.get(nameArity(predicate));
+      List<ExecutableElement> clauses = clausesByPredicate.get(predicateSignature(predicate));
       if (clauses.isEmpty()) {
         messager.printMessage(Diagnostic.Kind.ERROR, "No clauses found for predicate.",
             predicate);
@@ -103,12 +103,12 @@ public final class ClauseMethods {
   }
 
   /**
-   * Returns a String in the form {@code [NAME]/[PARAM_COUNT]}, which is the actual key used when
+   * Returns a String in the form {@code NAME(ARGS...)}, which is the actual key used when
    * {@code method} is used like a key in {@link #clausesByPredicate}.
    */
-  private static String nameArity(ExecutableElement method) {
-    return String.format("%s/%d",
+  private static String predicateSignature(ExecutableElement method) {
+    return String.format("%s(%s)",
         method.getSimpleName().toString().split("_", 2)[0],
-        method.getParameters().size());
+        Parameters.forPredicate(method).nonFinalSignatureString());
   }
 }

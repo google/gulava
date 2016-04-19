@@ -31,8 +31,6 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 
@@ -103,12 +101,7 @@ public final class MakeGoalFactoryMetadata {
         continue;
       } else if (clauseMethods.isEmpty()) {
         // This is the first clause method. Get parameter information.
-        for (VariableElement param : method.getParameters()) {
-          TypeMirror rawType = param.asType();
-          String type = new IsPassThroughType().visit(rawType)
-              ? rawType.toString() : "java.lang.Object";
-          parameters = parameters.plus(type, param.getSimpleName().toString());
-        }
+        parameters = Parameters.forPredicate(method);
         clauseMethods.add(method);
       } else if (method.getParameters().size() != parameters.getCount()) {
         // This method appears to be a clause but does not have the same number of parameters as the

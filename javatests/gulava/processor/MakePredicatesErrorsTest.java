@@ -53,8 +53,8 @@ public class MakePredicatesErrorsTest {
     MakePredicatesErrorsTest_ClauseWithoutPredicate_Errors.add(errors);
     Assert.assertEquals(1, errors.size());
     assertRegex("ERROR:"
-        + "Clause method without predicate method. Expect an abstract method with name and arity"
-        + " of: thePredicate/1:thePredicate_foo:.*",
+        + "Clause method without predicate method. Expect an abstract method with signature"
+        + " of: thePredicate[(]java[.]lang[.]Object x[)]:thePredicate_foo:.*",
         errors.get(0));
   }
 
@@ -81,5 +81,24 @@ public class MakePredicatesErrorsTest {
     Assert.assertEquals(2, errors.size());
     assertRegex("ERROR:No clauses found for predicate[.]:thePredicate:.*", errors.get(0));
     assertRegex("ERROR:No clauses found for predicate[.]:anotherPredicate:.*", errors.get(1));
+  }
+
+  @MakePredicates
+  @CollectErrors
+  public abstract static class MissingClausesForOverloadsOnNonLogicTypes {
+    public abstract Goal isOverloadedByPassThrough(int x, Object y);
+
+    public abstract Goal isOverloadedByPassThrough(String x, Object y);
+  }
+
+  @Test
+  public void missingClausesForOverloadsOnNonLogicTypes() {
+    List<String> errors = new ArrayList<>();
+    MakePredicatesErrorsTest_MissingClausesForOverloadsOnNonLogicTypes_Errors.add(errors);
+    Assert.assertEquals(2, errors.size());
+    assertRegex("ERROR:No clauses found for predicate.:isOverloadedByPassThrough:.*",
+        errors.get(0));
+    assertRegex("ERROR:No clauses found for predicate.:isOverloadedByPassThrough:.*",
+        errors.get(1));
   }
 }
