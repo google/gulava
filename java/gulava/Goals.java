@@ -21,10 +21,6 @@
  */
 package gulava;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Basic {@link Goal} factories.
  */
@@ -77,51 +73,27 @@ public class Goals {
     };
   }
 
-  private static abstract class Composite implements Goal, Dumpable {
-    private final String dumpHeading;
-    protected final List<Goal> allGoals;
-
-    Composite(String dumpHeading, Goal g1, Goal g2, Goal[] gs) {
-      allGoals = new ArrayList<>(gs.length + 2);
-      allGoals.add(g1);
-      allGoals.add(g2);
-      for (Goal g : gs) {
-        allGoals.add(g);
-      }
-
-      this.dumpHeading = dumpHeading;
-    }
-
-    @Override
-    public void dump(Dumper dumper) throws IOException {
-      dumper.dump(dumpHeading, allGoals.toArray());
-    }
-  }
-
+  /**
+   * Returns a goal that generates substitutions which satisfy any one subgoal.
+   */
   public static Goal disj(Goal g1, Goal g2, Goal... gs) {
-    return new Composite("disj", g1, g2, gs) {
+    return new CompositeGoal("disj", g1, g2, gs) {
       @Override
       public Stream run(Subst s) {
-        Stream result = allGoals.get(0).run(s);
-        for (int i = 1; i < allGoals.size(); i++) {
-          result = result.mplus(allGoals.get(i).run(s));
+        Stream result = allGoals[0].run(s);
+        for (int i = 1; i < allGoals.length; i++) {
+          result = result.mplus(allGoals[i].run(s));
         }
         return result;
       }
     };
   }
 
+  /**
+   * Returns a goal that generates substitutions that satisfy two or more subgoals.
+   */
   public static Goal conj(Goal g1, Goal g2, Goal... gs) {
-    return new Composite("conj", g1, g2, gs) {
-      @Override
-      public Stream run(Subst s) {
-        Stream result = allGoals.get(0).run(s);
-        for (int i = 1; i < allGoals.size(); i++) {
-          result = result.bind(allGoals.get(i));
-        }
-        return result;
-      }
-    };
+    return new ConjGoal(g1, g2, gs);
   }
 
   private Goals() {}
