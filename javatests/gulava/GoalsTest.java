@@ -162,4 +162,22 @@ public class GoalsTest {
 
     Assert.assertEquals(Collections.singleton(5), xValues);
   }
+
+  final static class ThrowingGoal implements Goal {
+    @Override
+    public Stream run(Subst s) {
+      throw new AssertionError("Should not be called");
+    }
+  }
+
+  @Test
+  public void shortCircuitConj() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                Cons.O.order(Cons.s(X), Cons.s(10, 20)),
+                Cons.O.order(Cons.s(X), Cons.s(5, 15)),
+                new ThrowingGoal()))
+        .test();
+  }
 }
