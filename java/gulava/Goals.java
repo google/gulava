@@ -92,7 +92,7 @@ public class Goals {
   /**
    * Returns a goal that generates substitutions that satisfy two or more subgoals.
    */
-  public static Goal conj(Goal g1, Goal g2, Goal... gs) {
+  public static ConjGoal conj(Goal g1, Goal g2, Goal... gs) {
     return new ConjGoal(g1, g2, gs);
   }
 

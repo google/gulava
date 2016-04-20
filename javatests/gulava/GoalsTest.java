@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -179,5 +180,75 @@ public class GoalsTest {
                 Cons.O.order(Cons.s(X), Cons.s(5, 15)),
                 new ThrowingGoal()))
         .test();
+  }
+
+  @Test
+  public void interleaveShortCircuitFirstConjIsLonger() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                Cons.O.order(Cons.s(X), Cons.s(10, 20)),
+                Cons.O.order(Cons.s(Y), Cons.s(15, 25)),
+                new ThrowingGoal())
+            .interleave(
+                Cons.O.order(Cons.s(X), Cons.s(5, 15)),
+                same(Y, 15)))
+        .test();
+  }
+
+  @Test
+  public void interleaveShortCircuitSecondConjIsLonger() {
+    new LogicAsserter()
+        .stream(
+            conj(
+                Cons.O.order(Cons.s(X), Cons.s(5, 15)),
+                same(Y, 15))
+            .interleave(
+                Cons.O.order(Cons.s(X), Cons.s(10, 20)),
+                Cons.O.order(Cons.s(Y), Cons.s(15, 25)),
+                new ThrowingGoal()))
+        .test();
+  }
+
+  final static class RecordsCallGoal implements Goal {
+    final StringBuilder reportTo;
+    final String name;
+
+    RecordsCallGoal(StringBuilder reportTo, String name) {
+      this.reportTo = reportTo;
+      this.name = name;
+    }
+
+    @Override
+    public Stream run(Subst s) {
+      reportTo.append(name);
+      return new SolveStep(s, EmptyStream.INSTANCE);
+    }
+  }
+
+  @Test
+  public void interleaveCorrectOrder() {
+    StringBuilder callReport = new StringBuilder();
+
+    new LogicAsserter()
+        .stream(
+            conj(
+                new RecordsCallGoal(callReport, "a"),
+                Cons.O.order(Cons.s(X), Cons.s(5, 15)),
+                new RecordsCallGoal(callReport, "b"),
+                same(Y, 15))
+            .interleave(
+                new RecordsCallGoal(callReport, "A"),
+                new RecordsCallGoal(callReport, "B"),
+                new RecordsCallGoal(callReport, "C"),
+                same(X, Y)))
+        .addRequestedVar(X)
+        .startSubst()
+        .put(X, 15)
+        .test();
+
+    // B, b, and C all appear twice because they are after the "order" goal which returns two
+    // substitutions.
+    Assert.assertEquals("aABBbbCC", callReport.toString());
   }
 }

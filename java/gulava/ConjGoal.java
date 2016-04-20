@@ -30,6 +30,10 @@ public final class ConjGoal extends CompositeGoal {
     super("conj", g1, g2, gs);
   }
 
+  ConjGoal(Goal[] gs) {
+    super("conj", gs);
+  }
+
   @Override
   public Stream run(Subst s) {
     Stream result = allGoals[0].run(s);
@@ -37,5 +41,26 @@ public final class ConjGoal extends CompositeGoal {
       result = result.bind(allGoals[i]);
     }
     return result;
+  }
+
+  /**
+   * Returns a new instance which interleaves the subgoals in this instance with other goals.
+   */
+  public ConjGoal interleave(Goal g1, Goal... gs) {
+    Goal[] newAllGoals = new Goal[gs.length + allGoals.length + 1];
+    int newI = 0;
+    int thisI = 0;
+    newAllGoals[newI++] = allGoals[thisI++];
+    newAllGoals[newI++] = g1;
+    int thatI = 0;
+    while (newI < newAllGoals.length) {
+      if (thisI < allGoals.length) {
+        newAllGoals[newI++] = allGoals[thisI++];
+      }
+      if (thatI < gs.length) {
+        newAllGoals[newI++] = gs[thatI++];
+      }
+    }
+    return new ConjGoal(newAllGoals);
   }
 }
