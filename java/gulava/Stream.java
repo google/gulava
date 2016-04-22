@@ -35,8 +35,8 @@ public interface Stream {
 
   /**
    * Returns a stream which contains the successful applications of {@code goal} to the solutions
-   * in this stream. Vaguely speaking, the number of solutions in the resulting stream is less than
-   * or equal to this stream.
+   * in this stream. For each solution in this stream, {@code goal} may return any number of other
+   * solutions, including none.
    */
   Stream bind(Goal goal);
 

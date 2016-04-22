@@ -248,7 +248,8 @@ public class GoalsTest {
         .test();
 
     // B, b, and C all appear twice because they are after the "order" goal which returns two
-    // substitutions.
+    // substitutions. DisjGoals interleave the results of their subgoals, so the duplicated letters
+    // appear consecutively - since they are run in parallel - rather than separated.
     Assert.assertEquals("aABBbbCC", callReport.toString());
   }
 }
