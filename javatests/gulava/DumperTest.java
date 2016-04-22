@@ -80,10 +80,10 @@ public class DumperTest {
     dumper(3).dump(GOAL);
 
     Assert.assertEquals(""
-        + "   conj\n"
+        + "   ConjGoal\n"
         + "     {" + A + " == foo}\n"
         + "     {" + B + " == bar}\n"
-        + "     disj\n"
+        + "     DisjGoal\n"
         + "       DelayedGoal\n"
         + "         {baz == " + C + "}\n"
         + "       RepeatedGoal\n"

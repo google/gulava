@@ -28,32 +28,28 @@ import java.util.Arrays;
  * A goal which is comprised of subgoals.
  */
 public abstract class CompositeGoal implements Goal, Dumpable {
-  private final String dumpHeading;
   final Goal[] allGoals;
 
-  CompositeGoal(String dumpHeading, Goal g1, Goal g2, Goal[] gs) {
+  CompositeGoal(Goal g1, Goal g2, Goal[] gs) {
     allGoals = new Goal[gs.length + 2];
     int i = 0;
     allGoals[0] = g1;
     allGoals[1] = g2;
     System.arraycopy(gs, 0, allGoals, 2, gs.length);
-
-    this.dumpHeading = dumpHeading;
   }
 
   /**
    * Constructs an instance that takes ownership of the goals array.
    */
-  CompositeGoal(String dumpHeading, Goal[] allGoals) {
+  CompositeGoal(Goal[] allGoals) {
     if (allGoals.length < 2) {
       throw new IllegalArgumentException("Require at least 2 subgoals: " + Arrays.asList(allGoals));
     }
-    this.dumpHeading = dumpHeading;
     this.allGoals = allGoals;
   }
 
   @Override
   public void dump(Dumper dumper) throws IOException {
-    dumper.dump(dumpHeading, (Object[]) allGoals);
+    dumper.dump(getClass().getSimpleName(), (Object[]) allGoals);
   }
 }

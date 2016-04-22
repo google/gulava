@@ -76,17 +76,8 @@ public class Goals {
   /**
    * Returns a goal that generates substitutions which satisfy any one subgoal.
    */
-  public static Goal disj(Goal g1, Goal g2, Goal... gs) {
-    return new CompositeGoal("disj", g1, g2, gs) {
-      @Override
-      public Stream run(Subst s) {
-        Stream result = allGoals[0].run(s);
-        for (int i = 1; i < allGoals.length; i++) {
-          result = result.mplus(allGoals[i].run(s));
-        }
-        return result;
-      }
-    };
+  public static DisjGoal disj(Goal g1, Goal g2, Goal... gs) {
+    return new DisjGoal(g1, g2, gs);
   }
 
   /**
