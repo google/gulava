@@ -96,7 +96,7 @@ public final class Subst implements Dumpable {
 
   @Override
   public void dump(Dumper dumper) throws IOException {
-    List<Map.Entry<Var, Object>> entries = new ArrayList(map.entrySet());
+    List<Map.Entry<Var, Object>> entries = new ArrayList<>(map.entrySet());
 
     // When dumping, we want the variables to appear in a predictable order. This makes the output
     // more consistent between runs. Rather than rely on the map's iteration order, which is

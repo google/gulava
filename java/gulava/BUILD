@@ -37,6 +37,7 @@ java_library(
         "//java/gulava/processor:make_logic_value_plugin",
         "//java/gulava/processor:make_predicates_plugin",
     ],
+    javacopts = ["-Xlint:unchecked"],
     deps = [
         "//java/gulava/annotation",
         "//third_party/pcollections",
