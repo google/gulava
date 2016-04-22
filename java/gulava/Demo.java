@@ -27,6 +27,8 @@ import static gulava.Goals.same;
 import gulava.util.Count;
 import gulava.util.InsertionSort;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
 /**
@@ -35,8 +37,12 @@ import java.util.Arrays;
  * logic computation.
  */
 public class Demo {
-  static void print(Stream s, int n, Var... requestedVars) {
+  static void print(Stream s, int n, Var... requestedVars) throws IOException {
+    Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
     while (n-- >= 0) {
+      System.out.println("\n--------------------------------------------------------------------------------");
+      dumper.dump(s);
+      dumper.flush();
       SolveStep solve = s.solve();
       if (solve == null) {
         System.out.println("()");
@@ -52,7 +58,7 @@ public class Demo {
     }
   }
 
-  public static void main(String... args) {
+  public static void main(String... args) throws Exception {
     Var a = new Var();
     Var b = new Var();
     Var x = new Var();

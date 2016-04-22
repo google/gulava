@@ -22,10 +22,29 @@
 package gulava;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class ImmatureStream implements Dumpable, Stream {
   protected abstract Stream realize();
+
+  /**
+   * Adds all the subcomponents which - when this stream is dumped - are dumped as direct children
+   * of this stream.
+   */
+  protected abstract void addSubcomponents(Collection<Object> destination);
+
+  @Override
+  public final SolveStep solve() {
+    return new SolveStep(null, realize());
+  }
+
+  @Override
+  public final void dump(Dumper dumper) throws IOException {
+    Collection<Object> subcomponents = new ArrayList<>();
+    addSubcomponents(subcomponents);
+    dumper.dump("ImmatureStream", subcomponents.toArray());
+  }
 
   @Override
   public final Stream mplus(final Stream s2) {
@@ -38,8 +57,9 @@ public abstract class ImmatureStream implements Dumpable, Stream {
       }
 
       @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream", s2, outer);
+      public void addSubcomponents(Collection<Object> destination) {
+        destination.add(s2);
+        outer.addSubcomponents(destination);
       }
     };
   }
@@ -55,14 +75,10 @@ public abstract class ImmatureStream implements Dumpable, Stream {
       }
 
       @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream", goal, outer);
+      public void addSubcomponents(Collection<Object> destination) {
+        destination.add(goal);
+        outer.addSubcomponents(destination);
       }
     };
-  }
-
-  @Override
-  public final SolveStep solve() {
-    return new SolveStep(null, realize());
   }
 }

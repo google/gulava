@@ -52,8 +52,7 @@ public class ImmatureStreamTest {
     writer.assertLines(
         "ImmatureStream",
         "  {" + B + " == " + C + "}",
-        "  ImmatureStream",
-        "    {" + A + " == " + B + "}",
-        "    Subst");
+        "  {" + A + " == " + B + "}",
+        "  Subst");
   }
 }

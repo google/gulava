@@ -22,6 +22,7 @@
 package gulava;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A goal which evaluates equivalently to some other goal, but requires realization of an
@@ -49,8 +50,9 @@ public final class DelayedGoal implements Dumpable, Goal {
       }
 
       @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream", g, s);
+      public void addSubcomponents(Collection<Object> destination) {
+        destination.add(g);
+        destination.add(s);
       }
     };
   }
