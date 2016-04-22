@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 The Gulava Authors
+ *  Copyright (c) 2016 The Gulava Authors
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -19,50 +19,37 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-package gulava;
+package gulava.testing;
 
+import org.junit.Assert;
+
+import java.io.FilterWriter;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.StringWriter;
 
-public abstract class ImmatureStream implements Dumpable, Stream {
-  protected abstract Stream realize();
+public final class AssertingWriter extends FilterWriter {
+  int flushes;
 
-  @Override
-  public final Stream mplus(final Stream s2) {
-    final ImmatureStream outer = this;
-
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return s2.mplus(outer.realize());
-      }
-
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(mplus)", s2, outer);
-      }
-    };
+  public AssertingWriter() {
+    super(new StringWriter());
   }
 
   @Override
-  public final Stream bind(final Goal goal) {
-    final ImmatureStream outer = this;
-
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return outer.realize().bind(goal);
-      }
-
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(bind)", goal, outer);
-      }
-    };
+  public void flush() throws IOException {
+    out.flush();
+    flushes++;
   }
 
-  @Override
-  public final SolveStep solve() {
-    return new SolveStep(null, realize());
+  public void assertLines(String... expectedLines) {
+    StringBuilder expected = new StringBuilder();
+    for (String line : expectedLines) {
+      expected.append(line);
+      expected.append('\n');
+    }
+    Assert.assertEquals(expected.toString(), out.toString());
+  }
+
+  public void assertFlushes(int expected) {
+    Assert.assertEquals(expected, flushes);
   }
 }

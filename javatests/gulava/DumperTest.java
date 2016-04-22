@@ -25,6 +25,8 @@ import static gulava.Goals.conj;
 import static gulava.Goals.disj;
 import static gulava.Goals.same;
 
+import gulava.testing.AssertingWriter;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,33 +44,6 @@ public class DumperTest {
   private static final Var C = new Var();
   private static final Var D = new Var();
   private static final Var E = new Var();
-
-  private static final class AssertingWriter extends FilterWriter {
-    int flushes;
-
-    AssertingWriter() {
-      super(new StringWriter());
-    }
-
-    @Override
-    public void flush() throws IOException {
-      out.flush();
-      flushes++;
-    }
-
-    public void assertLines(String... expectedLines) {
-      StringBuilder expected = new StringBuilder();
-      for (String line : expectedLines) {
-        expected.append(line);
-        expected.append('\n');
-      }
-      Assert.assertEquals(expected.toString(), out.toString());
-    }
-
-    public void assertFlushes(int expected) {
-      Assert.assertEquals(expected, flushes);
-    }
-  }
 
   private AssertingWriter writer;
 

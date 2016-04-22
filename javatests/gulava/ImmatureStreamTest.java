@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 The Gulava Authors
+ *  Copyright (c) 2016 The Gulava Authors
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,48 +21,39 @@
  */
 package gulava;
 
-import java.io.IOException;
-import java.io.Writer;
+import gulava.testing.AssertingWriter;
 
-public abstract class ImmatureStream implements Dumpable, Stream {
-  protected abstract Stream realize();
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-  @Override
-  public final Stream mplus(final Stream s2) {
-    final ImmatureStream outer = this;
+@RunWith(JUnit4.class)
+public class ImmatureStreamTest {
+  private static final Var A = new Var();
+  private static final Var B = new Var();
+  private static final Var C = new Var();
 
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return s2.mplus(outer.realize());
-      }
+  AssertingWriter writer;
 
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(mplus)", s2, outer);
-      }
-    };
+  @Before
+  public void setup() {
+    writer = new AssertingWriter();
   }
 
-  @Override
-  public final Stream bind(final Goal goal) {
-    final ImmatureStream outer = this;
+  @Test
+  public void dumpImmatureBindStream() throws Exception {
+    new Dumper(0, writer)
+        .dump(new DelayedGoal(Goals.same(A, B))
+            .run(Subst.EMPTY)
+            .bind(Goals.same(B, C)));
 
-    return new ImmatureStream() {
-      @Override
-      protected Stream realize() {
-        return outer.realize().bind(goal);
-      }
-
-      @Override
-      public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(bind)", goal, outer);
-      }
-    };
-  }
-
-  @Override
-  public final SolveStep solve() {
-    return new SolveStep(null, realize());
+    writer.assertLines(
+        "ImmatureStream(bind)",
+        "  {" + B + " == " + C + "}",
+        "  ImmatureStream(DelayedGoal)",
+        "    {" + A + " == " + B + "}",
+        "    Subst");
   }
 }

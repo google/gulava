@@ -66,6 +66,7 @@ java_test(
     srcs = ["DumperTest.java"],
     deps = [
         "//java/gulava",
+        "//java/gulava/testing",
         "@bazel_tools//third_party:junit4",
     ],
 )
@@ -73,6 +74,16 @@ java_test(
 java_test(
     name = "GoalsTest",
     srcs = ["GoalsTest.java"],
+    deps = [
+        "//java/gulava",
+        "//java/gulava/testing",
+        "@bazel_tools//third_party:junit4",
+    ],
+)
+
+java_test(
+    name = "ImmatureStreamTest",
+    srcs = ["ImmatureStreamTest.java"],
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
