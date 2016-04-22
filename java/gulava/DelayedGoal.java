@@ -50,7 +50,7 @@ public final class DelayedGoal implements Dumpable, Goal {
 
       @Override
       public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(DelayedGoal)", g, s);
+        dumper.dump("ImmatureStream", g, s);
       }
     };
   }

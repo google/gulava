@@ -50,9 +50,9 @@ public class ImmatureStreamTest {
             .bind(Goals.same(B, C)));
 
     writer.assertLines(
-        "ImmatureStream(bind)",
+        "ImmatureStream",
         "  {" + B + " == " + C + "}",
-        "  ImmatureStream(DelayedGoal)",
+        "  ImmatureStream",
         "    {" + A + " == " + B + "}",
         "    Subst");
   }

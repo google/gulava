@@ -39,7 +39,7 @@ public abstract class ImmatureStream implements Dumpable, Stream {
 
       @Override
       public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(mplus)", s2, outer);
+        dumper.dump("ImmatureStream", s2, outer);
       }
     };
   }
@@ -56,7 +56,7 @@ public abstract class ImmatureStream implements Dumpable, Stream {
 
       @Override
       public void dump(Dumper dumper) throws IOException {
-        dumper.dump("ImmatureStream(bind)", goal, outer);
+        dumper.dump("ImmatureStream", goal, outer);
       }
     };
   }
