@@ -31,6 +31,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.FilterWriter;
+import java.io.IOException;
 import java.io.StringWriter;
 
 @RunWith(JUnit4.class)
@@ -41,11 +43,38 @@ public class DumperTest {
   private static final Var D = new Var();
   private static final Var E = new Var();
 
-  private StringWriter writer;
+  private static final class AssertingWriter extends FilterWriter {
+    int flushes;
+
+    AssertingWriter() {
+      super(new StringWriter());
+    }
+
+    @Override
+    public void flush() throws IOException {
+      out.flush();
+      flushes++;
+    }
+
+    public void assertLines(String... expectedLines) {
+      StringBuilder expected = new StringBuilder();
+      for (String line : expectedLines) {
+        expected.append(line);
+        expected.append('\n');
+      }
+      Assert.assertEquals(expected.toString(), out.toString());
+    }
+
+    public void assertFlushes(int expected) {
+      Assert.assertEquals(expected, flushes);
+    }
+  }
+
+  private AssertingWriter writer;
 
   @Before
   public void setup() {
-    writer = new StringWriter();
+    writer = new AssertingWriter();
   }
 
   private Dumper dumper(int indentation) {
@@ -63,7 +92,9 @@ public class DumperTest {
 
     dumper(0).dump(o);
     dumper(7).dump(o);
-    Assert.assertEquals("!toString!\n       !toString!\n", writer.toString());
+    writer.assertLines(
+        "!toString!",
+        "       !toString!");
   }
 
   private static final Goal GOAL =
@@ -79,17 +110,16 @@ public class DumperTest {
   public void goals() throws Exception {
     dumper(3).dump(GOAL);
 
-    Assert.assertEquals(""
-        + "   ConjGoal\n"
-        + "     {" + A + " == foo}\n"
-        + "     {" + B + " == bar}\n"
-        + "     DisjGoal\n"
-        + "       DelayedGoal\n"
-        + "         {baz == " + C + "}\n"
-        + "       RepeatedGoal\n"
-        + "         {rrr == " + D + "}\n"
-        + "       {bot == " + E + "}\n",
-        writer.toString());
+    writer.assertLines(
+        "   ConjGoal",
+        "     {" + A + " == foo}",
+        "     {" + B + " == bar}",
+        "     DisjGoal",
+        "       DelayedGoal",
+        "         {baz == " + C + "}",
+        "       RepeatedGoal",
+        "         {rrr == " + D + "}",
+        "       {bot == " + E + "}");
   }
 
   @Test
@@ -99,57 +129,65 @@ public class DumperTest {
     writer.write("----------\n");
     dumper(0).dump(stream.solve().rest());
 
-    Assert.assertEquals(""
-        + "ImmatureStream(mplus)\n"
-        + "  EmptyStream\n"
-        + "  ImmatureStream(mplus)\n"
-        + "    SolveStep\n"
-        + "      Subst\n"
-        + "        " + A + "=foo\n"
-        + "        " + B + "=bar\n"
-        + "        " + E + "=bot\n"
-        + "      EmptyStream\n"
-        + "    ImmatureStream(mplus)\n"
-        + "      SolveStep\n"
-        + "        Subst\n"
-        + "          " + A + "=foo\n"
-        + "          " + B + "=bar\n"
-        + "          " + D + "=rrr\n"
-        + "        ImmatureStream(DelayedGoal)\n"
-        + "          RepeatedGoal\n"
-        + "            {rrr == " + D + "}\n"
-        + "          Subst\n"
-        + "            " + A + "=foo\n"
-        + "            " + B + "=bar\n"
-        + "      ImmatureStream(DelayedGoal)\n"
-        + "        {baz == " + C + "}\n"
-        + "        Subst\n"
-        + "          " + A + "=foo\n"
-        + "          " + B + "=bar\n"
-        + "----------\n"
-        + "SolveStep\n"
-        + "  Subst\n"
-        + "    " + A + "=foo\n"
-        + "    " + B + "=bar\n"
-        + "    " + E + "=bot\n"
-        + "  SolveStep\n"
-        + "    Subst\n"
-        + "      " + A + "=foo\n"
-        + "      " + B + "=bar\n"
-        + "      " + D + "=rrr\n"
-        + "    ImmatureStream(mplus)\n"
-        + "      SolveStep\n"
-        + "        Subst\n"
-        + "          " + A + "=foo\n"
-        + "          " + B + "=bar\n"
-        + "          " + C + "=baz\n"
-        + "        EmptyStream\n"
-        + "      ImmatureStream(DelayedGoal)\n"
-        + "        RepeatedGoal\n"
-        + "          {rrr == " + D + "}\n"
-        + "        Subst\n"
-        + "          " + A + "=foo\n"
-        + "          " + B + "=bar\n",
-        writer.toString());
+    writer.assertLines(
+        "ImmatureStream(mplus)",
+        "  EmptyStream",
+        "  ImmatureStream(mplus)",
+        "    SolveStep",
+        "      Subst",
+        "        " + A + "=foo",
+        "        " + B + "=bar",
+        "        " + E + "=bot",
+        "      EmptyStream",
+        "    ImmatureStream(mplus)",
+        "      SolveStep",
+        "        Subst",
+        "          " + A + "=foo",
+        "          " + B + "=bar",
+        "          " + D + "=rrr",
+        "        ImmatureStream(DelayedGoal)",
+        "          RepeatedGoal",
+        "            {rrr == " + D + "}",
+        "          Subst",
+        "            " + A + "=foo",
+        "            " + B + "=bar",
+        "      ImmatureStream(DelayedGoal)",
+        "        {baz == " + C + "}",
+        "        Subst",
+        "          " + A + "=foo",
+        "          " + B + "=bar",
+        "----------",
+        "SolveStep",
+        "  Subst",
+        "    " + A + "=foo",
+        "    " + B + "=bar",
+        "    " + E + "=bot",
+        "  SolveStep",
+        "    Subst",
+        "      " + A + "=foo",
+        "      " + B + "=bar",
+        "      " + D + "=rrr",
+        "    ImmatureStream(mplus)",
+        "      SolveStep",
+        "        Subst",
+        "          " + A + "=foo",
+        "          " + B + "=bar",
+        "          " + C + "=baz",
+        "        EmptyStream",
+        "      ImmatureStream(DelayedGoal)",
+        "        RepeatedGoal",
+        "          {rrr == " + D + "}",
+        "        Subst",
+        "          " + A + "=foo",
+        "          " + B + "=bar");
+  }
+
+  @Test
+  public void canFlush() throws Exception {
+    writer.assertFlushes(0);
+    dumper(0).dump(GOAL);
+    writer.assertFlushes(0);
+    dumper(0).flush();
+    writer.assertFlushes(1);
   }
 }

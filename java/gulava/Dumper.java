@@ -21,13 +21,14 @@
  */
 package gulava;
 
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
 
 /**
  * Utilities for text-based, tree-shaped object dumping.
  */
-public final class Dumper {
+public final class Dumper implements Flushable {
   private final int indentation;
   private final Writer writer;
 
@@ -84,6 +85,14 @@ public final class Dumper {
       writer.write(String.valueOf(what));
       writer.write("\n");
     }
+  }
+
+  /**
+   * Flushes the underlying writer.
+   */
+  @Override
+  public void flush() throws IOException {
+    writer.flush();
   }
 
   private void indent() throws IOException {
