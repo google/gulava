@@ -64,7 +64,7 @@ public class AppendTest {
 
   @Test
   public void divergingAppendYieldsToNextGoalInDisj() {
-    List<Map<Var, Object>> substs = new LogicAsserter()
+    List<Map<Object, Object>> substs = new LogicAsserter()
         .stream(
             disj(
                 Cons.O.append(new Var(), new Var(), new Var()),
@@ -75,7 +75,7 @@ public class AppendTest {
         .actualSubsts();
 
     Set<Object> xValues = new HashSet<>();
-    for (Map<Var, Object> subst : substs) {
+    for (Map<Object, Object> subst : substs) {
       xValues.add(subst.get(X));
     }
     xValues.remove(null);

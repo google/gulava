@@ -50,7 +50,7 @@ public class ReverseTest {
 
   @Test
   public void noBoundVars() {
-    List<Map<Var, Object>> substs = new LogicAsserter()
+    List<Map<Object, Object>> substs = new LogicAsserter()
         .stream(Cons.O.reverse(X, Y))
         .workUnits(11)
         .finishes(false)

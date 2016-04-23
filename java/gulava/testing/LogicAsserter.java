@@ -111,8 +111,8 @@ public final class LogicAsserter {
     Assert.assertEquals(expectedSubsts, execute());
   }
 
-  private List<Map<Var, Object>> execute() {
-    List<Map<Var, Object>> actualSubsts = new ArrayList<>();
+  private List<Map<Object, Object>> execute() {
+    List<Map<Object, Object>> actualSubsts = new ArrayList<>();
     boolean actualFinishes = false;
     int actualWorkUnits = 0;
 
@@ -146,7 +146,7 @@ public final class LogicAsserter {
    * correct number of work units were spent and and that the stream did or did not finish according
    * to expectations.
    */
-  public List<Map<Var, Object>> actualSubsts() {
+  public List<Map<Object, Object>> actualSubsts() {
     Assert.assertEquals(Collections.emptyList(), expectedSubsts);
     return execute();
   }

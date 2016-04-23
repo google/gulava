@@ -121,7 +121,7 @@ public class GoalsTest {
 
   @Test
   public void conjingTwoDelayedDivergingGoalsDoesNotRequireDelaying() {
-    List<Map<Var, Object>> substs = new LogicAsserter()
+    List<Map<Object, Object>> substs = new LogicAsserter()
         .stream(
             disj(
                 conj(
@@ -134,7 +134,7 @@ public class GoalsTest {
         .actualSubsts();
 
     Set<Object> xValues = new HashSet<>();
-    for (Map<Var, Object> subst : substs) {
+    for (Map<Object, Object> subst : substs) {
       xValues.add(subst.get(X));
     }
     xValues.remove(null);
@@ -144,7 +144,7 @@ public class GoalsTest {
 
   @Test
   public void disjingTwoDelayedDivergingGoalsDoesNotRequireDelaying() {
-    List<Map<Var, Object>> substs = new LogicAsserter()
+    List<Map<Object, Object>> substs = new LogicAsserter()
         .stream(
             disj(
                 disj(
@@ -157,7 +157,7 @@ public class GoalsTest {
         .actualSubsts();
 
     Set<Object> xValues = new HashSet<>();
-    for (Map<Var, Object> subst : substs) {
+    for (Map<Object, Object> subst : substs) {
       xValues.add(subst.get(X));
     }
     xValues.remove(null);

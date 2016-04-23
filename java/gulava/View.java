@@ -65,7 +65,7 @@ public final class View {
      * from the substitution mapping that are not used.
      */
     public View build() {
-      View view = new View(subst.map());
+      View view = new View(subst);
 
       while (true) {
         View simpler = view.simplify(requestedVars);
@@ -79,16 +79,16 @@ public final class View {
     }
   }
 
-  private final Map<Var, Object> map;
+  private final Map<Object, Object> map;
 
-  private View(Map<Var, Object> map) {
+  private View(Map<Object, Object> map) {
     this.map = map;
   }
 
   /**
    * Returns a map representation of this view, which is a mapping of variables to values.
    */
-  public Map<Var, Object> map() {
+  public Map<Object, Object> map() {
     return map;
   }
 
@@ -108,9 +108,9 @@ public final class View {
 
   private static final class ReplacerImpl implements Replacer {
     private final Map<Var, int[]> occurrences;
-    private final Map<Var, Object> map;
+    private final Map<Object, Object> map;
 
-    ReplacerImpl(Map<Var, int[]> occurrences, Map<Var, Object> map) {
+    ReplacerImpl(Map<Var, int[]> occurrences, Map<Object, Object> map) {
       this.occurrences = occurrences;
       this.map = map;
     }
@@ -140,8 +140,8 @@ public final class View {
       countOccurrences(occurrences, value);
     }
 
-    Map<Var, Object> newMap = new HashMap<>();
-    for (Var var : map.keySet()) {
+    Map<Object, Object> newMap = new HashMap<>();
+    for (Object var : map.keySet()) {
       if (!occurrences.containsKey(var)
           || ((occurrences.get(var)[0] == 1) && !requestedVars.contains(var))) {
         continue;
