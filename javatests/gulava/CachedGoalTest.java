@@ -82,6 +82,28 @@ public class CachedGoalTest {
   }
 
   @Test
+  public void prereqFail() {
+    CachedGoal g1 = new CachedGoal(same(X, 44));
+    Goal g2 = new CachedGoal(g1, same(Y, 100));
+    new LogicAsserter()
+        .stream(g2)
+        .test();
+  }
+
+  @Test
+  public void prereqSucceed() {
+    CachedGoal g1 = new CachedGoal(same(X, 44));
+    Goal g2 = new CachedGoal(g1, same(Y, 100));
+    new LogicAsserter()
+        .stream(conj(g1, g2))
+        .addRequestedVar(X, Y)
+        .startSubst()
+        .put(X, 44)
+        .put(Y, 100)
+        .test();
+  }
+
+  @Test
   public void dumpIncludesIdentityHashCode() throws Exception {
     Goal subGoal = same(X, 42);
     Goal goal = new CachedGoal(subGoal);

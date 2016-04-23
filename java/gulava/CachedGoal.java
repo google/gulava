@@ -32,14 +32,23 @@ import java.io.IOException;
  * {@link CachedGoalTest#disjIsNotReevaluated()} for an example of this.
  */
 public final class CachedGoal implements Dumpable, Goal {
+  private final CachedGoal prerequisite;
   private final Goal delegate;
 
   public CachedGoal(Goal delegate) {
+    this(null, delegate);
+  }
+
+  public CachedGoal(CachedGoal prerequisite, Goal delegate) {
+    this.prerequisite = prerequisite;
     this.delegate = delegate;
   }
 
   @Override
   public Stream run(Subst s) {
+    if (prerequisite != null && s.get(prerequisite) == null) {
+      return EmptyStream.INSTANCE;
+    }
     Object cached = s.get(this);
     if (cached == null) {
       return delegate.run(s.ext(this, true));
