@@ -26,6 +26,7 @@ import static gulava.Goals.disj;
 import static gulava.Goals.same;
 
 import gulava.testing.LogicAsserter;
+import gulava.testing.RecordsCallGoal;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -208,22 +209,6 @@ public class GoalsTest {
                 Cons.O.order(Cons.s(Y), Cons.s(15, 25)),
                 new ThrowingGoal()))
         .test();
-  }
-
-  final static class RecordsCallGoal implements Goal {
-    final StringBuilder reportTo;
-    final String name;
-
-    RecordsCallGoal(StringBuilder reportTo, String name) {
-      this.reportTo = reportTo;
-      this.name = name;
-    }
-
-    @Override
-    public Stream run(Subst s) {
-      reportTo.append(name);
-      return new SolveStep(s, EmptyStream.INSTANCE);
-    }
   }
 
   @Test
