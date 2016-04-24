@@ -87,13 +87,13 @@ public class MakePredicatesFunctionalTest {
     IsCons isCons = new MakePredicates_MakePredicatesFunctionalTest_IsCons();
     new LogicAsserter()
         .stream(isCons.isCons(new Var()))
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .test();
 
     new LogicAsserter()
         .stream(isCons.isCons(0))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 
@@ -103,7 +103,7 @@ public class MakePredicatesFunctionalTest {
         new MakePredicates_MakePredicatesFunctionalTest_MultiplePredicates();
     new LogicAsserter()
         .stream(predicates.even(null))
-        .workUnits(2)
+        .workUnits(1)
         .finishes(true)
         .startSubst()
         .test();
@@ -111,7 +111,7 @@ public class MakePredicatesFunctionalTest {
     new LogicAsserter()
         .stream(predicates.odd(A))
         .addRequestedVar(A)
-        .workUnits(10)
+        .workUnits(9)
         .finishes(false)
         .startSubst()
         .put(A, Count.fromInt(1))
@@ -157,7 +157,7 @@ public class MakePredicatesFunctionalTest {
     new LogicAsserter()
         .stream(overload.sum(Count.fromInt(5), Count.fromInt(4), A))
         .addRequestedVar(A)
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .put(A, Count.fromInt(9))
         .test();
@@ -165,7 +165,7 @@ public class MakePredicatesFunctionalTest {
     new LogicAsserter()
         .stream(overload.sum(Count.fromInt(5), Count.fromInt(4), Count.fromInt(10), A))
         .addRequestedVar(A)
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .put(A, Count.fromInt(19))
         .test();
@@ -278,14 +278,14 @@ public class MakePredicatesFunctionalTest {
         new MakePredicates_MakePredicatesFunctionalTest_ClausesThatReturnVoid();
     new LogicAsserter()
         .stream(clauses.isList(Cons.s(1, 2, 3)))
-        .workUnits(2)
+        .workUnits(1)
         .finishes(true)
         .startSubst()
         .test();
 
     new LogicAsserter()
         .stream(clauses.sameLength(Cons.s(1, 2), Cons.s(4, 5)))
-        .workUnits(2)
+        .workUnits(1)
         .finishes(true)
         .startSubst()
         .test();

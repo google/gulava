@@ -24,10 +24,8 @@ package gulava;
 /**
  * An implementation of {@link Stream} which has no solutions and no further streams to realize.
  */
-public final class EmptyStream implements Stream {
-  public static final Stream INSTANCE = new EmptyStream();
-
-  private EmptyStream() {}
+public enum EmptyStream implements Stream {
+  INSTANCE;
 
   @Override
   public Stream mplus(Stream s2) {
@@ -41,7 +39,7 @@ public final class EmptyStream implements Stream {
 
   @Override
   public Stream rest() {
-    return null;
+    return this;
   }
 
   @Override

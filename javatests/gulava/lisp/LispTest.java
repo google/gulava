@@ -43,7 +43,7 @@ public class LispTest {
   public void evalQuotedTrivially() {
     new LogicAsserter()
         .stream(O.eval(s("quote", 42), new Var(), A))
-        .workUnits(3)
+        .workUnits(2)
         .addRequestedVar(A)
         .startSubst()
         .put(A, 42)
@@ -60,7 +60,7 @@ public class LispTest {
                     s("quote", 99)),
                 new Var(),
                 A))
-        .workUnits(9)
+        .workUnits(8)
         .addRequestedVar(A)
         .startSubst()
         .put(A, 99)
@@ -77,7 +77,7 @@ public class LispTest {
                     s("quote", 101)),
                 new Var(),
                 A))
-        .workUnits(14)
+        .workUnits(13)
         .addRequestedVar(A)
         .startSubst()
         .put(A, Cons.of(101, 101))
@@ -90,7 +90,7 @@ public class LispTest {
   public void iLoveYou_1() {
     new LogicAsserter()
         .stream(O.eval(s("quote", I_LOVE_YOU), null, A))
-        .workUnits(3)
+        .workUnits(2)
         .finishes(true)
         .addRequestedVar(A)
         .startSubst()
@@ -102,7 +102,7 @@ public class LispTest {
   public void iLoveYou_2() {
     new LogicAsserter()
         .stream(O.eval(s("cdr", s("quote", Cons.of(B, I_LOVE_YOU))), null, A))
-        .workUnits(5)
+        .workUnits(4)
         .finishes(true)
         .addRequestedVar(A)
         .startSubst()
@@ -115,7 +115,7 @@ public class LispTest {
   public void iLoveYou_3() {
     new LogicAsserter()
         .stream(O.eval(s(s("lambda", s(s("lambda", s("quote", I_LOVE_YOU))))), null, A))
-        .workUnits(9)
+        .workUnits(8)
         .finishes(true)
         .addRequestedVar(A)
         .startSubst()
@@ -133,7 +133,7 @@ public class LispTest {
             conj(
                 same(quine, B),
                 O.eval(quine, null, quine)))
-        .workUnits(5)
+        .workUnits(4)
         .startSubst()
         .test();
   }
@@ -146,7 +146,7 @@ public class LispTest {
             conj(
                 same(quine, B),
                 O.eval(quine, null, quine)))
-        .workUnits(5)
+        .workUnits(4)
         .startSubst()
         .test();
   }
@@ -159,7 +159,7 @@ public class LispTest {
             conj(
                 same(quine, A),
                 O.eval(quine, null, quine)))
-        .workUnits(9)
+        .workUnits(8)
         .startSubst()
         .test();
   }
@@ -179,7 +179,7 @@ public class LispTest {
                     "cdr"),
                 null,
                 A))
-        .workUnits(20)
+        .workUnits(19)
         .addRequestedVar(A)
         .startSubst()
         .put(A, 42)

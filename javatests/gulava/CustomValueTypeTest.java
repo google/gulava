@@ -110,7 +110,7 @@ public class CustomValueTypeTest {
         .startSubst()
         .put(name, new PersonName("Doe", "John"))
         .addRequestedVar(name)
-        .workUnits(2)
+        .workUnits(1)
         .test();
   }
 
@@ -125,7 +125,7 @@ public class CustomValueTypeTest {
             conj(
                 same(family, "Doe"),
                 same(new PersonName("Fooey", given), new PersonName(family, "Barson"))))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 
@@ -142,7 +142,7 @@ public class CustomValueTypeTest {
                     Cons.list(Arrays.asList(family, given)),
                     Cons.list(Arrays.asList(1, 2, 3, 4))),
                 same(new PersonName(family, given), name)))
-        .workUnits(7)
+        .workUnits(6)
         .addRequestedVar(name)
         .startSubst()
         .put(name, new PersonName(1, 2))
@@ -198,7 +198,7 @@ public class CustomValueTypeTest {
 
     new LogicAsserter()
         .stream(conj(same(x, y), same(x, new Foo()), same(y, new Bar())))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 }

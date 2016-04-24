@@ -61,7 +61,7 @@ public class QueueTest {
                 same(D, FINISH_QUEUE.contents().head()),
                 same(E, FINISH_QUEUE.size())))
         .addRequestedVar(D, E)
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .put(D, Cons.list(Arrays.asList(42, "1011", false, 'a')))
         .put(E, Count.of(Count.of(Count.of(Count.of(null)))))
@@ -80,7 +80,7 @@ public class QueueTest {
                 Queue.O.first(F, G, E),
                 Queue.O.first(H, FINISH_QUEUE, G)))
         .addRequestedVar(D, F, H, FINISH_QUEUE.size())
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .put(D, 42)
         .put(F, "1011")
@@ -96,7 +96,7 @@ public class QueueTest {
             conj(
                 Queue.O.last(42, B, Queue.of(Count.of(null), new Var())),
                 Queue.O.last(42, A, B)))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 
@@ -113,7 +113,7 @@ public class QueueTest {
                 Queue.O.last(20, EMPTY, A),
                 same(startList.head().cdr().cdr(), null),
                 same(C, startList.head())))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(C)
         .startSubst()
         .put(C, Cons.list(Arrays.asList(20, 10)))

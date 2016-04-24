@@ -40,7 +40,7 @@ public class Demo {
   static void print(Stream s, int n, Var... requestedVars) throws IOException {
     Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
     while (n-- >= 0) {
-      if (s == null) {
+      if (s == EmptyStream.INSTANCE) {
         System.out.println("()");
         break;
       }

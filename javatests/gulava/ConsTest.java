@@ -56,7 +56,7 @@ public class ConsTest {
                 same(X, 42),
                 same(Y, Cons.list(Arrays.asList(5, 7, 9))),
                 same(Z, Cons.of(X, Y))))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(Z)
         .startSubst()
         .put(Z, Cons.list(Arrays.asList(42, 5, 7, 9)))

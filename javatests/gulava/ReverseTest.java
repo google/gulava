@@ -41,7 +41,7 @@ public class ReverseTest {
   public void plainReverse() {
     new LogicAsserter()
         .stream(Cons.O.reverse(Cons.list(Arrays.asList(4, 5, 6)), X))
-        .workUnits(5)
+        .workUnits(4)
         .addRequestedVar(X)
         .startSubst()
         .put(X, Cons.list(java.util.Arrays.asList(6, 5, 4)))

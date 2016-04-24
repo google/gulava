@@ -45,7 +45,7 @@ public class InsertionSortTest {
     new LogicAsserter()
         .stream(
             InsertionSort.O.sorted(null, null))
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .test();
   }
@@ -57,7 +57,7 @@ public class InsertionSortTest {
             InsertionSort.O.sorted(
                 Cons.s(A), Cons.s(Count.fromInt(2))))
         .addRequestedVar(A)
-        .workUnits(3)
+        .workUnits(2)
         .startSubst()
         .put(A, Count.fromInt(2))
         .test();
@@ -75,7 +75,7 @@ public class InsertionSortTest {
                     Count.fromInt(10),
                     Count.fromInt(20))))
         .addRequestedVar(A)
-        .workUnits(4)
+        .workUnits(3)
         .startSubst()
         .put(A,
             Cons.s(
@@ -97,7 +97,7 @@ public class InsertionSortTest {
                     Count.fromInt(20)),
                 A))
         .addRequestedVar(A)
-        .workUnits(14)
+        .workUnits(13)
         .startSubst()
         .put(A,
             Cons.s(
@@ -122,7 +122,7 @@ public class InsertionSortTest {
                     Count.fromInt(20)),
                 Cons.of(Count.fromInt(1), A)))
         .addRequestedVar(A)
-        .workUnits(9)
+        .workUnits(8)
         // No substitutions
         .test();
   }
@@ -140,7 +140,7 @@ public class InsertionSortTest {
                     Count.fromInt(20)),
                 Cons.of(null, Cons.of(Count.fromInt(2), A))))
         .addRequestedVar(A)
-        .workUnits(10)
+        .workUnits(9)
         // No substitutions
         .test();
   }

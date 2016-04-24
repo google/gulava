@@ -21,12 +21,14 @@
  */
 package gulava.testing;
 
+import gulava.EmptyStream;
 import gulava.Goal;
 import gulava.SolveStep;
 import gulava.Stream;
 import gulava.Subst;
 import gulava.Var;
 import gulava.View;
+
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -117,7 +119,7 @@ public final class LogicAsserter {
     int actualWorkUnits = 0;
 
     while (expectedFinishes || (actualWorkUnits < expectedWorkUnits)) {
-      if (stream == null) {
+      if (stream == EmptyStream.INSTANCE) {
         actualFinishes = true;
         break;
       }

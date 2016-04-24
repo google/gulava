@@ -60,7 +60,7 @@ public class MakeLogicValueFunctionalTest {
         .put(fooVar, "Doe")
         .put(barVar, "John")
         .addRequestedVar(fooVar, barVar)
-        .workUnits(2)
+        .workUnits(1)
         .test();
   }
 
@@ -78,7 +78,7 @@ public class MakeLogicValueFunctionalTest {
         .startSubst()
         .put(simpleValueVar, SimpleValueInterface.of("foo", "bar"))
         .addRequestedVar(simpleValueVar)
-        .workUnits(2)
+        .workUnits(1)
         .test();
   }
 
@@ -137,7 +137,7 @@ public class MakeLogicValueFunctionalTest {
         .put(a, 'a')
         .put(b, 'b')
         .addRequestedVar(a, b)
-        .workUnits(2)
+        .workUnits(1)
         .test();
   }
 
@@ -169,7 +169,7 @@ public class MakeLogicValueFunctionalTest {
             conj(
                 same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2()),
                 same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(X)
         .startSubst()
         .put(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())
@@ -183,7 +183,7 @@ public class MakeLogicValueFunctionalTest {
             conj(
                 same(X, new MakeLogicValue_HasNoFields()),
                 same(X, new MakeLogicValue_MakeLogicValueFunctionalTest_HasNoFields2())))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 

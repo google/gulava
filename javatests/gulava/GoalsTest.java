@@ -84,7 +84,7 @@ public class GoalsTest {
     new LogicAsserter()
         .stream(conj(same(X, Y), same(X, 5)))
         .addRequestedVar(X, Y)
-        .workUnits(2)
+        .workUnits(1)
         .startSubst().put(X, Y).put(Y, 5)
         .test();
   }
@@ -93,7 +93,7 @@ public class GoalsTest {
   public void unifyVarWithSelf() {
     new LogicAsserter()
         .stream(same(X, X))
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .test();
   }
@@ -102,7 +102,7 @@ public class GoalsTest {
   public void unitGoalTest() {
     new LogicAsserter()
         .stream(Goals.UNIT)
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .test();
   }
@@ -130,7 +130,7 @@ public class GoalsTest {
                 same(X, 5)))
         .addRequestedVar(X)
         .finishes(false)
-        .workUnits(500)
+        .workUnits(499)
         .actualSubsts();
 
     Set<Object> xValues = new HashSet<>();
@@ -153,7 +153,7 @@ public class GoalsTest {
                 same(X, 5)))
         .addRequestedVar(X)
         .finishes(false)
-        .workUnits(500)
+        .workUnits(499)
         .actualSubsts();
 
     Set<Object> xValues = new HashSet<>();
@@ -236,5 +236,14 @@ public class GoalsTest {
     // substitutions. DisjGoals interleave the results of their subgoals, so the duplicated letters
     // appear consecutively - since they are run in parallel - rather than separated.
     Assert.assertEquals("aABBbbCC", callReport.toString());
+  }
+
+  @Test
+  public void unitReturnsEmptyStreamRepeatedlyAfterSubst() {
+    Stream solution = Goals.UNIT.run(Subst.EMPTY);
+    Assert.assertSame(EmptyStream.INSTANCE, solution.rest());
+    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest());
+    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest().rest());
+    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest().rest().rest());
   }
 }

@@ -50,12 +50,12 @@ public class MakeGoalFactoryFunctionalTest {
   public void decomposeEmptyField() {
     new LogicAsserter()
         .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2))))
-        .workUnits(1)
+        .workUnits(0)
         .test();
 
     new LogicAsserter()
         .stream(HasAnAtom.o(Cons.list(Arrays.asList(1, 2, HasNoFields.of(), 3, 4))))
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .test();
   }

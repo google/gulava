@@ -54,7 +54,7 @@ public class MakeGoalFactoryNonLogicArgsTest {
     new LogicAsserter()
         .stream(ContainsIntLiteral.o(42, Cons.s(A, B)))
         .addRequestedVar(A, B)
-        .workUnits(3)
+        .workUnits(2)
         .startSubst()
         .put(A, 42)
         .startSubst()

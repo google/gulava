@@ -47,7 +47,7 @@ public class AppendTest {
   public void onlyLastArgBound() {
     new LogicAsserter()
         .stream(Cons.O.append(X, Y, Cons.list(Arrays.asList(1, 2, 3, 4))))
-        .workUnits(10)
+        .workUnits(9)
         .startSubst()
         .put(X, null).put(Y, Cons.list(Arrays.asList(1, 2, 3, 4)))
         .startSubst()
@@ -70,7 +70,7 @@ public class AppendTest {
                 Cons.O.append(new Var(), new Var(), new Var()),
                 same(X, 5)))
         .finishes(false)
-        .workUnits(100)
+        .workUnits(99)
         .addRequestedVar(X)
         .actualSubsts();
 

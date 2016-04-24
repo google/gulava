@@ -35,7 +35,7 @@ public final class SolveStep implements Dumpable, Stream {
 
   public SolveStep(Subst subst, Stream rest) {
     if (rest == null) {
-      rest = EmptyStream.INSTANCE;
+      throw new NullPointerException();
     }
     this.subst = subst;
     this.rest = rest;

@@ -57,7 +57,7 @@ public class CountTest {
             same(
                 Count.of(Count.of(X)),
                 Count.of(Count.of(Count.of(null)))))
-        .workUnits(2)
+        .workUnits(1)
         .startSubst()
         .put(X, Count.of(null))
         .addRequestedVar(X)

@@ -51,7 +51,7 @@ public class DiffListTest {
                 DiffList.O.last('a', A, B),
                 DiffList.O.finish(B, C),
                 DiffList.O.last("hello", B, new Var())))
-        .workUnits(1)
+        .workUnits(0)
         .test();
   }
 
@@ -63,7 +63,7 @@ public class DiffListTest {
                 DiffList.O.last(42, EMPTY, A),
                 DiffList.O.last('a', A, B),
                 DiffList.O.finish(B, C)))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(C)
         .startSubst()
         .put(C, Cons.list(Arrays.asList(42, 'a')))
@@ -77,7 +77,7 @@ public class DiffListTest {
             conj(
                 DiffList.O.asList(A, null),
                 same(A, DiffList.of(B, C))))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(B, C)
         .startSubst()
         .put(B, C)
@@ -95,7 +95,7 @@ public class DiffListTest {
                 DiffList.O.asList(diffList, Cons.list(Arrays.asList(42, 'a'))),
                 same(diffList.head().car(), B),
                 same(diffList.head().cdr().car(), C)))
-        .workUnits(2)
+        .workUnits(1)
         .addRequestedVar(B, C)
         .startSubst()
         .put(B, 42)

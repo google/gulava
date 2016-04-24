@@ -38,17 +38,17 @@ public class OrderTest {
   public void testEmptyLists() {
     new LogicAsserter()
         .stream(Cons.O.order(Cons.list(Arrays.asList(1)), null))
-        .workUnits(1)
+        .workUnits(0)
         .test();
     new LogicAsserter()
         .stream(new DelayedGoal(Cons.O.order(Cons.list(Arrays.asList(1)), null)))
-        .workUnits(2)
+        .workUnits(1)
         .test();
 
     new LogicAsserter()
         .stream(Cons.O.order(null, Cons.list(Arrays.asList(1))))
         .startSubst()
-        .workUnits(2)
+        .workUnits(1)
         .test();
   }
 
@@ -56,7 +56,7 @@ public class OrderTest {
   public void subIsAnySize() {
     new LogicAsserter()
         .stream(Cons.O.order(X, Cons.list(Arrays.asList(1, 2, 3, 4, 5))))
-        .workUnits(33)
+        .workUnits(32)
         .addRequestedVar(X)
         .startSubst()
         .put(X, Cons.list(Arrays.asList(1, 2, 3, 4, 5)))
@@ -131,7 +131,7 @@ public class OrderTest {
         .stream(Cons.O.order(
             Cons.list(Arrays.asList(X, Y)),
             Cons.list(Arrays.asList(1, 2, 3, 4, 5))))
-        .workUnits(11)
+        .workUnits(10)
         .addRequestedVar(X, Y)
         .startSubst().put(X, 1).put(Y, 2)
         .startSubst().put(X, 1).put(Y, 3)
