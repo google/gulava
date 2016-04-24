@@ -21,9 +21,7 @@
  */
 package gulava.testing;
 
-import gulava.EmptyStream;
 import gulava.Goal;
-import gulava.SolveStep;
 import gulava.Stream;
 import gulava.Subst;
 
@@ -39,6 +37,6 @@ public final class RecordsCallGoal implements Goal {
   @Override
   public Stream run(Subst s) {
     reportTo.append(name);
-    return new SolveStep(s, EmptyStream.INSTANCE);
+    return s;
   }
 }

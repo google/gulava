@@ -31,7 +31,7 @@ public class Goals {
   public static final Goal UNIT = new Goal() {
     @Override
     public Stream run(Subst s) {
-      return new SolveStep(s, EmptyStream.INSTANCE);
+      return s;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class Goals {
         if (state == null) {
           return EmptyStream.INSTANCE;
         }
-        return new SolveStep(state, EmptyStream.INSTANCE);
+        return state;
       }
 
       @Override

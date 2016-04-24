@@ -53,7 +53,7 @@ public final class CachedGoal implements Dumpable, Goal {
     if (cached == null) {
       return delegate.run(s.ext(this, true));
     } else {
-      return new SolveStep(s, EmptyStream.INSTANCE);
+      return s;
     }
   }
 

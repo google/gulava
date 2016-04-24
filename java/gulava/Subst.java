@@ -29,7 +29,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
 
-public final class Subst extends AbstractMap<Object, Object> implements Dumpable {
+public final class Subst extends AbstractMap<Object, Object> implements Dumpable, Stream {
   public static final Subst EMPTY = new Subst(Empty.map());
 
   private final PMap<Object, Object> map;
@@ -85,5 +85,25 @@ public final class Subst extends AbstractMap<Object, Object> implements Dumpable
   @Override
   public void dump(Dumper dumper) throws IOException {
     dumper.dump("Subst", entrySet().toArray());
+  }
+
+  @Override
+  public Stream mplus(Stream s2) {
+    return new SolveStep(this, s2);
+  }
+
+  @Override
+  public Stream bind(Goal goal) {
+    return goal.run(this);
+  }
+
+  @Override
+  public Subst subst() {
+    return this;
+  }
+
+  @Override
+  public Stream rest() {
+    return EmptyStream.INSTANCE;
   }
 }
