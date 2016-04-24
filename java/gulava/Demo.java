@@ -37,16 +37,18 @@ import java.util.Arrays;
  * logic computation.
  */
 public class Demo {
-  static void print(Stream s, int n, Var... requestedVars) throws IOException {
+  static void print(Stream s, int n, boolean dump, Var... requestedVars) throws IOException {
     Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
     while (n-- >= 0) {
       if (s == EmptyStream.INSTANCE) {
         System.out.println("()");
         break;
       }
-      System.out.println("\n--------------------------------------------------------------------------------");
-      dumper.dump(s);
-      dumper.flush();
+      if (dump) {
+        System.out.println("\n--------------------------------------------------------------------------------");
+        dumper.dump(s);
+        dumper.flush();
+      }
       Subst subst = s.subst();
 
       if (subst != null) {
@@ -64,6 +66,10 @@ public class Demo {
     Var b = new Var();
     Var x = new Var();
     Var y = new Var();
+    boolean dump = false;
+    if (args.length > 0 && args[0].equals("--dump")) {
+      dump = true;
+    }
 
     System.out.println("\nexample 1: unification");
     Goal g = conj(
@@ -71,7 +77,7 @@ public class Demo {
         same(x, Cons.list(Arrays.asList(2, 3, 4))),
         same(a, Cons.of(42, x)),
         same(b, Cons.of(43, y)));
-    print(g.run(Subst.EMPTY), 10, a, b);
+    print(g.run(Subst.EMPTY), 10, dump, a, b);
 
     System.out.println("\nexample 2: undo insertion");
     Goal uninsert = InsertionSort.O.insert(
@@ -81,7 +87,7 @@ public class Demo {
             Count.fromInt(1),
             Count.fromInt(10),
             Count.fromInt(20)));
-    print(uninsert.run(Subst.EMPTY), 100, a);
+    print(uninsert.run(Subst.EMPTY), 100, dump, a);
 
     System.out.println("\nexample 3: insertion sort");
     Goal sort = InsertionSort.O.sorted(
@@ -94,6 +100,6 @@ public class Demo {
                 Count.fromInt(12),
                 Count.fromInt(9)),
         a);
-    print(sort.run(Subst.EMPTY), 100, a);
+    print(sort.run(Subst.EMPTY), 100, dump, a);
   }
 }
