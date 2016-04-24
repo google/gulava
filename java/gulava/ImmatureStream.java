@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class ImmatureStream implements Dumpable, Stream {
-  protected abstract Stream realize();
-
   /**
    * Adds all the subcomponents which - when this stream is dumped - are dumped as direct children
    * of this stream.
@@ -35,8 +33,8 @@ public abstract class ImmatureStream implements Dumpable, Stream {
   protected abstract void addSubcomponents(Collection<Object> destination);
 
   @Override
-  public final SolveStep solve() {
-    return new SolveStep(null, realize());
+  public final Subst subst() {
+    return null;
   }
 
   @Override
@@ -52,8 +50,8 @@ public abstract class ImmatureStream implements Dumpable, Stream {
 
     return new ImmatureStream() {
       @Override
-      protected Stream realize() {
-        return s2.mplus(outer.realize());
+      public Stream rest() {
+        return s2.mplus(outer.rest());
       }
 
       @Override
@@ -70,8 +68,8 @@ public abstract class ImmatureStream implements Dumpable, Stream {
 
     return new ImmatureStream() {
       @Override
-      protected Stream realize() {
-        return outer.realize().bind(goal);
+      public Stream rest() {
+        return outer.rest().bind(goal);
       }
 
       @Override

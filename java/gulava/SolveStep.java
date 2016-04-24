@@ -66,11 +66,6 @@ public final class SolveStep implements Dumpable, Stream {
   }
 
   @Override
-  public SolveStep solve() {
-    return this;
-  }
-
-  @Override
   public void dump(Dumper dumper) throws IOException {
     dumper.dump("SolveStep", subst, rest);
   }

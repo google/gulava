@@ -40,21 +40,22 @@ public class Demo {
   static void print(Stream s, int n, Var... requestedVars) throws IOException {
     Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
     while (n-- >= 0) {
-      System.out.println("\n--------------------------------------------------------------------------------");
-      dumper.dump(s);
-      dumper.flush();
-      SolveStep solve = s.solve();
-      if (solve == null) {
+      if (s == null) {
         System.out.println("()");
         break;
       }
-      if (solve.subst() != null) {
+      System.out.println("\n--------------------------------------------------------------------------------");
+      dumper.dump(s);
+      dumper.flush();
+      Subst subst = s.subst();
+
+      if (subst != null) {
         System.out.println(new View.Builder()
-            .setSubst(solve.subst())
+            .setSubst(subst)
             .addRequestedVar(requestedVars)
             .build());
       }
-      s = solve.rest();
+      s = s.rest();
     }
   }
 

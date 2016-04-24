@@ -117,20 +117,20 @@ public final class LogicAsserter {
     int actualWorkUnits = 0;
 
     while (expectedFinishes || (actualWorkUnits < expectedWorkUnits)) {
-      actualWorkUnits += 1;
-      SolveStep solve = stream.solve();
-      if (solve == null) {
+      if (stream == null) {
         actualFinishes = true;
         break;
       }
-      if (solve.subst() != null) {
+      actualWorkUnits += 1;
+      Subst subst = stream.subst();
+      if (subst != null) {
         actualSubsts.add(new View.Builder()
-            .setSubst(solve.subst())
+            .setSubst(subst)
             .addAllRequestedVars(requestedVars)
             .build()
             .map());
       }
-      stream = solve.rest();
+      stream = stream.rest();
     }
 
     if (expectedWorkUnits != -1) {

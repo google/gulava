@@ -40,7 +40,12 @@ public final class EmptyStream implements Stream {
   }
 
   @Override
-  public SolveStep solve() {
+  public Stream rest() {
+    return null;
+  }
+
+  @Override
+  public Subst subst() {
     return null;
   }
 

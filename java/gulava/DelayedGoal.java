@@ -45,7 +45,7 @@ public final class DelayedGoal implements Dumpable, Goal {
   public Stream run(final Subst s) {
     return new ImmatureStream() {
       @Override
-      protected Stream realize() {
+      public Stream rest() {
         return g.run(s);
       }
 

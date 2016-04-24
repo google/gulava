@@ -24,6 +24,9 @@ package gulava;
 /**
  * A stream of substitutions, or logic solutions. A solution is a substitution that fulfills a
  * {@link Goal}.
+ * <p>
+ * Each stream object has an optional solution (a {@link Subst}) and a {@code rest()} stream which
+ * contains the following solutions.
  */
 public interface Stream {
   /**
@@ -41,9 +44,13 @@ public interface Stream {
   Stream bind(Goal goal);
 
   /**
-   * Performs one "step" and returns the resulting solution, if any, and the maybe more-realized,
-   * further-advanced stream. Returns null if there are no more solutions and the streams are fully
-   * realized.
+   * The head of the stream. This can be {@code null}, in which case the first solution in this
+   * stream is in the {@code rest()} stream.
    */
-  SolveStep solve();
+  Subst subst();
+
+  /**
+   * The rest (i.e. tail) of this stream.
+   */
+  Stream rest();
 }

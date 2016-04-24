@@ -102,7 +102,7 @@ public class DumperTest {
     Stream stream = GOAL.run(Subst.EMPTY);
     dumper(0).dump(stream);
     writer.write("----------\n");
-    dumper(0).dump(stream.solve().rest());
+    dumper(0).dump(stream.rest());
 
     writer.assertLines(
         "ImmatureStream",
