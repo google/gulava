@@ -37,9 +37,10 @@ import java.util.Arrays;
  * logic computation.
  */
 public class Demo {
-  static void print(Stream s, int n, boolean dump, Var... requestedVars) throws IOException {
+  static void print(Stream s, int maxSteps, boolean dump, Var... requestedVars) throws IOException {
     Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
-    while (n-- >= 0) {
+    int totalSteps = 0;
+    while (totalSteps < maxSteps) {
       if (s == EmptyStream.INSTANCE) {
         System.out.println("()");
         break;
@@ -58,7 +59,9 @@ public class Demo {
             .build());
       }
       s = s.rest();
+      totalSteps++;
     }
+    System.out.println("total steps: " + totalSteps);
   }
 
   public static void main(String... args) throws Exception {
@@ -101,5 +104,9 @@ public class Demo {
                 Count.fromInt(9)),
         a);
     print(sort.run(Subst.EMPTY), 100, dump, a);
+
+    System.out.println("\nTry append");
+    Goal append = Cons.O.append(a, b, Cons.s(1, 2, 3, 4, 5, 6, 7));
+    print(append.run(Subst.EMPTY), 1000, dump, a, b);
   }
 }
