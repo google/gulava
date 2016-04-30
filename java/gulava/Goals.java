@@ -22,36 +22,26 @@
 package gulava;
 
 /**
- * Basic {@link Goal} factories.
+ * Basic {@link Goal} factories and singleton instances.
  */
-public class Goals {
+public enum Goals implements Goal {
   /**
    * A goal that simply succeeds once without affecting substitutions.
    */
-  public static final Goal UNIT = new Goal() {
+  UNIT {
     @Override
     public Stream run(Subst s) {
       return s;
     }
-
-    @Override
-    public String toString() {
-      return "UNIT";
-    }
-  };
+  },
 
   /**
    * A goal that fails, always returning an empty stream.
    */
-  public static final Goal FAIL = new Goal() {
+  FAIL {
     @Override
     public Stream run(Subst s) {
-      return EmptyStream.INSTANCE;
-    }
-
-    @Override
-    public String toString() {
-      return "FAIL";
+      return Streams.EMPTY;
     }
   };
 
@@ -61,7 +51,7 @@ public class Goals {
       public Stream run(Subst state) {
         state = state.unify(u, v);
         if (state == null) {
-          return EmptyStream.INSTANCE;
+          return Streams.EMPTY;
         }
         return state;
       }
@@ -86,6 +76,4 @@ public class Goals {
   public static ConjGoal conj(Goal g1, Goal g2, Goal... gs) {
     return new ConjGoal(g1, g2, gs);
   }
-
-  private Goals() {}
 }

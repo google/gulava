@@ -47,7 +47,7 @@ public final class CachedGoal implements Dumpable, Goal {
   @Override
   public Stream run(Subst s) {
     if (prerequisite != null && s.get(prerequisite) == null) {
-      return EmptyStream.INSTANCE;
+      return Streams.EMPTY;
     }
     Object cached = s.get(this);
     if (cached == null) {

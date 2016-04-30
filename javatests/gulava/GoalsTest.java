@@ -241,9 +241,9 @@ public class GoalsTest {
   @Test
   public void unitReturnsEmptyStreamRepeatedlyAfterSubst() {
     Stream solution = Goals.UNIT.run(Subst.EMPTY);
-    Assert.assertSame(EmptyStream.INSTANCE, solution.rest());
-    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest());
-    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest().rest());
-    Assert.assertSame(EmptyStream.INSTANCE, solution.rest().rest().rest().rest());
+    Assert.assertSame(Streams.EMPTY, solution.rest());
+    Assert.assertSame(Streams.EMPTY, solution.rest().rest());
+    Assert.assertSame(Streams.EMPTY, solution.rest().rest().rest());
+    Assert.assertSame(Streams.EMPTY, solution.rest().rest().rest().rest());
   }
 }

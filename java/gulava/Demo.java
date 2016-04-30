@@ -41,7 +41,7 @@ public class Demo {
     Dumper dumper = new Dumper(0, new OutputStreamWriter(System.out));
     int totalSteps = 0;
     while (totalSteps < maxSteps) {
-      if (s == EmptyStream.INSTANCE) {
+      if (s == Streams.EMPTY) {
         System.out.println("()");
         break;
       }

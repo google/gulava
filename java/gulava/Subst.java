@@ -104,6 +104,6 @@ public final class Subst extends AbstractMap<Object, Object> implements Dumpable
 
   @Override
   public Stream rest() {
-    return EmptyStream.INSTANCE;
+    return Streams.EMPTY;
   }
 }

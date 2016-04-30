@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 The Gulava Authors
+ *  Copyright (c) 2016 The Gulava Authors
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,34 +21,32 @@
  */
 package gulava;
 
-/**
- * An implementation of {@link Stream} which has no solutions and no further streams to realize.
- */
-public enum EmptyStream implements Stream {
-  INSTANCE;
+import static gulava.Goals.same;
 
-  @Override
-  public Stream mplus(Stream s2) {
-    return s2;
-  }
+import gulava.testing.AssertingWriter;
 
-  @Override
-  public Stream bind(Goal goal) {
-    return this;
-  }
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-  @Override
-  public Stream rest() {
-    return this;
-  }
+import java.io.IOException;
 
-  @Override
-  public Subst subst() {
-    return null;
-  }
+@RunWith(JUnit4.class)
+public class StreamsTest {
+  private static final Var A = new Var();
 
-  @Override
-  public String toString() {
-    return "EmptyStream";
+  @Test
+  public void emptyStreamInDump() throws IOException {
+    AssertingWriter writer = new AssertingWriter();
+    new Dumper(0, writer)
+        .dump(new DelayedGoal(same(A, 42))
+            .run(Subst.EMPTY)
+            .mplus(Streams.EMPTY));
+    writer.assertLines(
+        "ImmatureStream",
+        "  EMPTY",
+        "  {" + A + " == 42}",
+        "  Subst");
   }
 }

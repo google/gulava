@@ -122,6 +122,16 @@ java_test(
 )
 
 java_test(
+    name = "StreamsTest",
+    srcs = ["StreamsTest.java"],
+    deps = [
+        "//java/gulava",
+        "//java/gulava/testing",
+        "@bazel_tools//third_party:junit4",
+    ],
+)
+
+java_test(
     name = "SubstTest",
     srcs = ["SubstTest.java"],
     deps = [
