@@ -21,8 +21,7 @@
  */
 package gulava;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.util.Collection;
 
 /**
  * Represents a step in solving a logic problem. A step may or may not contain a valid substitution
@@ -66,7 +65,13 @@ public final class SolveStep implements Dumpable, Stream {
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump("SolveStep", subst, rest);
+  public String dumpHeading() {
+    return "SolveStep";
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.add(subst);
+    destination.add(rest);
   }
 }

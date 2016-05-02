@@ -21,7 +21,6 @@
  */
 package gulava;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -37,8 +36,13 @@ public final class DelayedGoal implements Dumpable, Goal {
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump("DelayedGoal", g);
+  public String dumpHeading() {
+    return "DelayedGoal";
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.add(g);
   }
 
   @Override

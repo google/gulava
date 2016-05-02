@@ -24,6 +24,7 @@ package gulava;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 
 /**
  * Utilities for text-based, tree-shaped object dumping.
@@ -79,7 +80,10 @@ public final class Dumper implements Flushable {
    */
   public void dump(Object what) throws IOException {
     if (what instanceof Dumpable) {
-      ((Dumpable) what).dump(this);
+      Dumpable dumpable = (Dumpable) what;
+      ArrayList<Object> subcomponents = new ArrayList<>();
+      dumpable.addSubcomponents(subcomponents);
+      dump(dumpable.dumpHeading(), subcomponents.toArray());
     } else {
       indent();
       writer.write(String.valueOf(what));

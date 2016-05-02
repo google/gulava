@@ -23,7 +23,7 @@ package gulava;
 
 import static gulava.Goals.disj;
 
-import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A goal which causes some other goal to be repeated ad-infinitum. The results that would be
@@ -46,7 +46,12 @@ public final class RepeatedGoal implements Goal, Dumpable {
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump("RepeatedGoal", repeated);
+  public String dumpHeading() {
+    return "RepeatedGoal";
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.add(repeated);
   }
 }

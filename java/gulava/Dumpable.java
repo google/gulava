@@ -21,7 +21,7 @@
  */
 package gulava;
 
-import java.io.IOException;
+import java.util.Collection;
 
 /**
  * An object that can be dumped using the functionality in {@link Dumper} with output that is richer
@@ -33,8 +33,12 @@ import java.io.IOException;
  */
 public interface Dumpable {
   /**
-   * Dumps a tree of objects rooted at this object. Usually, an implementation should delegate to
-   * {@link Dumper#dump(String, Object...)}.
+   * The heading this object has in a dump.
    */
-  void dump(Dumper dumper) throws IOException;
+  String dumpHeading();
+
+  /**
+   * Adds the objects to {@code destination} that appear nested in this object in the dump.
+   */
+  void addSubcomponents(Collection<Object> destination);
 }

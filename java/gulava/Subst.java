@@ -24,8 +24,8 @@ package gulava;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
-import java.io.IOException;
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,8 +83,13 @@ public final class Subst extends AbstractMap<Object, Object> implements Dumpable
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump("Subst", entrySet().toArray());
+  public String dumpHeading() {
+    return "Subst";
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.addAll(entrySet());
   }
 
   @Override

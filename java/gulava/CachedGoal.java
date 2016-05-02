@@ -21,7 +21,7 @@
  */
 package gulava;
 
-import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A goal which will not be run more than once after it has already passed. This is not just an
@@ -58,9 +58,12 @@ public final class CachedGoal implements Dumpable, Goal {
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump(
-        "CachedGoal@" + Integer.toString(System.identityHashCode(this), 36),
-        delegate);
+  public String dumpHeading() {
+    return "CachedGoal@" + Integer.toString(System.identityHashCode(this), 36);
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.add(delegate);
   }
 }

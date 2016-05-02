@@ -21,8 +21,8 @@
  */
 package gulava;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * A goal which is comprised of subgoals.
@@ -49,7 +49,12 @@ public abstract class CompositeGoal implements Goal, Dumpable {
   }
 
   @Override
-  public void dump(Dumper dumper) throws IOException {
-    dumper.dump(getClass().getSimpleName(), (Object[]) allGoals);
+  public String dumpHeading() {
+    return getClass().getSimpleName();
+  }
+
+  @Override
+  public void addSubcomponents(Collection<Object> destination) {
+    destination.addAll(Arrays.asList(allGoals));
   }
 }

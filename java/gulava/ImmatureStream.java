@@ -21,27 +21,17 @@
  */
 package gulava;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class ImmatureStream implements Dumpable, Stream {
-  /**
-   * Adds all the subcomponents which - when this stream is dumped - are dumped as direct children
-   * of this stream.
-   */
-  protected abstract void addSubcomponents(Collection<Object> destination);
-
   @Override
   public final Subst subst() {
     return null;
   }
 
   @Override
-  public final void dump(Dumper dumper) throws IOException {
-    Collection<Object> subcomponents = new ArrayList<>();
-    addSubcomponents(subcomponents);
-    dumper.dump("ImmatureStream", subcomponents.toArray());
+  public String dumpHeading() {
+    return "ImmatureStream";
   }
 
   @Override
