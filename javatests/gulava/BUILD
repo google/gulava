@@ -26,7 +26,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -36,7 +36,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -46,7 +46,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -56,7 +56,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -67,7 +67,7 @@ java_test(
         "//java/gulava",
         "//java/gulava/processor",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -77,7 +77,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -87,7 +87,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -97,7 +97,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -107,7 +107,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -117,7 +117,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -127,7 +127,7 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -137,6 +137,6 @@ java_test(
     deps = [
         "//java/gulava",
         "//java/gulava/testing",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )

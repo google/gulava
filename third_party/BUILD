@@ -1,4 +1,4 @@
-#  Copyright (c) 2015 The Gulava Authors
+#  Copyright (c) 2016 The Gulava Authors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -18,15 +18,11 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-package(default_testonly = 1)
+package(default_visibility = ["//visibility:public"])
 
-java_test(
-    name = "LispTest",
-    srcs = ["LispTest.java"],
-    deps = [
-        "//java/gulava",
-        "//java/gulava/lisp",
-        "//java/gulava/testing",
-        "//third_party:junit4",
+java_library(
+    name = "junit4",
+    exports = [
+        "@junit4//jar",
     ],
 )

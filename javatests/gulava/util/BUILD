@@ -27,7 +27,7 @@ java_test(
         "//java/gulava",
         "//java/gulava/testing",
         "//java/gulava/util",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -38,7 +38,7 @@ java_test(
         "//java/gulava",
         "//java/gulava/testing",
         "//java/gulava/util",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -49,7 +49,7 @@ java_test(
         "//java/gulava",
         "//java/gulava/testing",
         "//java/gulava/util",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
 
@@ -60,6 +60,6 @@ java_test(
         "//java/gulava",
         "//java/gulava/testing",
         "//java/gulava/util",
-        "@bazel_tools//third_party:junit4",
+        "//third_party:junit4",
     ],
 )
