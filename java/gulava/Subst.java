@@ -25,7 +25,9 @@ import org.pcollections.Empty;
 import org.pcollections.PMap;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -87,9 +89,39 @@ public final class Subst extends AbstractMap<Object, Object> implements Dumpable
     return "Subst";
   }
 
+  /**
+   * When dumping the substitution, we sort the sub components lexicographically so that they always
+   * appear in the same order between JDK versions. This class caches the String representation of
+   * the key and sorts based on that.
+   */
+  private static class DumpComponent implements Comparable<DumpComponent> {
+    final String key;
+    final Object value;
+
+    DumpComponent(Map.Entry<?, ?> mapEntry) {
+      key = mapEntry.getKey().toString();
+      value = mapEntry.getValue();
+    }
+
+    @Override
+    public int compareTo(DumpComponent o) {
+      return key.compareTo(o.key);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s=%s", key, value);
+    }
+  }
+
   @Override
   public void addSubcomponents(Collection<Object> destination) {
-    destination.addAll(entrySet());
+    ArrayList<DumpComponent> components = new ArrayList<>();
+    for (Map.Entry<?, ?> entry : entrySet()) {
+      components.add(new DumpComponent(entry));
+    }
+    Collections.sort(components);
+    destination.addAll(components);
   }
 
   @Override
